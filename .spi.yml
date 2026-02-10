@@ -1,0 +1,8 @@
+version: 1
+builder:
+  configs:
+  - documentation_targets:
+    - DebugSnapshots
+    custom_documentation_parameters:
+    - --enable-experimental-code-block-annotations
+    - --enable-experimental-overloaded-symbol-presentation

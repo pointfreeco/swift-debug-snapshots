@@ -1,0 +1,1359 @@
+import SwiftDiagnostics
+public import SwiftSyntax
+import SwiftSyntaxBuilder
+public import SwiftSyntaxMacros
+
+public enum DebugSnapshotAttribute {
+  case convertible, ignored, tracked
+}
+
+public enum DebugSnapshotMacro {}
+
+extension DebugSnapshotMacro: ExtensionMacro {
+  public static func expansion(
+    of node: AttributeSyntax,
+    attachedTo declaration: some DeclGroupSyntax,
+    providingExtensionsOf type: some TypeSyntaxProtocol,
+    conformingTo protocols: [TypeSyntax],
+    in context: some MacroExpansionContext
+  ) throws -> [ExtensionDeclSyntax] {
+    guard !hasDebugSnapshotConvertibleConformance(declaration) else {
+      return []
+    }
+
+    let conformanceIsolation: String
+    #if compiler(>=6.2)
+      conformanceIsolation = hasMainActorAnnotation(declaration) ? "@MainActor " : ""
+    #else
+      conformanceIsolation = ""
+    #endif
+    return [
+      DeclSyntax(
+        """
+        extension \(type.trimmed): \
+        \(raw: conformanceIsolation)\(raw: moduleName).DebugSnapshotConvertible {}
+        """
+      )
+      .cast(ExtensionDeclSyntax.self)
+    ]
+  }
+}
+
+extension DebugSnapshotMacro: MemberAttributeMacro {
+  public static func expansion(
+    of node: AttributeSyntax,
+    attachedTo declaration: some DeclGroupSyntax,
+    providingAttributesFor member: some DeclSyntaxProtocol,
+    in context: some MacroExpansionContext
+  ) throws -> [AttributeSyntax] {
+    return try expansion(
+      of: node,
+      attachedTo: declaration,
+      providingAttributesFor: member,
+      in: context,
+      debugSnapshotAttribute: { _ in nil }
+    )
+  }
+
+  public static func expansion(
+    of node: AttributeSyntax,
+    attachedTo declaration: some DeclGroupSyntax,
+    providingAttributesFor member: some DeclSyntaxProtocol,
+    in context: some MacroExpansionContext,
+    debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
+  ) throws -> [AttributeSyntax] {
+    let logChanges = hasLogChangesOption(node)
+    if logChanges,
+      let funcDecl = member.as(FunctionDeclSyntax.self),
+      !funcDecl.modifiers.contains(where: {
+        $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
+      }),
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges")
+    {
+      return ["@LogChanges"]
+    }
+    let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
+    if let variable = member.as(VariableDeclSyntax.self),
+      variable.bindings.count == 1,
+      !variable.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotIgnored"),
+      !variable.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotTracked"),
+      !variable.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotConvertible")
+    {
+      let attribute: DebugSnapshotAttribute
+      if let override = debugSnapshotAttribute(DeclSyntax(variable)) {
+        attribute = override
+      } else if let binding = variable.bindings.first,
+        isTrackedByDefault(variable, binding: binding, requiredAccess: requiredAccess)
+      {
+        attribute = .tracked
+      } else {
+        attribute = .ignored
+      }
+      var attributes: [AttributeSyntax] = []
+      switch attribute {
+      case .convertible:
+        variable.addIfNeeded("@DebugSnapshotConvertible", in: \.attributes, to: &attributes)
+      case .tracked:
+        variable.addIfNeeded("@DebugSnapshotTracked", in: \.attributes, to: &attributes)
+      case .ignored:
+        variable.addIfNeeded("@DebugSnapshotIgnored", in: \.attributes, to: &attributes)
+      }
+      return attributes
+    }
+
+    if let enumCase = member.as(EnumCaseDeclSyntax.self),
+      !enumCase.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotIgnored"),
+      !enumCase.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotTracked"),
+      !enumCase.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotConvertible")
+    {
+      let attribute: DebugSnapshotAttribute
+      if let override = debugSnapshotAttribute(DeclSyntax(enumCase)) {
+        attribute = override
+      } else if enumCase.elements.allSatisfy(isEnumElementTrackedByDefault) {
+        attribute = .tracked
+      } else {
+        attribute = .ignored
+      }
+      var attributes: [AttributeSyntax] = []
+      switch attribute {
+      case .convertible:
+        enumCase.addIfNeeded("@DebugSnapshotConvertible", in: \.attributes, to: &attributes)
+      case .tracked:
+        enumCase.addIfNeeded("@DebugSnapshotTracked", in: \.attributes, to: &attributes)
+      case .ignored:
+        enumCase.addIfNeeded("@DebugSnapshotIgnored", in: \.attributes, to: &attributes)
+      }
+      return attributes
+    }
+
+    return []
+  }
+}
+
+extension DebugSnapshotMacro: MemberMacro {
+  public static func expansion(
+    of node: AttributeSyntax,
+    providingMembersOf declaration: some DeclGroupSyntax,
+    conformingTo protocols: [TypeSyntax],
+    in context: some MacroExpansionContext
+  ) throws -> [DeclSyntax] {
+    try expansion(
+      of: node,
+      providingMembersOf: declaration,
+      conformingTo: protocols,
+      in: context,
+      attributeConformanceMapping: [:],
+      filterPropagatedAttributes: { _ in [] },
+      debugSnapshotAttribute: { _ in nil }
+    )
+  }
+
+  public static func expansion(
+    of node: AttributeSyntax,
+    providingMembersOf declaration: some DeclGroupSyntax,
+    conformingTo protocols: [TypeSyntax],
+    in context: some MacroExpansionContext,
+    attributeConformanceMapping: [String: [String]] = [:],
+    filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
+    debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
+  ) throws -> [DeclSyntax] {
+    guard
+      let modelDecl = ModelDecl(
+        declaration: declaration,
+        context: context,
+        debugSnapshotAttribute: debugSnapshotAttribute
+      )
+    else {
+      return []
+    }
+
+    return memberDeclarations(
+      for: modelDecl,
+      declaration: declaration,
+      filterPropagatedAttributes: filterPropagatedAttributes,
+      attributeConformanceMapping: attributeConformanceMapping
+    )
+  }
+}
+
+private func memberDeclarations(
+  for modelDecl: ModelDecl,
+  declaration: some DeclGroupSyntax,
+  filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
+  attributeConformanceMapping: [String: [String]]
+) -> [DeclSyntax] {
+  switch modelDecl.kind {
+  case .classOrStruct(let properties, let isClass):
+    return classOrStructMemberDeclarations(
+      for: modelDecl,
+      declaration: declaration,
+      properties: properties,
+      isClass: isClass,
+      filterPropagatedAttributes: filterPropagatedAttributes,
+      attributeConformanceMapping: attributeConformanceMapping
+    )
+  case .enumeration(let enumCases):
+    return enumMemberDeclarations(
+      name: modelDecl.name,
+      declaration: declaration,
+      enumCases: enumCases,
+      filterPropagatedAttributes: filterPropagatedAttributes,
+      attributeConformanceMapping: attributeConformanceMapping
+    )
+  }
+}
+
+private func classOrStructMemberDeclarations(
+  for modelDecl: ModelDecl,
+  declaration: some DeclGroupSyntax,
+  properties: [ModelDecl.Property],
+  isClass: Bool,
+  filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
+  attributeConformanceMapping: [String: [String]]
+) -> [DeclSyntax] {
+  if isClass {
+    return classMemberDeclarations(
+      for: modelDecl,
+      declaration: declaration,
+      properties: properties,
+      filterPropagatedAttributes: filterPropagatedAttributes,
+      attributeConformanceMapping: attributeConformanceMapping
+    )
+  } else {
+    return structMemberDeclarations(
+      for: modelDecl,
+      declaration: declaration,
+      properties: properties,
+      filterPropagatedAttributes: filterPropagatedAttributes,
+      attributeConformanceMapping: attributeConformanceMapping
+    )
+  }
+}
+
+private func structMemberDeclarations(
+  for modelDecl: ModelDecl,
+  declaration: some DeclGroupSyntax,
+  properties: [ModelDecl.Property],
+  filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
+  attributeConformanceMapping: [String: [String]]
+) -> [DeclSyntax] {
+  let propagatedAttributes = propagatedAttributesOutput(
+    from: declaration,
+    filterPropagatedAttributes: filterPropagatedAttributes,
+    attributeConformanceMapping: attributeConformanceMapping
+  )
+  let debugSnapshotConformances = deduplicatedConformances(
+    debugSnapshotConformances(
+      for: declaration,
+      properties: properties
+    ) + propagatedAttributes.conformances
+  )
+  let propertyLines = snapshotPropertyLines(for: properties, modelName: modelDecl.name)
+  let hasIndirectProperties = properties.contains(where: \.isDebugSnapshotConvertible)
+  var allConformances = debugSnapshotConformances
+  if hasIndirectProperties {
+    allConformances.append("CustomReflectable")
+  }
+  let conformancesDescription =
+    snapshotConformanceDescription(allConformances)
+  let customMirrorDecl: String
+  if hasIndirectProperties {
+    let mirrorChildren =
+      properties
+      .map { "\"\($0.name)\": \($0.name) as Any" }
+      .joined(separator: ", ")
+    customMirrorDecl = """
+      \npublic var customMirror: Mirror {
+      Mirror(self, children: [\(mirrorChildren)], displayStyle: .struct)
+      }
+      """
+  } else {
+    customMirrorDecl = ""
+  }
+  let representation =
+    DeclSyntax(
+      """
+      \(raw: propagatedAttributes.description)\
+      public struct DebugSnapshot\(raw: conformancesDescription) {
+      \(raw: propertyLines.joined(separator: "\n"))\(raw: customMirrorDecl)
+      }
+      """
+    )
+
+  let visitorInitArguments =
+    properties
+    .map {
+      "\($0.name): \($0.isDebugSnapshotConvertible ? "\(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" : "value.\($0.name)")"
+    }
+    .joined(separator: ", ")
+  let _debugSnapshot =
+    DeclSyntax(
+      """
+      public static func _debugSnapshot(\
+      _ value: \(raw: modelDecl.name), \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
+      DebugSnapshot(\(raw: visitorInitArguments))
+      }
+      """
+    )
+  return [representation, _debugSnapshot]
+}
+
+private func classMemberDeclarations(
+  for modelDecl: ModelDecl,
+  declaration: some DeclGroupSyntax,
+  properties: [ModelDecl.Property],
+  filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
+  attributeConformanceMapping: [String: [String]]
+) -> [DeclSyntax] {
+  let propagatedAttributes = propagatedAttributesOutput(
+    from: declaration,
+    filterPropagatedAttributes: filterPropagatedAttributes,
+    attributeConformanceMapping: attributeConformanceMapping
+  )
+  let snapshotConformances = deduplicatedConformances(
+    debugSnapshotConformances(
+      for: declaration,
+      properties: properties
+    ) + propagatedAttributes.conformances
+  )
+  let snapshotConformancesDescription =
+    snapshotConformances.isEmpty
+    ? ""
+    : ": \(snapshotConformances.joined(separator: ", "))"
+
+  let propertyLines = snapshotPropertyLines(
+    for: properties,
+    modelName: modelDecl.name,
+    snapshotTypeName: "DebugSnapshot",
+    applyIndirection: false
+  )
+  let snapshotStruct =
+    DeclSyntax(
+      """
+      \(raw: propagatedAttributes.description)\
+      public struct DebugSnapshotValue\(raw: snapshotConformancesDescription) {
+      \(raw: propertyLines.joined(separator: "\n"))
+      }
+      """
+    )
+
+  let initParams = classInitParams(for: properties, modelName: modelDecl.name)
+  let snapshotInitArguments = properties.map { "\($0.name): \($0.name)" }.joined(separator: ", ")
+  let debugSnapshotClass =
+    DeclSyntax(
+      """
+      @dynamicMemberLookup
+      public final class DebugSnapshot: \(raw: moduleName)._DebugSnapshotObject {
+      public var _snapshot: DebugSnapshotValue
+      public var _originIdentifier: ObjectIdentifier?
+      public var _diffSnapshot: (any \(raw: moduleName)._DebugSnapshotObject)?
+      public init(\(raw: initParams)) {
+      self._snapshot = DebugSnapshotValue(\(raw: snapshotInitArguments))
+      }
+      public subscript<T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+      get { _snapshot[keyPath: keyPath] }
+      set { _snapshot[keyPath: keyPath] = newValue }
+      }
+      }
+      """
+    )
+
+  let nonConvertibleInitArguments =
+    properties
+    .filter { !$0.isDebugSnapshotConvertible }
+    .map { "\($0.name): value.\($0.name)" }
+    .joined(separator: ", ")
+  let convertibleAssignments =
+    properties
+    .filter { $0.isDebugSnapshotConvertible }
+    .map {
+      "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
+    }
+  let convertibleAssignmentsCode =
+    convertibleAssignments.isEmpty
+    ? ""
+    : "\n" + convertibleAssignments.joined(separator: "\n")
+  let _debugSnapshotMethod =
+    DeclSyntax(
+      """
+      public static func _debugSnapshot(\
+      _ value: \(raw: modelDecl.name), \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
+      if let existing: DebugSnapshot = visitor.lookup(value) { return existing }
+      let snapshot = DebugSnapshot(\(raw: nonConvertibleInitArguments))
+      snapshot._originIdentifier = ObjectIdentifier(value)
+      visitor.register(value, snapshot: snapshot)\(raw: convertibleAssignmentsCode)
+      return snapshot
+      }
+      """
+    )
+
+  return [snapshotStruct, debugSnapshotClass, _debugSnapshotMethod]
+}
+
+private func snapshotPropertyLines(
+  for properties: [ModelDecl.Property],
+  modelName: String,
+  snapshotTypeName: String = "DebugSnapshot",
+  applyIndirection: Bool = true
+) -> [String] {
+  properties.map { property in
+    let indirectPrefix =
+      applyIndirection && property.isDebugSnapshotConvertible
+      ? "@\(moduleName)._Indirect "
+      : ""
+    switch property.kind {
+    case .type(let type):
+      let typeDescription = type.trimmedDescription
+      let snapshotType =
+        property.isDebugSnapshotConvertible
+        ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
+        : typeDescription
+      return "\(indirectPrefix)public var \(property.name): \(snapshotType)"
+    case .initializer(let defaultValue):
+      let defaultValue = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
+        .trimmedDescription
+      if property.isDebugSnapshotConvertible {
+        return "\(indirectPrefix)public var \(property.name) = \(moduleName).snap(\(defaultValue))"
+      } else {
+        return "public var \(property.name) = \(defaultValue)"
+      }
+    case .pair(let type, initializer: let defaultValue):
+      let typeDescription = type.trimmedDescription
+      let snapshotType =
+        property.isDebugSnapshotConvertible
+        ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
+        : typeDescription
+      let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
+      if property.isDebugSnapshotConvertible {
+        let snapshotDefault = convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault)
+        return "\(indirectPrefix)public var \(property.name): \(snapshotType) = \(snapshotDefault)"
+      } else {
+        return """
+          public var \(property.name): \(typeDescription) = \(rewrittenDefault.trimmedDescription)
+          """
+      }
+    }
+  }
+}
+
+private func classInitParams(
+  for properties: [ModelDecl.Property],
+  modelName: String
+) -> String {
+  properties.map { property in
+    let (type, defaultValue) = classInitParamTypeAndDefault(for: property, modelName: modelName)
+    let defaultSuffix = defaultValue.map { " = \($0)" } ?? ""
+    return "\(property.name): \(type)\(defaultSuffix)"
+  }
+  .joined(separator: ", ")
+}
+
+private func classInitParamTypeAndDefault(
+  for property: ModelDecl.Property,
+  modelName: String
+) -> (type: String, default: String?) {
+  switch property.kind {
+  case .type(let type):
+    let typeDescription = type.trimmedDescription
+    let snapshotType =
+      property.isDebugSnapshotConvertible
+      ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: "DebugSnapshot")
+      : typeDescription
+    let defaultValue: String? = isOptionalType(type) ? "nil" : nil
+    return (snapshotType, defaultValue)
+
+  case .initializer(let defaultValue):
+    let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
+      .trimmedDescription
+    return (inferredLiteralType(of: defaultValue) ?? "_", rewrittenDefault)
+
+  case .pair(let type, initializer: let defaultValue):
+    let typeDescription = type.trimmedDescription
+    let snapshotType =
+      property.isDebugSnapshotConvertible
+      ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: "DebugSnapshot")
+      : typeDescription
+    let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
+    if property.isDebugSnapshotConvertible {
+      return (snapshotType, convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault))
+    } else {
+      return (snapshotType, rewrittenDefault.trimmedDescription)
+    }
+  }
+}
+
+private func isOptionalType(_ type: TypeSyntax) -> Bool {
+  type.is(OptionalTypeSyntax.self) || type.is(ImplicitlyUnwrappedOptionalTypeSyntax.self)
+}
+
+private func diagnoseMissingTypeAnnotation(
+  on binding: PatternBindingSyntax,
+  in context: some MacroExpansionContext
+) {
+  var fixed = binding
+  fixed.pattern = binding.pattern.with(\.trailingTrivia, [])
+  fixed.typeAnnotation = TypeAnnotationSyntax(
+    colon: .colonToken(trailingTrivia: .space),
+    type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("<#Type#>")))
+  )
+  if let initializer = binding.initializer {
+    fixed.initializer = initializer.with(\.equal, initializer.equal.with(\.leadingTrivia, .space))
+  }
+  context.diagnose(
+    Diagnostic(
+      node: Syntax(binding),
+      message: MacroExpansionErrorMessage("Missing required type annotation"),
+      fixIt: FixIt(
+        message: MacroExpansionFixItMessage("Insert ': <#Type#>'"),
+        changes: [.replace(oldNode: Syntax(binding), newNode: Syntax(fixed))]
+      )
+    )
+  )
+}
+
+private func inferredLiteralType(of expression: ExprSyntax) -> String? {
+  if let prefix = expression.as(PrefixOperatorExprSyntax.self),
+    prefix.operator.text == "-" || prefix.operator.text == "+"
+  {
+    return inferredLiteralType(of: prefix.expression)
+  }
+  if expression.is(IntegerLiteralExprSyntax.self) { return "Int" }
+  if expression.is(FloatLiteralExprSyntax.self) { return "Double" }
+  if expression.is(StringLiteralExprSyntax.self) { return "String" }
+  if expression.is(BooleanLiteralExprSyntax.self) { return "Bool" }
+  return nil
+}
+
+private func convertibleSnapshotDefault(
+  for type: TypeSyntax,
+  defaultValue: ExprSyntax
+) -> String {
+  if isOptionalType(type), defaultValue.is(NilLiteralExprSyntax.self) {
+    return "nil"
+  }
+  return "\(moduleName).snap(\(defaultValue.trimmedDescription) as \(type.trimmedDescription))"
+}
+
+private func enumMemberDeclarations(
+  name: String,
+  declaration: some DeclGroupSyntax,
+  enumCases: [ModelDecl.EnumCase],
+  filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
+  attributeConformanceMapping: [String: [String]]
+) -> [DeclSyntax] {
+  let propagatedAttributes = propagatedAttributesOutput(
+    from: declaration,
+    filterPropagatedAttributes: filterPropagatedAttributes,
+    attributeConformanceMapping: attributeConformanceMapping
+  )
+  let isIndirect =
+    modifiers(of: declaration).contains { $0.name.tokenKind == .keyword(.indirect) }
+  let debugSnapshotConformances = deduplicatedConformances(
+    debugSnapshotConformances(
+      for: declaration,
+      properties: []
+    ) + propagatedAttributes.conformances
+  )
+  let conformanceDescription =
+    snapshotConformanceDescription(debugSnapshotConformances)
+  let snapshotCaseLines = enumCases.map { debugSnapshotCaseDeclaration($0, modelName: name) }
+  let representation =
+    DeclSyntax(
+      """
+      \(raw: propagatedAttributes.description)\
+      public \(raw: isIndirect ? "indirect " : "")enum DebugSnapshot\(raw: conformanceDescription) {
+      \(raw: snapshotCaseLines.joined(separator: "\n"))
+      }
+      """
+    )
+  let switchCases = enumCases.map(debugSnapshotSwitchCase)
+  let _debugSnapshot =
+    DeclSyntax(
+      """
+      public static func _debugSnapshot(\
+      _ value: \(raw: name), \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
+      switch value {
+      \(raw: switchCases.joined(separator: "\n"))
+      }
+      }
+      """
+    )
+  return [representation, _debugSnapshot]
+}
+
+private func debugSnapshotCaseDeclaration(
+  _ enumCase: ModelDecl.EnumCase,
+  modelName: String
+) -> String {
+  let name = enumCase.element.name.text
+  let indirectPrefix = enumCase.isIndirect ? "indirect " : ""
+  guard !enumCase.isIgnored else {
+    return "\(indirectPrefix)case \(name)"
+  }
+  guard var parameterClause = enumCase.element.parameterClause else {
+    return "\(indirectPrefix)case \(name)"
+  }
+  for index in parameterClause.parameters.indices {
+    let originalType = parameterClause.parameters[index].type
+    if enumCase.isDebugSnapshotConvertible {
+      parameterClause.parameters[index].type = debugSnapshotType(originalType)
+    }
+    if let defaultValue = parameterClause.parameters[index].defaultValue {
+      let selfRewritten = rewriteDefaultValue(defaultValue.value, modelTypeName: modelName)
+      let snapshotValue =
+        enumCase.isDebugSnapshotConvertible
+        ? ExprSyntax(
+          "\(raw: convertibleSnapshotDefault(for: originalType, defaultValue: selfRewritten))"
+        )
+        : selfRewritten
+      parameterClause.parameters[index].defaultValue = defaultValue.with(\.value, snapshotValue)
+    }
+  }
+  return "\(indirectPrefix)case \(name)\(parameterClause.trimmedDescription)"
+}
+
+private func debugSnapshotSwitchCase(_ enumCase: ModelDecl.EnumCase) -> String {
+  let name = enumCase.element.name.text
+  let parameters = Array(enumCase.element.parameterClause?.parameters ?? [])
+  let bindings = parameters.indices.map { "v\($0 + 1)" }
+  let pattern =
+    if bindings.isEmpty {
+      ".\(name)"
+    } else {
+      ".\(name)(\(bindings.map { "let \($0)" }.joined(separator: ", ")))"
+    }
+
+  if enumCase.isIgnored {
+    return """
+      case .\(name):
+        return .\(name)
+      """
+  }
+
+  if bindings.isEmpty {
+    return """
+      case \(pattern):
+        return .\(name)
+      """
+  }
+
+  let valueArguments = zip(parameters, bindings)
+    .map { parameter, binding in
+      let mappedValue =
+        enumCase.isDebugSnapshotConvertible
+        ? "\(moduleName)._debugSnapshot(\(binding), visitor: &visitor)"
+        : binding
+      return "\(caseParameterLabelPrefix(parameter))\(mappedValue)"
+    }
+    .joined(separator: ", ")
+  return """
+    case \(pattern):
+      return .\(name)(\(valueArguments))
+    """
+}
+
+private func debugSnapshotType(_ type: TypeSyntax) -> TypeSyntax {
+  if let optionalType = type.trimmed.as(OptionalTypeSyntax.self) {
+    return TypeSyntax(
+      OptionalTypeSyntax(
+        wrappedType: debugSnapshotType(optionalType.wrappedType),
+        questionMark: optionalType.questionMark
+      )
+    )
+  }
+  if let implicitlyUnwrappedOptionalType = type.trimmed.as(
+    ImplicitlyUnwrappedOptionalTypeSyntax.self
+  ) {
+    return TypeSyntax(
+      ImplicitlyUnwrappedOptionalTypeSyntax(
+        wrappedType: debugSnapshotType(implicitlyUnwrappedOptionalType.wrappedType),
+        exclamationMark: implicitlyUnwrappedOptionalType.exclamationMark
+      )
+    )
+  }
+  if let arrayType = type.trimmed.as(ArrayTypeSyntax.self) {
+    return TypeSyntax(arrayType.with(\.element, debugSnapshotType(arrayType.element)))
+  }
+  if let dictionaryType = type.trimmed.as(DictionaryTypeSyntax.self) {
+    return TypeSyntax(dictionaryType.with(\.value, debugSnapshotType(dictionaryType.value)))
+  }
+  return TypeSyntax(MemberTypeSyntax(baseType: type.trimmed, name: .identifier("DebugSnapshot")))
+}
+
+private func snapshotTypeDescription(
+  for type: String,
+  snapshotTypeName: String = "DebugSnapshot"
+) -> String {
+  var base = type
+  var optionalSuffix = ""
+  while let last = base.last, last == "?" || last == "!" {
+    optionalSuffix.insert(last, at: optionalSuffix.startIndex)
+    base.removeLast()
+  }
+  if base.hasPrefix("["), base.hasSuffix("]") {
+    let element = String(base.dropFirst().dropLast())
+    return "[\(element).\(snapshotTypeName)]\(optionalSuffix)"
+  }
+  return "\(base).\(snapshotTypeName)\(optionalSuffix)"
+}
+
+private func caseParameterLabelPrefix(_ parameter: EnumCaseParameterSyntax) -> String {
+  guard
+    let label = parameter.firstName,
+    label.tokenKind != .wildcard
+  else { return "" }
+  return "\(label.text): "
+}
+
+private struct ModelDecl {
+  struct Property {
+    var name: String
+    var kind: Kind
+    var isDebugSnapshotConvertible: Bool
+
+    enum Kind {
+      case type(TypeSyntax)
+      case initializer(ExprSyntax)
+      case pair(type: TypeSyntax, initializer: ExprSyntax)
+    }
+  }
+
+  struct EnumCase {
+    var element: EnumCaseElementSyntax
+    var isDebugSnapshotConvertible: Bool
+    var isIgnored: Bool
+    var isIndirect: Bool
+  }
+
+  enum Kind {
+    case classOrStruct([Property], isClass: Bool)
+    case enumeration([EnumCase])
+  }
+
+  var name: String
+  var kind: Kind
+
+  init?(
+    declaration: some DeclGroupSyntax,
+    context: some MacroExpansionContext,
+    debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
+  ) {
+    if let classDecl = declaration.as(ClassDeclSyntax.self) {
+      let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
+      self.name = classDecl.name.text
+      self.kind = .classOrStruct(
+        Self.storedProperties(
+          from: declaration,
+          context: context,
+          requiredAccess: requiredAccess,
+          isClass: true,
+          debugSnapshotAttribute: debugSnapshotAttribute
+        ),
+        isClass: true
+      )
+      return
+    } else if let structDecl = declaration.as(StructDeclSyntax.self) {
+      let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
+      self.name = structDecl.name.text
+      self.kind = .classOrStruct(
+        Self.storedProperties(
+          from: declaration,
+          context: context,
+          requiredAccess: requiredAccess,
+          isClass: false,
+          debugSnapshotAttribute: debugSnapshotAttribute
+        ),
+        isClass: false
+      )
+      return
+    } else if let name = declaration.as(EnumDeclSyntax.self)?.name {
+      self.name = name.text
+      self.kind = .enumeration(
+        Self.enumCases(
+          from: declaration,
+          context: context,
+          debugSnapshotAttribute: debugSnapshotAttribute
+        )
+      )
+      return
+    } else {
+      context.diagnose(
+        Diagnostic(
+          node: Syntax(declaration),
+          message: MacroExpansionErrorMessage(
+            "'@DebugSnapshot' can only be applied to classes, structs, and enums"
+          )
+        )
+      )
+      return nil
+    }
+  }
+
+  static func storedProperties(
+    from declaration: some DeclGroupSyntax,
+    context: some MacroExpansionContext,
+    requiredAccess: AccessLevel,
+    isClass: Bool,
+    debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
+  ) -> [ModelDecl.Property] {
+    declaration.memberBlock.members.compactMap { member -> [ModelDecl.Property]? in
+      guard
+        let variable = member.decl.as(VariableDeclSyntax.self),
+        modifiers(of: variable).contains(where: {
+          $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
+        }) != true,
+        !variable.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotIgnored")
+      else { return nil }
+
+      let isDebugSnapshotTracked = variable.hasAttribute(
+        in: \.attributes,
+        equivalentTo: "@DebugSnapshotTracked"
+      )
+      let hasDebugSnapshotConvertibleAttribute = variable.hasAttribute(
+        in: \.attributes,
+        equivalentTo: "@DebugSnapshotConvertible"
+      )
+      guard
+        accessControl(for: variable).effectiveAccessLevel >= requiredAccess
+          || isDebugSnapshotTracked
+          || hasDebugSnapshotConvertibleAttribute
+      else { return nil }
+
+      if variable.attributes.hasIgnoredPropertyWrapper,
+        !isDebugSnapshotTracked,
+        !hasDebugSnapshotConvertibleAttribute
+      {
+        return nil
+      }
+
+      return variable.bindings.compactMap { binding in
+        guard
+          let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
+          !identifier.hasPrefix("_")
+        else { return nil }
+
+        guard
+          isStoredProperty(binding)
+            || isDebugSnapshotTracked
+            || hasDebugSnapshotConvertibleAttribute
+        else {
+          return nil
+        }
+
+        let typeAnnotation = binding.typeAnnotation?.type
+        let defaultValue = binding.initializer?.value
+        let attribute = debugSnapshotAttribute(DeclSyntax(variable))
+        guard attribute != .ignored else { return nil }
+        let isDebugSnapshotConvertible =
+          hasDebugSnapshotConvertibleAttribute
+          || attribute == .convertible
+
+        switch (typeAnnotation, defaultValue) {
+        case (nil, nil):
+          diagnoseMissingTypeAnnotation(on: binding, in: context)
+          return nil
+        case (nil, let defaultValue?):
+          guard !isClosureInitializer(defaultValue)
+          else { return nil }
+
+          var canInferInitParameterType: Bool {
+            !isDebugSnapshotConvertible && inferredLiteralType(of: defaultValue) != nil
+          }
+          if isClass, !canInferInitParameterType {
+            diagnoseMissingTypeAnnotation(on: binding, in: context)
+            return nil
+          }
+
+          return ModelDecl.Property(
+            name: identifier,
+            kind: .initializer(defaultValue),
+            isDebugSnapshotConvertible: isDebugSnapshotConvertible
+          )
+        case (let typeAnnotation?, nil):
+          guard !isClosureType(typeAnnotation)
+          else { return nil }
+
+          return ModelDecl.Property(
+            name: identifier,
+            kind: .type(typeAnnotation),
+            isDebugSnapshotConvertible: isDebugSnapshotConvertible
+          )
+        case (let typeAnnotation?, let defaultValue?):
+          guard
+            !isClosureType(typeAnnotation),
+            !isClosureInitializer(defaultValue) || isDebugSnapshotConvertible
+          else { return nil }
+
+          return ModelDecl.Property(
+            name: identifier,
+            kind: .pair(
+              type: typeAnnotation,
+              initializer: defaultValue
+            ),
+            isDebugSnapshotConvertible: isDebugSnapshotConvertible
+          )
+        }
+      }
+    }
+    .flatMap(\.self)
+  }
+
+  static func enumCases(
+    from declaration: some DeclGroupSyntax,
+    context: some MacroExpansionContext,
+    debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
+  ) -> [ModelDecl.EnumCase] {
+    declaration.memberBlock.members.compactMap { member -> [ModelDecl.EnumCase]? in
+      guard let enumCase = member.decl.as(EnumCaseDeclSyntax.self)
+      else { return nil }
+
+      let isExplicitlyIgnored = enumCase.hasAttribute(
+        in: \.attributes,
+        equivalentTo: "@DebugSnapshotIgnored"
+      )
+      let isExplicitlyTracked = enumCase.hasAttribute(
+        in: \.attributes,
+        equivalentTo: "@DebugSnapshotTracked"
+      )
+      let hasDebugSnapshotConvertibleAttribute = enumCase.hasAttribute(
+        in: \.attributes,
+        equivalentTo: "@DebugSnapshotConvertible"
+      )
+      let attribute = debugSnapshotAttribute(DeclSyntax(enumCase))
+      let hasExplicitAttribute =
+        isExplicitlyIgnored
+        || isExplicitlyTracked
+        || hasDebugSnapshotConvertibleAttribute
+        || attribute != nil
+      let isIndirect =
+        modifiers(of: enumCase).contains { $0.name.tokenKind == .keyword(.indirect) }
+      return enumCase.elements.map { element in
+        var isDebugSnapshotConvertible =
+          hasDebugSnapshotConvertibleAttribute || attribute == .convertible
+        if isDebugSnapshotConvertible, element.parameterClause?.parameters.count != 1 {
+          let convertibleAttribute: AttributeSyntax = "@DebugSnapshotConvertible"
+          let withoutAttribute =
+            enumCase
+            .with(
+              \.attributes,
+              enumCase.attributes.filter { attribute in
+                guard case .attribute(let attribute) = attribute else { return true }
+                return !attribute.isEquivalent(to: convertibleAttribute)
+              }
+            )
+            .with(\.leadingTrivia, enumCase.leadingTrivia)
+          context.diagnose(
+            Diagnostic(
+              node: Syntax(element),
+              message: MacroExpansionErrorMessage(
+                "Must be applied to a case with a single associated value"
+              ),
+              fixIt: FixIt(
+                message: MacroExpansionFixItMessage("Remove '@DebugSnapshotConvertible'"),
+                changes: [.replace(oldNode: Syntax(enumCase), newNode: Syntax(withoutAttribute))]
+              )
+            )
+          )
+          isDebugSnapshotConvertible = false
+        }
+        let isElementIgnoredByDefault =
+          !hasExplicitAttribute && !isEnumElementTrackedByDefault(element)
+        return ModelDecl.EnumCase(
+          element: element,
+          isDebugSnapshotConvertible: isDebugSnapshotConvertible,
+          isIgnored: isExplicitlyIgnored || attribute == .ignored || isElementIgnoredByDefault,
+          isIndirect: isIndirect
+        )
+      }
+    }
+    .flatMap(\.self)
+  }
+}
+
+private func isStoredProperty(_ binding: PatternBindingSyntax) -> Bool {
+  guard let accessorBlock = binding.accessorBlock else { return true }
+  switch accessorBlock.accessors {
+  case .accessors(let accessors):
+    return !accessors.contains { accessor in
+      switch accessor.accessorSpecifier.tokenKind {
+      case .keyword(.get), .keyword(.set), .keyword(._modify), .keyword(._read):
+        return true
+      default:
+        return false
+      }
+    }
+  case .getter:
+    return false
+  }
+}
+
+private func isTrackedByDefault(
+  _ variable: VariableDeclSyntax,
+  binding: PatternBindingSyntax,
+  requiredAccess: AccessLevel
+) -> Bool {
+  guard
+    modifiers(of: variable).contains(where: {
+      $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
+    }) != true
+  else { return false }
+
+  guard !variable.attributes.hasIgnoredPropertyWrapper else { return false }
+
+  guard accessControl(for: variable).effectiveAccessLevel >= requiredAccess else {
+    return false
+  }
+
+  guard
+    let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
+    !identifier.hasPrefix("_"),
+    isStoredProperty(binding)
+  else { return false }
+
+  switch (binding.typeAnnotation?.type, binding.initializer?.value) {
+  case (nil, nil):
+    return true
+  case (nil, let defaultValue?):
+    return !isClosureInitializer(defaultValue)
+  case (let typeAnnotation?, nil):
+    return !isClosureType(typeAnnotation)
+  case (let typeAnnotation?, let defaultValue?):
+    return !isClosureType(typeAnnotation) && !isClosureInitializer(defaultValue)
+  }
+}
+
+private func isEnumElementTrackedByDefault(_ element: EnumCaseElementSyntax) -> Bool {
+  guard !element.name.text.hasPrefix("_") else { return false }
+  if let parameterClause = element.parameterClause {
+    for parameter in parameterClause.parameters where isClosureType(parameter.type) {
+      return false
+    }
+  }
+  return true
+}
+
+private func isClosureType(_ type: TypeSyntax) -> Bool {
+  if type.as(FunctionTypeSyntax.self) != nil {
+    return true
+  }
+  if let type = type.as(OptionalTypeSyntax.self) {
+    return isClosureType(type.wrappedType)
+  }
+  if let type = type.as(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
+    return isClosureType(type.wrappedType)
+  }
+  if let type = type.as(AttributedTypeSyntax.self) {
+    return isClosureType(type.baseType)
+  }
+  return false
+}
+
+private func isClosureInitializer(_ initializer: ExprSyntax) -> Bool {
+  initializer.as(ClosureExprSyntax.self) != nil
+}
+
+private enum AccessLevel: Int, Comparable {
+  case `private`
+  case `fileprivate`
+  case `internal`
+  case `package`
+  case `public`
+
+  static func < (lhs: Self, rhs: Self) -> Bool {
+    lhs.rawValue < rhs.rawValue
+  }
+}
+
+extension AccessLevel? {
+  fileprivate var effectiveAccessLevel: AccessLevel {
+    self ?? .internal
+  }
+}
+
+private func accessControl(for declaration: some DeclGroupSyntax) -> AccessLevel? {
+  switch accessControl(from: modifiers(of: declaration)) {
+  case .private: return .fileprivate
+  case let access: return access
+  }
+}
+
+private func accessControl(for varDecl: VariableDeclSyntax) -> AccessLevel? {
+  accessControl(from: modifiers(of: varDecl))
+}
+
+private func accessControl(from modifiers: DeclModifierListSyntax) -> AccessLevel? {
+  let accessLevels: [TokenKind] = [
+    .keyword(.public),
+    .keyword(.open),
+    .keyword(.package),
+    .keyword(.internal),
+    .keyword(.fileprivate),
+    .keyword(.private),
+  ]
+  for modifier in modifiers where accessLevels.contains(modifier.name.tokenKind) {
+    switch modifier.name.tokenKind {
+    case .keyword(.open), .keyword(.public):
+      return .public
+    case .keyword(.package):
+      return .package
+    case .keyword(.internal):
+      return .internal
+    case .keyword(.fileprivate):
+      return .fileprivate
+    case .keyword(.private):
+      return .private
+    default:
+      break
+    }
+  }
+  return nil
+}
+
+private func effectiveAccessLevel(
+  for declaration: some DeclGroupSyntax,
+  in context: some MacroExpansionContext
+) -> AccessLevel {
+  min(
+    accessControl(for: declaration).effectiveAccessLevel,
+    enclosingAccessLevel(in: context)
+  )
+}
+
+private func enclosingAccessLevel(in context: some MacroExpansionContext) -> AccessLevel {
+  var access: AccessLevel = .internal
+  for node in context.lexicalContext {
+    if let decl = node.as(ClassDeclSyntax.self) {
+      access = min(access, accessControl(for: decl).effectiveAccessLevel)
+    } else if let decl = node.as(StructDeclSyntax.self) {
+      access = min(access, accessControl(for: decl).effectiveAccessLevel)
+    } else if let decl = node.as(EnumDeclSyntax.self) {
+      access = min(access, accessControl(for: decl).effectiveAccessLevel)
+    } else if let decl = node.as(ActorDeclSyntax.self) {
+      access = min(access, accessControl(for: decl).effectiveAccessLevel)
+    }
+  }
+  return access
+}
+
+private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool {
+  attributes(of: declaration).contains { attribute in
+    guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
+    let name = attribute.attributeName.trimmedDescription
+    return name.split(separator: ".").last == "MainActor"
+  }
+}
+
+private func hasDebugSnapshotConvertibleConformance(_ declaration: some DeclGroupSyntax) -> Bool {
+  return hasConformance(named: "DebugSnapshotConvertible", in: declaration)
+}
+
+private func debugSnapshotConformances(
+  for declaration: some DeclGroupSyntax,
+  properties: [ModelDecl.Property]
+) -> [String] {
+  var conformances: [String] = []
+  if let sendableConformance = sendableConformance(in: declaration) {
+    conformances.append(sendableConformance)
+  }
+  if hasConformance(named: "Identifiable", in: declaration),
+    properties.contains(where: { $0.name == "id" })
+  {
+    conformances.append("Identifiable")
+  }
+  return conformances
+}
+
+private func snapshotConformanceDescription(
+  _ conformances: [String]
+) -> String {
+  let conformances = deduplicatedConformances(conformances)
+  return conformances.isEmpty ? "" : ": \(conformances.joined(separator: ", "))"
+}
+
+private func hasConformance(
+  named conformanceName: String,
+  in declaration: some DeclGroupSyntax
+) -> Bool {
+  inheritedTypes(in: declaration).contains { inheritedType in
+    conformanceBaseName(of: inheritedType.type) == conformanceName
+  }
+}
+
+private func sendableConformance(in declaration: some DeclGroupSyntax) -> String? {
+  for inheritedType in inheritedTypes(in: declaration) {
+    guard conformanceBaseName(of: inheritedType.type) == "Sendable" else { continue }
+    return hasUncheckedSpecifier(in: inheritedType.type) ? "@unchecked Sendable" : "Sendable"
+  }
+  return nil
+}
+
+private func inheritedTypes(in declaration: some DeclGroupSyntax) -> [InheritedTypeSyntax] {
+  guard
+    let inheritedTypes =
+      declaration.as(ClassDeclSyntax.self)?.inheritanceClause?.inheritedTypes
+      ?? declaration.as(StructDeclSyntax.self)?.inheritanceClause?.inheritedTypes
+      ?? declaration.as(EnumDeclSyntax.self)?.inheritanceClause?.inheritedTypes
+  else { return [] }
+  return Array(inheritedTypes)
+}
+
+private func conformanceBaseName(of type: TypeSyntax) -> String? {
+  if let type = type.as(IdentifierTypeSyntax.self) {
+    return type.name.text
+  }
+  if let type = type.as(MemberTypeSyntax.self) {
+    return type.name.text
+  }
+  if let type = type.as(AttributedTypeSyntax.self) {
+    return conformanceBaseName(of: type.baseType)
+  }
+  return nil
+}
+
+private func hasUncheckedSpecifier(in type: TypeSyntax) -> Bool {
+  guard let type = type.as(AttributedTypeSyntax.self) else { return false }
+  let hasUnchecked =
+    type.attributes.contains { attribute in
+      guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
+      let name = attribute.attributeName.trimmedDescription
+      return name.split(separator: ".").last == "unchecked"
+    }
+  return hasUnchecked || hasUncheckedSpecifier(in: type.baseType)
+}
+
+private struct PropagatedAttributesOutput {
+  var conformances: [String]
+  var description: String
+}
+
+private func propagatedAttributesOutput(
+  from declaration: some DeclGroupSyntax,
+  filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
+  attributeConformanceMapping: [String: [String]]
+) -> PropagatedAttributesOutput {
+  let propagatedAttributes = filterPropagatedAttributes(attributes(of: declaration))
+
+  var conformances: [String] = []
+  for element in propagatedAttributes {
+    guard let attribute = element.as(AttributeSyntax.self) else { continue }
+    if let shortName = shortAttributeName(attribute),
+      let mappedConformances = attributeConformanceMapping[shortName]
+        ?? attributeConformanceMapping[attribute.attributeName.trimmedDescription]
+    {
+      conformances.append(contentsOf: mappedConformances)
+    }
+  }
+
+  let description =
+    propagatedAttributes.isEmpty
+    ? ""
+    : propagatedAttributes
+      .map(\.trimmedDescription)
+      .joined(separator: "\n")
+      + "\n"
+  return PropagatedAttributesOutput(
+    conformances: deduplicatedConformances(conformances),
+    description: description
+  )
+}
+
+private func shortAttributeName(_ attribute: AttributeSyntax) -> String? {
+  attribute.attributeName.trimmedDescription.split(separator: ".").last.map(String.init)
+}
+
+private func deduplicatedConformances(_ conformances: [String]) -> [String] {
+  var seen: Set<String> = []
+  return conformances.filter { seen.insert($0).inserted }
+}
+
+private func attributes(of declaration: some DeclGroupSyntax) -> AttributeListSyntax {
+  #if compiler(>=6)
+    return declaration.attributes
+  #else
+    return declaration.attributes ?? []
+  #endif
+}
+
+private func modifiers(of declaration: some DeclGroupSyntax) -> DeclModifierListSyntax {
+  #if compiler(>=6)
+    return declaration.modifiers
+  #else
+    return declaration.modifiers ?? []
+  #endif
+}
+
+private func modifiers(of varDecl: VariableDeclSyntax) -> DeclModifierListSyntax {
+  #if compiler(>=6)
+    return varDecl.modifiers
+  #else
+    return varDecl.modifiers ?? []
+  #endif
+}
+
+private func modifiers(of enumCaseDecl: EnumCaseDeclSyntax) -> DeclModifierListSyntax {
+  #if compiler(>=6)
+    return enumCaseDecl.modifiers
+  #else
+    return enumCaseDecl.modifiers ?? []
+  #endif
+}
+
+private func rewriteSelf(in expression: ExprSyntax, with typeName: String) -> ExprSyntax {
+  SelfRewriter(typeName: typeName).rewrite(expression).cast(ExprSyntax.self)
+}
+
+private func rewriteDefaultValue(
+  _ expression: ExprSyntax,
+  modelTypeName: String
+) -> ExprSyntax {
+  rewriteSelf(in: expression, with: modelTypeName)
+}
+
+func hasLogChangesOption(_ node: AttributeSyntax) -> Bool {
+  guard case .argumentList(let arguments) = node.arguments else { return false }
+  return arguments.contains(where: { argument in
+    containsLogChangesMember(Syntax(argument.expression))
+  })
+}
+
+private func containsLogChangesMember(_ syntax: Syntax) -> Bool {
+  if let access = syntax.as(MemberAccessExprSyntax.self),
+    access.declName.baseName.text == "logChanges"
+  {
+    return true
+  }
+  for child in syntax.children(viewMode: .sourceAccurate) {
+    if containsLogChangesMember(child) { return true }
+  }
+  return false
+}
+
+private final class SelfRewriter: SyntaxRewriter {
+  let typeName: String
+
+  init(typeName: String) {
+    self.typeName = typeName
+  }
+
+  override func visit(_ node: DeclReferenceExprSyntax) -> ExprSyntax {
+    guard node.baseName.tokenKind == .keyword(.Self) || node.baseName.text == "Self"
+    else { return ExprSyntax(node) }
+    var node = node
+    node.baseName = .identifier(self.typeName)
+    return ExprSyntax(node)
+  }
+
+  override func visit(_ node: IdentifierTypeSyntax) -> TypeSyntax {
+    guard node.name.tokenKind == .keyword(.Self) || node.name.text == "Self"
+    else { return TypeSyntax(node) }
+    var node = node
+    node.name = .identifier(self.typeName)
+    return TypeSyntax(node)
+  }
+}

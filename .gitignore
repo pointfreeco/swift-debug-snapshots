@@ -1,0 +1,8 @@
+.DS_Store
+.netrc
+.swift-version
+.swiftpm
+/.build
+/Packages
+DerivedData/
+xcuserdata/

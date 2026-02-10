@@ -1,0 +1,15 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Project Discussion
+    url: https://github.com/pointfreeco/swift-debug-snapshots/discussions
+    about: DebugSnapshots Q&A, ideas, and more
+  - name: Documentation
+    url: https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots/~/documentation/debugsnapshots
+    about: Read DebugSnapshots documentation
+  - name: Slack
+    url: https://www.pointfree.co/slack-invite
+    about: Community chat
+  - name: Point-Free
+    url: https://www.pointfree.co/
+    about: Support the development of this library and get access to expert Swift knowledge, beta previews, AI skills, behind-the-scenes videos, and more
