@@ -939,7 +939,10 @@ extension AccessLevel? {
 }
 
 private func accessControl(for declaration: some DeclGroupSyntax) -> AccessLevel? {
-  accessControl(from: modifiers(of: declaration))
+  switch accessControl(from: modifiers(of: declaration)) {
+  case .private: return .fileprivate
+  case let access: return access
+  }
 }
 
 private func accessControl(for varDecl: VariableDeclSyntax) -> AccessLevel? {
