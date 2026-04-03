@@ -181,6 +181,10 @@ private func isReflectivelyEqual(
   let lhsType = type(of: lhs)
   guard lhsType == type(of: rhs) else { return false }
 
+  if let lhs = lhs as? any Equatable {
+    return isEqual(lhs, rhs)
+  }
+
   if lhsType is AnyClass {
     if let lhsSnap = lhs as? any _DebugSnapshotObject,
       let rhsSnap = rhs as? any _DebugSnapshotObject
@@ -244,10 +248,6 @@ private func isReflectivelyEqual(
       )
       return false
     }
-  }
-
-  if let lhs = lhs as? any Equatable {
-    return isEqual(lhs, rhs)
   }
 
   let lhsMirror = Mirror(reflecting: lhs)

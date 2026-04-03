@@ -71,6 +71,11 @@ final class UserModel {
   }
 }
 
+@DebugSnapshot
+private final class Wrapper {
+  var keyPath: AnyKeyPath = \Wrapper.keyPath
+}
+
 @MainActor
 @Suite struct ExpectTests {
   @Test func exhaustive() throws {
@@ -79,6 +84,15 @@ final class UserModel {
       model.perturb()
     } changes: {
       $0.title = "!"
+    }
+  }
+
+  @Test func equatableReferences() throws {
+    let wrapper = Wrapper()
+    expect(wrapper) {
+      wrapper.keyPath = \String.count
+    } changes: {
+      $0.keyPath = \String.count
     }
   }
 
@@ -110,11 +124,11 @@ final class UserModel {
         """
         Expected changes do not match: ...
 
-          \u{2007} #1 FeatureModel.DebugSnapshot(
-          \u{2212}   title: "?",
-          \u{002B}   title: "!",
-          \u{2007}   isLoading: false
-          \u{2007} )
+            #1 FeatureModel.DebugSnapshot(
+          −   title: "?",
+          +   title: "!",
+              isLoading: false
+            )
 
         (Expected: −, Actual: +)
         """
