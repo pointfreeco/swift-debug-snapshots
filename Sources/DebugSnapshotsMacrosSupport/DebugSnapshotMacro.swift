@@ -223,11 +223,13 @@ private func structMemberDeclarations(
     filterPropagatedAttributes: filterPropagatedAttributes,
     attributeConformanceMapping: attributeConformanceMapping
   )
+  let hasConvertibles = properties.contains(where: \.isDebugSnapshotConvertible)
   let debugSnapshotConformances = deduplicatedConformances(
     debugSnapshotConformances(
       for: declaration,
       properties: properties
     ) + propagatedAttributes.conformances
+    + (hasConvertibles ? ["CustomReflectable"] : [])
   )
   let propertyLines = snapshotPropertyLines(for: properties, modelName: modelDecl.name)
   let conformancesDescription =
@@ -235,13 +237,14 @@ private func structMemberDeclarations(
       adding: "\(moduleName)._DebugSnapshot",
       to: debugSnapshotConformances
     )
+  let customMirrorMember = hasConvertibles ? customMirrorDeclaration(for: properties) + "\n" : ""
   let representation =
     DeclSyntax(
       """
       \(raw: propagatedAttributes.description)\
       public struct DebugSnapshot\(raw: conformancesDescription) {
       \(raw: propertyLines.joined(separator: "\n"))
-      }
+      \(raw: customMirrorMember)}
       """
     )
 
@@ -260,6 +263,17 @@ private func structMemberDeclarations(
       """
     )
   return [representation, _debugSnapshot]
+}
+
+private func customMirrorDeclaration(for properties: [ModelDecl.Property]) -> String {
+  let children = properties
+    .map { "(\"\($0.name)\", self.\($0.name) as Any)" }
+    .joined(separator: ", ")
+  return """
+    public var customMirror: Mirror {
+    Mirror(self, children: [\(children)], displayStyle: .struct)
+    }
+    """
 }
 
 private func classMemberDeclarations(
@@ -288,7 +302,8 @@ private func classMemberDeclarations(
   let propertyLines = snapshotPropertyLines(
     for: properties,
     modelName: modelDecl.name,
-    snapshotTypeName: "DebugSnapshot"
+    snapshotTypeName: "DebugSnapshot",
+    applyIndirection: false
   )
   let snapshotStruct =
     DeclSyntax(
@@ -353,16 +368,20 @@ private func classMemberDeclarations(
 private func snapshotPropertyLines(
   for properties: [ModelDecl.Property],
   modelName: String,
-  snapshotTypeName: String = "DebugSnapshot"
+  snapshotTypeName: String = "DebugSnapshot",
+  applyIndirection: Bool = true
 ) -> [String] {
   properties.map { property in
+    let indirectPrefix = applyIndirection && property.isDebugSnapshotConvertible
+      ? "@\(moduleName)._Indirect "
+      : ""
     switch property.kind {
     case .type(let type):
       let snapshotType =
         property.isDebugSnapshotConvertible
         ? snapshotTypeDescription(for: type, snapshotTypeName: snapshotTypeName)
         : type
-      return "public var \(property.name): \(snapshotType)"
+      return "\(indirectPrefix)public var \(property.name): \(snapshotType)"
     case .initializer(let defaultValue):
       let defaultValue = rewriteDefaultValue(
         defaultValue,
@@ -371,7 +390,7 @@ private func snapshotPropertyLines(
       )
       .trimmedDescription
       if property.isDebugSnapshotConvertible {
-        return "public var \(property.name) = (\(defaultValue))._debugSnapshot"
+        return "\(indirectPrefix)public var \(property.name) = (\(defaultValue))._debugSnapshot"
       } else {
         return "public var \(property.name) = \(defaultValue)"
       }
@@ -388,7 +407,7 @@ private func snapshotPropertyLines(
       .trimmedDescription
       if property.isDebugSnapshotConvertible {
         return """
-          public var \(property.name): \(snapshotType) = \
+          \(indirectPrefix)public var \(property.name): \(snapshotType) = \
           (\(defaultValue))._debugSnapshot
           """
       } else {

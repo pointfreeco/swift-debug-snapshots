@@ -818,6 +818,76 @@
       }
     }
 
+    @Test func structWithOptionalConvertibleAddsIndirection() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        struct State {
+          @DebugSnapshotConvertible var nested: State?
+          var count: Int = 0
+        }
+        """
+      } expansion: {
+        """
+        struct State {
+          @DebugSnapshotConvertible var nested: State?
+          @DebugSnapshotTracked
+          var count: Int = 0
+
+          public struct DebugSnapshot: DebugSnapshots._DebugSnapshot, CustomReflectable {
+            @DebugSnapshots._Indirect public var nested: State.DebugSnapshot?
+            public var count: Int = 0
+            public var customMirror: Mirror {
+              Mirror(self, children: [("nested", self.nested as Any), ("count", self.count as Any)], displayStyle: .struct)
+            }
+          }
+
+          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            DebugSnapshot(nested: self.nested._debugSnapshot(visitor: &visitor), count: self.count)
+          }
+        }
+
+        extension State: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func structWithNonOptionalConvertibleAddsIndirection() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        struct State {
+          @DebugSnapshotConvertible var child: Child
+          var count: Int = 0
+        }
+        """
+      } expansion: {
+        """
+        struct State {
+          @DebugSnapshotConvertible var child: Child
+          @DebugSnapshotTracked
+          var count: Int = 0
+
+          public struct DebugSnapshot: DebugSnapshots._DebugSnapshot, CustomReflectable {
+            @DebugSnapshots._Indirect public var child: Child.DebugSnapshot
+            public var count: Int = 0
+            public var customMirror: Mirror {
+              Mirror(self, children: [("child", self.child as Any), ("count", self.count as Any)], displayStyle: .struct)
+            }
+          }
+
+          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot(visitor: &visitor), count: self.count)
+          }
+        }
+
+        extension State: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
     @Test func DebugSnapshotsConvertiblePrivateProperty() {
       assertMacro {
         """
