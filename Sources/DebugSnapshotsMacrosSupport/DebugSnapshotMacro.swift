@@ -245,7 +245,7 @@ private func structMemberDeclarations(
   if hasIndirectProperties {
     let mirrorChildren =
       properties
-      .map { "\"\($0.name)\": \($0.name)" }
+      .map { "\"\($0.name)\": \($0.name) as Any" }
       .joined(separator: ", ")
     customMirrorDecl = """
       \npublic var customMirror: Mirror {
