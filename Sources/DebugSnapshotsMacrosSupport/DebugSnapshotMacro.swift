@@ -231,17 +231,36 @@ private func structMemberDeclarations(
     ) + propagatedAttributes.conformances
   )
   let propertyLines = snapshotPropertyLines(for: properties, modelName: modelDecl.name)
+  let hasIndirectProperties = properties.contains(where: \.isDebugSnapshotConvertible)
+  var allConformances = debugSnapshotConformances
+  if hasIndirectProperties {
+    allConformances.append("CustomReflectable")
+  }
   let conformancesDescription =
     snapshotConformanceDescription(
       adding: "\(moduleName)._DebugSnapshot",
-      to: debugSnapshotConformances
+      to: allConformances
     )
+  let customMirrorDecl: String
+  if hasIndirectProperties {
+    let mirrorChildren =
+      properties
+      .map { "\"\($0.name)\": \($0.name)" }
+      .joined(separator: ", ")
+    customMirrorDecl = """
+      \npublic var customMirror: Mirror {
+      Mirror(self, children: [\(mirrorChildren)], displayStyle: .struct)
+      }
+      """
+  } else {
+    customMirrorDecl = ""
+  }
   let representation =
     DeclSyntax(
       """
       \(raw: propagatedAttributes.description)\
       public struct DebugSnapshot\(raw: conformancesDescription) {
-      \(raw: propertyLines.joined(separator: "\n"))
+      \(raw: propertyLines.joined(separator: "\n"))\(raw: customMirrorDecl)
       }
       """
     )
@@ -377,7 +396,7 @@ private func snapshotPropertyLines(
       )
       .trimmedDescription
       if property.isDebugSnapshotConvertible {
-        return "\(indirectPrefix)public var \(property.name) = \(moduleName)._debugSnapshot(\(defaultValue))"
+        return "\(indirectPrefix)public var \(property.name) = \(moduleName).snap(\(defaultValue))"
       } else {
         return "public var \(property.name) = \(defaultValue)"
       }
@@ -395,7 +414,7 @@ private func snapshotPropertyLines(
       if property.isDebugSnapshotConvertible {
         return """
           \(indirectPrefix)public var \(property.name): \(snapshotType) = \
-          \(moduleName)._debugSnapshot(\(defaultValue))
+          \(moduleName).snap(\(defaultValue))
           """
       } else {
         return "public var \(property.name): \(type) = \(defaultValue)"
@@ -442,7 +461,7 @@ private func classInitParamTypeAndDefault(
     )
     .trimmedDescription
     if property.isDebugSnapshotConvertible {
-      return ("_", "\(moduleName)._debugSnapshot(\(defaultValue))")
+      return ("_", "\(moduleName).snap(\(defaultValue))")
     } else {
       return ("_", defaultValue)
     }
@@ -462,7 +481,7 @@ private func classInitParamTypeAndDefault(
       if let simpleDefault = convertibleDefaultValue(for: type) {
         return (snapshotType, simpleDefault)
       }
-      return (snapshotType, "\(moduleName)._debugSnapshot(\(defaultValue))")
+      return (snapshotType, "\(moduleName).snap(\(defaultValue))")
     } else {
       return (snapshotType, defaultValue)
     }

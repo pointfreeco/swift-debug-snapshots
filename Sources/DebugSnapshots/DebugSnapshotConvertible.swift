@@ -24,10 +24,6 @@ public func _debugSnapshot<T: DebugSnapshotConvertible>(
   T._debugSnapshot(value, visitor: &visitor)
 }
 
-public func _debugSnapshot<T: DebugSnapshotConvertible>(_ value: T) -> T.DebugSnapshot {
-  T._debugSnapshot(value)
-}
-
 extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertible {
   public static func _debugSnapshot(_ value: Self, visitor: inout _DebugSnapshotVisitor) -> [Element.DebugSnapshot] {
     var result: [Element.DebugSnapshot] = []
