@@ -68,13 +68,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(title: self.title)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(title: value.title)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -138,13 +138,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(doubledCount: self.doubledCount, count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(doubledCount: value.doubledCount, count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -203,13 +203,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -269,13 +269,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -332,13 +332,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -393,13 +393,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -453,13 +453,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -502,13 +502,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: EmptyModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -563,13 +563,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -627,13 +627,13 @@
               }
             }
 
-            public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-              if let existing: DebugSnapshot = visitor.lookup(self) {
+            public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let snapshot = DebugSnapshot(count: self.count)
-              snapshot._originIdentifier = ObjectIdentifier(self)
-              visitor.register(self, snapshot: snapshot)
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = ObjectIdentifier(value)
+              visitor.register(value, snapshot: snapshot)
               return snapshot
             }
           }
@@ -681,13 +681,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -747,14 +747,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -800,89 +800,19 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
 
         extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
-        }
-        """
-      }
-    }
-
-    @Test func structWithOptionalConvertibleAddsIndirection() {
-      assertMacro {
-        """
-        @DebugSnapshot
-        struct State {
-          @DebugSnapshotConvertible var nested: State?
-          var count: Int = 0
-        }
-        """
-      } expansion: {
-        """
-        struct State {
-          @DebugSnapshotConvertible var nested: State?
-          @DebugSnapshotTracked
-          var count: Int = 0
-
-          public struct DebugSnapshot: DebugSnapshots._DebugSnapshot, CustomReflectable {
-            @DebugSnapshots._Indirect public var nested: State.DebugSnapshot?
-            public var count: Int = 0
-            public var customMirror: Mirror {
-              Mirror(self, children: [("nested", self.nested as Any), ("count", self.count as Any)], displayStyle: .struct)
-            }
-          }
-
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(nested: self.nested._debugSnapshot(visitor: &visitor), count: self.count)
-          }
-        }
-
-        extension State: DebugSnapshots.DebugSnapshotConvertible {
-        }
-        """
-      }
-    }
-
-    @Test func structWithNonOptionalConvertibleAddsIndirection() {
-      assertMacro {
-        """
-        @DebugSnapshot
-        struct State {
-          @DebugSnapshotConvertible var child: Child
-          var count: Int = 0
-        }
-        """
-      } expansion: {
-        """
-        struct State {
-          @DebugSnapshotConvertible var child: Child
-          @DebugSnapshotTracked
-          var count: Int = 0
-
-          public struct DebugSnapshot: DebugSnapshots._DebugSnapshot, CustomReflectable {
-            @DebugSnapshots._Indirect public var child: Child.DebugSnapshot
-            public var count: Int = 0
-            public var customMirror: Mirror {
-              Mirror(self, children: [("child", self.child as Any), ("count", self.count as Any)], displayStyle: .struct)
-            }
-          }
-
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(child: self.child._debugSnapshot(visitor: &visitor), count: self.count)
-          }
-        }
-
-        extension State: DebugSnapshots.DebugSnapshotConvertible {
         }
         """
       }
@@ -936,14 +866,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -998,13 +928,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -1033,8 +963,8 @@
             public var count: Int
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(count: self.count)
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            DebugSnapshot(count: value.count)
           }
         }
 
@@ -1080,13 +1010,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(count: self.count)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }
@@ -1119,8 +1049,8 @@
             public var count: Int
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(id: self.id, count: self.count)
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            DebugSnapshot(id: value.id, count: value.count)
           }
         }
 
@@ -1150,8 +1080,8 @@
             public var count: Int
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(count: self.count)
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            DebugSnapshot(count: value.count)
           }
         }
 
@@ -1175,7 +1105,7 @@
           @DebugSnapshotConvertible var child = Child()
 
           public struct DebugSnapshotValue {
-            public var child = (Child())._debugSnapshot
+            public var child = DebugSnapshots._debugSnapshot(Child())
           }
 
           @dynamicMemberLookup
@@ -1183,7 +1113,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: _ = (Child())._debugSnapshot) {
+            public init(child: _ = DebugSnapshots._debugSnapshot(Child())) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1196,14 +1126,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1228,7 +1158,7 @@
           @DebugSnapshotConvertible var child: Child = Child()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = (Child())._debugSnapshot
+            public var child: Child.DebugSnapshot = DebugSnapshots._debugSnapshot(Child())
           }
 
           @dynamicMemberLookup
@@ -1236,7 +1166,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = (Child())._debugSnapshot) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots._debugSnapshot(Child())) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1249,14 +1179,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1289,7 +1219,7 @@
           }
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = (FeatureModel.makeChild())._debugSnapshot
+            public var child: Child.DebugSnapshot = DebugSnapshots._debugSnapshot(FeatureModel.makeChild())
           }
 
           @dynamicMemberLookup
@@ -1297,7 +1227,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = (FeatureModel.makeChild())._debugSnapshot) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots._debugSnapshot(FeatureModel.makeChild())) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1310,14 +1240,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1342,7 +1272,7 @@
           @DebugSnapshotConvertible var child: Child = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = (Child.make())._debugSnapshot
+            public var child: Child.DebugSnapshot = DebugSnapshots._debugSnapshot(Child.make())
           }
 
           @dynamicMemberLookup
@@ -1350,7 +1280,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = (Child.make())._debugSnapshot) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots._debugSnapshot(Child.make())) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1363,14 +1293,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1395,7 +1325,7 @@
           @DebugSnapshotConvertible var child: Child? = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot? = (Child.make())._debugSnapshot
+            public var child: Child.DebugSnapshot? = DebugSnapshots._debugSnapshot(Child.make())
           }
 
           @dynamicMemberLookup
@@ -1416,14 +1346,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1448,7 +1378,7 @@
           @DebugSnapshotConvertible var child: Child?? = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot?? = (Child.make())._debugSnapshot
+            public var child: Child.DebugSnapshot?? = DebugSnapshots._debugSnapshot(Child.make())
           }
 
           @dynamicMemberLookup
@@ -1469,14 +1399,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1501,7 +1431,7 @@
           @DebugSnapshotConvertible var child: Child = Factory<Self>.make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = (Factory<FeatureModel>.make())._debugSnapshot
+            public var child: Child.DebugSnapshot = DebugSnapshots._debugSnapshot(Factory<FeatureModel>.make())
           }
 
           @dynamicMemberLookup
@@ -1509,7 +1439,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = (Factory<FeatureModel>.make())._debugSnapshot) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots._debugSnapshot(Factory<FeatureModel>.make())) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1522,14 +1452,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1554,7 +1484,7 @@
           @DebugSnapshotConvertible var child: ChildContainer = ChildContainer(child: .make())
 
           public struct DebugSnapshotValue {
-            public var child: ChildContainer.DebugSnapshot = (ChildContainer(child: .make()))._debugSnapshot
+            public var child: ChildContainer.DebugSnapshot = DebugSnapshots._debugSnapshot(ChildContainer(child: .make()))
           }
 
           @dynamicMemberLookup
@@ -1562,7 +1492,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: ChildContainer.DebugSnapshot = (ChildContainer(child: .make()))._debugSnapshot) {
+            public init(child: ChildContainer.DebugSnapshot = DebugSnapshots._debugSnapshot(ChildContainer(child: .make()))) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1575,14 +1505,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1615,9 +1545,9 @@
           }
 
           public struct DebugSnapshotValue {
-            public var child = ({
+            public var child = DebugSnapshots._debugSnapshot({
                 FeatureModel.makeChild()
-              }())._debugSnapshot
+              }())
           }
 
           @dynamicMemberLookup
@@ -1625,9 +1555,9 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: _ = ({
+            public init(child: _ = DebugSnapshots._debugSnapshot({
                   FeatureModel.makeChild()
-                }())._debugSnapshot) {
+                }())) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1640,14 +1570,14 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
             let snapshot = DebugSnapshot()
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
-            snapshot.child = self.child._debugSnapshot(visitor: &visitor)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
             return snapshot
           }
         }
@@ -1685,12 +1615,12 @@
             case update(Int, String)
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            switch self {
+          public static func _debugSnapshot(_ value: FeatureAction, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            switch value {
             case .increment:
               return .increment
             case .decrement(let v1):
-              return .decrement(v1._debugSnapshot(visitor: &visitor))
+              return .decrement(DebugSnapshots._debugSnapshot(v1, visitor: &visitor))
             case .update(let v1, let v2):
               return .update(v1, v2)
             }
@@ -1726,10 +1656,10 @@
             case increment
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            switch self {
+          public static func _debugSnapshot(_ value: FeatureAction, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            switch value {
             case .decrement(let v1):
-              return .decrement(v1._debugSnapshot(visitor: &visitor))
+              return .decrement(DebugSnapshots._debugSnapshot(v1, visitor: &visitor))
             case .increment:
               return .increment
             }
@@ -1765,10 +1695,10 @@
             case done
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            switch self {
+          public static func _debugSnapshot(_ value: FeatureAction, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            switch value {
             case .next(let v1):
-              return .next(v1._debugSnapshot(visitor: &visitor))
+              return .next(DebugSnapshots._debugSnapshot(v1, visitor: &visitor))
             case .done:
               return .done
             }
@@ -1804,10 +1734,10 @@
             case done
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            switch self {
+          public static func _debugSnapshot(_ value: FeatureAction, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            switch value {
             case .next(let v1):
-              return .next(v1._debugSnapshot(visitor: &visitor))
+              return .next(DebugSnapshots._debugSnapshot(v1, visitor: &visitor))
             case .done:
               return .done
             }
@@ -1843,8 +1773,8 @@
             case increment
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            switch self {
+          public static func _debugSnapshot(_ value: FeatureAction, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            switch value {
             case .decrement:
               return .decrement
             case .increment:
@@ -1912,13 +1842,13 @@
             }
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            if let existing: DebugSnapshot = visitor.lookup(self) {
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
               return existing
             }
-            let snapshot = DebugSnapshot(reminders: self.reminders)
-            snapshot._originIdentifier = ObjectIdentifier(self)
-            visitor.register(self, snapshot: snapshot)
+            let snapshot = DebugSnapshot(reminders: value.reminders)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
             return snapshot
           }
         }

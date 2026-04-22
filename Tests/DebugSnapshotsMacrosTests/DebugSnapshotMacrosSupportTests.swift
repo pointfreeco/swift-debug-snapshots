@@ -103,8 +103,8 @@
             case increment
           }
 
-          public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            switch self {
+          public static func _debugSnapshot(_ value: FeatureAction, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            switch value {
             case .increment:
               return .increment
             }
