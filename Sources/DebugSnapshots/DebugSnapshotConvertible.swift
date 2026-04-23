@@ -32,6 +32,20 @@ extension Array where Element: DebugSnapshotConvertible {
   }
 }
 
+extension Dictionary where Value: DebugSnapshotConvertible {
+  public static func _debugSnapshot(
+    _ value: Self,
+    visitor: inout _DebugSnapshotVisitor
+  ) -> [Key: Value.DebugSnapshot] {
+    var result: [Key: Value.DebugSnapshot] = [:]
+    result.reserveCapacity(value.count)
+    for (key, value) in value {
+      result[key] = Value._debugSnapshot(value, visitor: &visitor)
+    }
+    return result
+  }
+}
+
 extension Optional: DebugSnapshotConvertible where Wrapped: DebugSnapshotConvertible {
   public static func _debugSnapshot(
     _ value: Self,
