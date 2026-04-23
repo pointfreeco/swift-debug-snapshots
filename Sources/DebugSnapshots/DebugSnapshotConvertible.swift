@@ -18,7 +18,7 @@ public func _debugSnapshot<T: DebugSnapshotConvertible>(
   T._debugSnapshot(value, visitor: &visitor)
 }
 
-extension Array where Element: DebugSnapshotConvertible {
+extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertible {
   public static func _debugSnapshot(
     _ value: Self,
     visitor: inout _DebugSnapshotVisitor

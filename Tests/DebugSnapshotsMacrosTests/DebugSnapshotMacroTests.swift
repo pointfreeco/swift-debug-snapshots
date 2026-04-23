@@ -1858,5 +1858,75 @@
         """
       }
     }
+
+    @Test func structWithOptionalConvertibleAddsIndirection() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        struct State {
+          @DebugSnapshotConvertible var nested: State?
+          var count: Int = 0
+        }
+        """
+      } expansion: {
+        """
+        struct State {
+          @DebugSnapshotConvertible var nested: State?
+          @DebugSnapshotTracked
+          var count: Int = 0
+
+          public struct DebugSnapshot: CustomReflectable {
+            @DebugSnapshots._Indirect public var nested: State.DebugSnapshot?
+            public var count: Int = 0
+            public var customMirror: Mirror {
+              Mirror(self, children: ["nested": nested as Any, "count": count as Any], displayStyle: .struct)
+            }
+          }
+
+          public static func _debugSnapshot(_ value: State, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            DebugSnapshot(nested: DebugSnapshots._debugSnapshot(value.nested, visitor: &visitor), count: value.count)
+          }
+        }
+
+        extension State: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func structWithNonOptionalConvertibleAddsIndirection() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        struct State {
+          @DebugSnapshotConvertible var child: Child
+          var count: Int = 0
+        }
+        """
+      } expansion: {
+        """
+        struct State {
+          @DebugSnapshotConvertible var child: Child
+          @DebugSnapshotTracked
+          var count: Int = 0
+
+          public struct DebugSnapshot: CustomReflectable {
+            @DebugSnapshots._Indirect public var child: Child.DebugSnapshot
+            public var count: Int = 0
+            public var customMirror: Mirror {
+              Mirror(self, children: ["child": child as Any, "count": count as Any], displayStyle: .struct)
+            }
+          }
+
+          public static func _debugSnapshot(_ value: State, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            DebugSnapshot(child: DebugSnapshots._debugSnapshot(value.child, visitor: &visitor), count: value.count)
+          }
+        }
+
+        extension State: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
   }
 #endif
