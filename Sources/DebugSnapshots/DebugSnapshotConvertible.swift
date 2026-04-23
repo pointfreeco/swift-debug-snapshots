@@ -24,8 +24,11 @@ public func _debugSnapshot<T: DebugSnapshotConvertible>(
   T._debugSnapshot(value, visitor: &visitor)
 }
 
-extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertible {
-  public static func _debugSnapshot(_ value: Self, visitor: inout _DebugSnapshotVisitor) -> [Element.DebugSnapshot] {
+extension Collection where Element: DebugSnapshotConvertible {
+  public static func _debugSnapshot(
+    _ value: Self,
+    visitor: inout _DebugSnapshotVisitor
+  ) -> [Element.DebugSnapshot] {
     var result: [Element.DebugSnapshot] = []
     result.reserveCapacity(value.count)
     for element in value {
@@ -34,6 +37,8 @@ extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertibl
     return result
   }
 }
+
+extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertible {}
 
 extension Optional: DebugSnapshotConvertible where Wrapped: DebugSnapshotConvertible {
   public static func _debugSnapshot(_ value: Self, visitor: inout _DebugSnapshotVisitor) -> Wrapped.DebugSnapshot? {
