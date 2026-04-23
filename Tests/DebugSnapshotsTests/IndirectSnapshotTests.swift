@@ -13,10 +13,10 @@ struct IndirectSnapshotTests {
 
   @Test func snapshotMutationIndependentOfSource() {
     let original = Parent(name: "p", child: Child(count: 5))
-    var snapshot = original._debugSnapshot
+    var snapshot = snap(original)
     snapshot.child?.count = 999
     #expect(snapshot.child?.count == 999)
-    let fresh = original._debugSnapshot
+    let fresh = snap(original)
     #expect(fresh.child?.count == 5)
   }
 

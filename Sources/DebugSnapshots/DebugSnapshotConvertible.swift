@@ -5,37 +5,57 @@ public import CustomDump
 /// This conformance is automatically applied to a type using the ``DebugSnapshot()`` macro.
 public protocol DebugSnapshotConvertible<DebugSnapshot> {
   /// A type representing a "snapshot" of this type.
-  associatedtype DebugSnapshot: _DebugSnapshot
+  associatedtype DebugSnapshot
 
-  func _debugSnapshot(visitor: inout _DebugSnapshotVisitor) -> DebugSnapshot
+  static func _debugSnapshot(_ value: Self, visitor: inout _DebugSnapshotVisitor) -> DebugSnapshot
 }
 
-// TODO: Get rid of this helper?
-extension DebugSnapshotConvertible {
-  public var _debugSnapshot: DebugSnapshot {
-    var visitor = _DebugSnapshotVisitor()
-    return _debugSnapshot(visitor: &visitor)
-  }
+
+public func _debugSnapshot<T: DebugSnapshotConvertible>(
+  _ value: T,
+  visitor: inout _DebugSnapshotVisitor
+) -> T.DebugSnapshot {
+  T._debugSnapshot(value, visitor: &visitor)
 }
 
 extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertible {
-  public func _debugSnapshot(visitor: inout _DebugSnapshotVisitor) -> [Element.DebugSnapshot] {
+  public static func _debugSnapshot(
+    _ value: Self,
+    visitor: inout _DebugSnapshotVisitor
+  ) -> [Element.DebugSnapshot] {
     var result: [Element.DebugSnapshot] = []
-    result.reserveCapacity(count)
-    for element in self {
-      result.append(element._debugSnapshot(visitor: &visitor))
+    result.reserveCapacity(value.count)
+    for element in value {
+      result.append(Element._debugSnapshot(element, visitor: &visitor))
+    }
+    return result
+  }
+}
+
+extension Dictionary where Value: DebugSnapshotConvertible {
+  public static func _debugSnapshot(
+    _ value: Self,
+    visitor: inout _DebugSnapshotVisitor
+  ) -> [Key: Value.DebugSnapshot] {
+    var result: [Key: Value.DebugSnapshot] = [:]
+    result.reserveCapacity(value.count)
+    for (key, value) in value {
+      result[key] = Value._debugSnapshot(value, visitor: &visitor)
     }
     return result
   }
 }
 
 extension Optional: DebugSnapshotConvertible where Wrapped: DebugSnapshotConvertible {
-  public func _debugSnapshot(visitor: inout _DebugSnapshotVisitor) -> Wrapped.DebugSnapshot? {
-    switch self {
+  public static func _debugSnapshot(
+    _ value: Self,
+    visitor: inout _DebugSnapshotVisitor
+  ) -> Wrapped.DebugSnapshot? {
+    switch value {
     case .none:
       return nil
-    case .some(let value):
-      return value._debugSnapshot(visitor: &visitor)
+    case .some(let wrapped):
+      return Wrapped._debugSnapshot(wrapped, visitor: &visitor)
     }
   }
 }
@@ -54,8 +74,7 @@ public struct _DebugSnapshotVisitor: @unchecked Sendable {
   }
 }
 
-public protocol _DebugSnapshotObject<Snapshot>: AnyObject, CustomDumpReflectable, _CustomDiffObject,
-  _DebugSnapshot
+public protocol _DebugSnapshotObject<Snapshot>: AnyObject, CustomDumpReflectable, _CustomDiffObject
 {
   associatedtype Snapshot
   var _snapshot: Snapshot { get set }

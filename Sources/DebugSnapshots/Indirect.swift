@@ -60,3 +60,9 @@ extension _Indirect: Identifiable where Value: Identifiable {
 }
 
 extension _Indirect: Sendable where Value: Sendable {}
+
+extension _Indirect: CustomReflectable {
+  public var customMirror: Mirror {
+    Mirror(reflecting: wrappedValue)
+  }
+}
