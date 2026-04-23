@@ -1,12 +1,16 @@
 #if IdentifiedCollections
   public import IdentifiedCollections
 
-  extension IdentifiedArray: DebugSnapshotConvertible where Element: DebugSnapshotConvertible {
-    public func _debugSnapshot(visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> [Element.DebugSnapshot] {
-      var result: [Element.DebugSnapshot] = []
-      result.reserveCapacity(count)
-      for element in self.elements {
-        result.append(element._debugSnapshot(visitor: &visitor))
+  extension IdentifiedArray: DebugSnapshotConvertible
+  where Element: DebugSnapshotConvertible & Identifiable, Element.DebugSnapshot: Identifiable<ID> {
+    public static func _debugSnapshot(
+      _ value: IdentifiedArray<ID, Element>,
+      visitor: inout _DebugSnapshotVisitor
+    ) -> IdentifiedArray<ID, Element.DebugSnapshot> {
+      var result: IdentifiedArray<ID, Element.DebugSnapshot> = []
+      result.reserveCapacity(value.count)
+      for element in value {
+        result.append(Element._debugSnapshot(element, visitor: &visitor))
       }
       return result
     }
