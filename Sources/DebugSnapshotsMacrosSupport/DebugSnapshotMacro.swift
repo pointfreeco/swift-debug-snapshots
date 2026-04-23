@@ -237,10 +237,7 @@ private func structMemberDeclarations(
     allConformances.append("CustomReflectable")
   }
   let conformancesDescription =
-    snapshotConformanceDescription(
-      adding: "\(moduleName)._DebugSnapshot",
-      to: allConformances
-    )
+    snapshotConformanceDescription(allConformances)
   let customMirrorDecl: String
   if hasIndirectProperties {
     let mirrorChildren =
@@ -519,10 +516,7 @@ private func enumMemberDeclarations(
     ) + propagatedAttributes.conformances
   )
   let conformanceDescription =
-    snapshotConformanceDescription(
-      adding: "\(moduleName)._DebugSnapshot",
-      to: debugSnapshotConformances
-    )
+    snapshotConformanceDescription(debugSnapshotConformances)
   let snapshotCaseLines = enumCases.map(debugSnapshotCaseDeclaration)
   let representation =
     DeclSyntax(
@@ -1058,10 +1052,9 @@ private func debugSnapshotConformances(
 }
 
 private func snapshotConformanceDescription(
-  adding conformance: String,
-  to existing: [String]
+  _ conformances: [String]
 ) -> String {
-  let conformances = deduplicatedConformances([conformance] + existing)
+  let conformances = deduplicatedConformances(conformances)
   return conformances.isEmpty ? "" : ": \(conformances.joined(separator: ", "))"
 }
 

@@ -5,17 +5,11 @@ public import CustomDump
 /// This conformance is automatically applied to a type using the ``DebugSnapshot()`` macro.
 public protocol DebugSnapshotConvertible<DebugSnapshot> {
   /// A type representing a "snapshot" of this type.
-  associatedtype DebugSnapshot: _DebugSnapshot
+  associatedtype DebugSnapshot
 
   static func _debugSnapshot(_ value: Self, visitor: inout _DebugSnapshotVisitor) -> DebugSnapshot
 }
 
-extension DebugSnapshotConvertible {
-  public static func _debugSnapshot(_ value: Self) -> DebugSnapshot {
-    var visitor = _DebugSnapshotVisitor()
-    return _debugSnapshot(value, visitor: &visitor)
-  }
-}
 
 public func _debugSnapshot<T: DebugSnapshotConvertible>(
   _ value: T,
@@ -41,7 +35,10 @@ extension Collection where Element: DebugSnapshotConvertible {
 extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertible {}
 
 extension Optional: DebugSnapshotConvertible where Wrapped: DebugSnapshotConvertible {
-  public static func _debugSnapshot(_ value: Self, visitor: inout _DebugSnapshotVisitor) -> Wrapped.DebugSnapshot? {
+  public static func _debugSnapshot(
+    _ value: Self,
+    visitor: inout _DebugSnapshotVisitor
+  ) -> Wrapped.DebugSnapshot? {
     switch value {
     case .none:
       return nil
@@ -65,8 +62,7 @@ public struct _DebugSnapshotVisitor: @unchecked Sendable {
   }
 }
 
-public protocol _DebugSnapshotObject<Snapshot>: AnyObject, CustomDumpReflectable, _CustomDiffObject,
-  _DebugSnapshot
+public protocol _DebugSnapshotObject<Snapshot>: AnyObject, CustomDumpReflectable, _CustomDiffObject
 {
   associatedtype Snapshot
   var _snapshot: Snapshot { get set }

@@ -203,7 +203,7 @@ private final class Wrapper {
     blob.name = "Blob!"
     let after = snap(blobJr)
 
-    let difference = after.difference(from: before)
+    let difference = _diff(before, after)
     #expect(difference?.contains(#"-       name: "Blob""#) == true)
     #expect(difference?.contains(#"+       name: "Blob!""#) == true)
     #expect(difference?.contains(#"referrer: #1 UserModel.DebugSnapshot(↩︎)"#) == true)

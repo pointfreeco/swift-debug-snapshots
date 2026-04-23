@@ -959,7 +959,7 @@
           @DebugSnapshotTracked
           var count: Int
 
-          public struct DebugSnapshot: DebugSnapshots._DebugSnapshot, Sendable {
+          public struct DebugSnapshot: Sendable {
             public var count: Int
           }
 
@@ -1044,7 +1044,7 @@
           @DebugSnapshotTracked
           var count: Int
 
-          public struct DebugSnapshot: DebugSnapshots._DebugSnapshot, Identifiable {
+          public struct DebugSnapshot: Identifiable {
             public var id: UUID
             public var count: Int
           }
@@ -1076,7 +1076,7 @@
           @DebugSnapshotTracked
           var count: Int
 
-          public struct DebugSnapshot: DebugSnapshots._DebugSnapshot {
+          public struct DebugSnapshot {
             public var count: Int
           }
 
@@ -1609,7 +1609,7 @@
           @DebugSnapshotTracked
           case update(Int, String)
 
-          public enum DebugSnapshot: DebugSnapshots._DebugSnapshot {
+          public enum DebugSnapshot {
             case increment
             case decrement(Bar.DebugSnapshot)
             case update(Int, String)
@@ -1651,7 +1651,7 @@
           @DebugSnapshotTracked
           case increment
 
-          public enum DebugSnapshot: DebugSnapshots._DebugSnapshot {
+          public enum DebugSnapshot {
             case decrement(Bar.DebugSnapshot?)
             case increment
           }
@@ -1690,7 +1690,7 @@
           @DebugSnapshotTracked
           case done
 
-          public indirect enum DebugSnapshot: DebugSnapshots._DebugSnapshot {
+          public indirect enum DebugSnapshot {
             case next(FeatureAction.DebugSnapshot)
             case done
           }
@@ -1729,7 +1729,7 @@
           @DebugSnapshotTracked
           case done
 
-          public enum DebugSnapshot: DebugSnapshots._DebugSnapshot {
+          public enum DebugSnapshot {
             indirect case next(FeatureAction.DebugSnapshot)
             case done
           }
@@ -1768,7 +1768,7 @@
           @DebugSnapshotTracked
           case increment
 
-          public enum DebugSnapshot: DebugSnapshots._DebugSnapshot {
+          public enum DebugSnapshot {
             case decrement
             case increment
           }

@@ -333,8 +333,7 @@ private func reportReflectiveDifference<Value>(
   column: UInt
 ) {
   let format = DiffFormat.proportional
-  prepareDiffTargets(expected, actual)
-  guard let difference = diff(expected, actual, format: format)
+  guard let difference = _diff(expected, actual, format: format)
   else {
     reportIssue(
       """

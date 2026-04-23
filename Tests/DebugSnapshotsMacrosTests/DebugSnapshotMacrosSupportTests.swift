@@ -99,7 +99,7 @@
 
           @CasePathable
           @dynamicMemberLookup
-          public enum DebugSnapshot: DebugSnapshots._DebugSnapshot, CasePaths.CasePathable, CasePaths.CasePathIterable {
+          public enum DebugSnapshot: CasePaths.CasePathable, CasePaths.CasePathIterable {
             case increment
           }
 

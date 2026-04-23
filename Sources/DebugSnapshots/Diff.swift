@@ -30,7 +30,7 @@ public func diff<Value, Result, Failure: Error>(
   let original = snap(instance())
   let result = try operation()
   let actual = snap(instance())
-  if let difference = actual.difference(from: original, format: format) {
+  if let difference = _diff(original, actual, format: format) {
     print(
       """
       Difference: ...
@@ -74,7 +74,7 @@ public func diff<Value, Result, Failure: Error>(
   let original = snap(instance())
   let result = try await operation()
   let actual = snap(instance())
-  if let difference = actual.difference(from: original, format: format) {
+  if let difference = _diff(original, actual, format: format) {
     print(
       """
       Difference: ...
@@ -88,17 +88,11 @@ public func diff<Value, Result, Failure: Error>(
   return result
 }
 
-public protocol _DebugSnapshot {
-  func difference(from previous: Self, format: DiffFormat) -> String?
+public func _diff<Value>(
+  _ previous: Value,
+  _ current: Value,
+  format: DiffFormat = .default
+) -> String? {
+  prepareDiffTargets(previous, current)
+  return CustomDump.diff(previous, current, format: format)
 }
-
-extension Array: _DebugSnapshot where Element: _DebugSnapshot {}
-
-extension _DebugSnapshot {
-  public func difference(from previous: Self, format: DiffFormat = .default) -> String? {
-    prepareDiffTargets(previous, self)
-    return CustomDump.diff(previous, self, format: format)
-  }
-}
-
-extension Optional: _DebugSnapshot where Wrapped: _DebugSnapshot {}

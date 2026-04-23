@@ -3,5 +3,6 @@
 /// - Parameter instance: An instance of a snapshottable type.
 /// - Returns: A snapshot.
 public func snap<T: DebugSnapshotConvertible>(_ model: T) -> T.DebugSnapshot {
-  T._debugSnapshot(model)
+  var visitor = _DebugSnapshotVisitor()
+  return T._debugSnapshot(model, visitor: &visitor)
 }
