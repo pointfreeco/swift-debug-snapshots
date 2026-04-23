@@ -176,6 +176,7 @@ private func memberDeclarations(
     )
   case .enumeration(let enumCases):
     return enumMemberDeclarations(
+      name: modelDecl.name,
       declaration: declaration,
       enumCases: enumCases,
       filterPropagatedAttributes: filterPropagatedAttributes,
@@ -223,57 +224,59 @@ private func structMemberDeclarations(
     filterPropagatedAttributes: filterPropagatedAttributes,
     attributeConformanceMapping: attributeConformanceMapping
   )
-  let hasConvertibles = properties.contains(where: \.isDebugSnapshotConvertible)
   let debugSnapshotConformances = deduplicatedConformances(
     debugSnapshotConformances(
       for: declaration,
       properties: properties
     ) + propagatedAttributes.conformances
-    + (hasConvertibles ? ["CustomReflectable"] : [])
   )
   let propertyLines = snapshotPropertyLines(for: properties, modelName: modelDecl.name)
+  let hasIndirectProperties = properties.contains(where: \.isDebugSnapshotConvertible)
+  var allConformances = debugSnapshotConformances
+  if hasIndirectProperties {
+    allConformances.append("CustomReflectable")
+  }
   let conformancesDescription =
-    snapshotConformanceDescription(
-      adding: "\(moduleName)._DebugSnapshot",
-      to: debugSnapshotConformances
-    )
-  let customMirrorMember = hasConvertibles ? customMirrorDeclaration(for: properties) + "\n" : ""
+    snapshotConformanceDescription(allConformances)
+  let customMirrorDecl: String
+  if hasIndirectProperties {
+    let mirrorChildren =
+      properties
+      .map { "\"\($0.name)\": \($0.name) as Any" }
+      .joined(separator: ", ")
+    customMirrorDecl = """
+      \npublic var customMirror: Mirror {
+      Mirror(self, children: [\(mirrorChildren)], displayStyle: .struct)
+      }
+      """
+  } else {
+    customMirrorDecl = ""
+  }
   let representation =
     DeclSyntax(
       """
       \(raw: propagatedAttributes.description)\
       public struct DebugSnapshot\(raw: conformancesDescription) {
-      \(raw: propertyLines.joined(separator: "\n"))
-      \(raw: customMirrorMember)}
+      \(raw: propertyLines.joined(separator: "\n"))\(raw: customMirrorDecl)
+      }
       """
     )
 
   let visitorInitArguments =
     properties
     .map {
-      "\($0.name): self.\($0.name)\($0.isDebugSnapshotConvertible ? "._debugSnapshot(visitor: &visitor)" : "")"
+      "\($0.name): \($0.isDebugSnapshotConvertible ? "\(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" : "value.\($0.name)")"
     }
     .joined(separator: ", ")
   let _debugSnapshot =
     DeclSyntax(
       """
-      public func _debugSnapshot(visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
+      public static func _debugSnapshot(_ value: \(raw: modelDecl.name), visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
       DebugSnapshot(\(raw: visitorInitArguments))
       }
       """
     )
   return [representation, _debugSnapshot]
-}
-
-private func customMirrorDeclaration(for properties: [ModelDecl.Property]) -> String {
-  let children = properties
-    .map { "(\"\($0.name)\", self.\($0.name) as Any)" }
-    .joined(separator: ", ")
-  return """
-    public var customMirror: Mirror {
-    Mirror(self, children: [\(children)], displayStyle: .struct)
-    }
-    """
 }
 
 private func classMemberDeclarations(
@@ -339,12 +342,12 @@ private func classMemberDeclarations(
   let nonConvertibleInitArguments =
     properties
     .filter { !$0.isDebugSnapshotConvertible }
-    .map { "\($0.name): self.\($0.name)" }
+    .map { "\($0.name): value.\($0.name)" }
     .joined(separator: ", ")
   let convertibleAssignments =
     properties
     .filter { $0.isDebugSnapshotConvertible }
-    .map { "snapshot.\($0.name) = self.\($0.name)._debugSnapshot(visitor: &visitor)" }
+    .map { "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" }
   let convertibleAssignmentsCode =
     convertibleAssignments.isEmpty
     ? ""
@@ -352,11 +355,11 @@ private func classMemberDeclarations(
   let _debugSnapshotMethod =
     DeclSyntax(
       """
-      public func _debugSnapshot(visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
-      if let existing: DebugSnapshot = visitor.lookup(self) { return existing }
+      public static func _debugSnapshot(_ value: \(raw: modelDecl.name), visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
+      if let existing: DebugSnapshot = visitor.lookup(value) { return existing }
       let snapshot = DebugSnapshot(\(raw: nonConvertibleInitArguments))
-      snapshot._originIdentifier = ObjectIdentifier(self)
-      visitor.register(self, snapshot: snapshot)\(raw: convertibleAssignmentsCode)
+      snapshot._originIdentifier = ObjectIdentifier(value)
+      visitor.register(value, snapshot: snapshot)\(raw: convertibleAssignmentsCode)
       return snapshot
       }
       """
@@ -390,7 +393,7 @@ private func snapshotPropertyLines(
       )
       .trimmedDescription
       if property.isDebugSnapshotConvertible {
-        return "\(indirectPrefix)public var \(property.name) = (\(defaultValue))._debugSnapshot"
+        return "\(indirectPrefix)public var \(property.name) = \(moduleName).snap(\(defaultValue))"
       } else {
         return "public var \(property.name) = \(defaultValue)"
       }
@@ -408,7 +411,7 @@ private func snapshotPropertyLines(
       if property.isDebugSnapshotConvertible {
         return """
           \(indirectPrefix)public var \(property.name): \(snapshotType) = \
-          (\(defaultValue))._debugSnapshot
+          \(moduleName).snap(\(defaultValue))
           """
       } else {
         return "public var \(property.name): \(type) = \(defaultValue)"
@@ -455,7 +458,7 @@ private func classInitParamTypeAndDefault(
     )
     .trimmedDescription
     if property.isDebugSnapshotConvertible {
-      return ("_", "(\(defaultValue))._debugSnapshot")
+      return ("_", "\(moduleName).snap(\(defaultValue))")
     } else {
       return ("_", defaultValue)
     }
@@ -475,7 +478,7 @@ private func classInitParamTypeAndDefault(
       if let simpleDefault = convertibleDefaultValue(for: type) {
         return (snapshotType, simpleDefault)
       }
-      return (snapshotType, "(\(defaultValue))._debugSnapshot")
+      return (snapshotType, "\(moduleName).snap(\(defaultValue))")
     } else {
       return (snapshotType, defaultValue)
     }
@@ -493,6 +496,7 @@ private func convertibleDefaultValue(for type: String) -> String? {
 }
 
 private func enumMemberDeclarations(
+  name: String,
   declaration: some DeclGroupSyntax,
   enumCases: [ModelDecl.EnumCase],
   filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
@@ -512,10 +516,7 @@ private func enumMemberDeclarations(
     ) + propagatedAttributes.conformances
   )
   let conformanceDescription =
-    snapshotConformanceDescription(
-      adding: "\(moduleName)._DebugSnapshot",
-      to: debugSnapshotConformances
-    )
+    snapshotConformanceDescription(debugSnapshotConformances)
   let snapshotCaseLines = enumCases.map(debugSnapshotCaseDeclaration)
   let representation =
     DeclSyntax(
@@ -530,8 +531,8 @@ private func enumMemberDeclarations(
   let _debugSnapshot =
     DeclSyntax(
       """
-      public func _debugSnapshot(visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
-      switch self {
+      public static func _debugSnapshot(_ value: \(raw: name), visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
+      switch value {
       \(raw: switchCases.joined(separator: "\n"))
       }
       }
@@ -587,7 +588,7 @@ private func debugSnapshotSwitchCase(_ enumCase: ModelDecl.EnumCase) -> String {
     .map { parameter, binding in
       let mappedValue =
         enumCase.isDebugSnapshotConvertible
-        ? "\(binding)._debugSnapshot(visitor: &visitor)"
+        ? "\(moduleName)._debugSnapshot(\(binding), visitor: &visitor)"
         : binding
       return "\(caseParameterLabelPrefix(parameter))\(mappedValue)"
     }
@@ -1051,10 +1052,9 @@ private func debugSnapshotConformances(
 }
 
 private func snapshotConformanceDescription(
-  adding conformance: String,
-  to existing: [String]
+  _ conformances: [String]
 ) -> String {
-  let conformances = deduplicatedConformances([conformance] + existing)
+  let conformances = deduplicatedConformances(conformances)
   return conformances.isEmpty ? "" : ": \(conformances.joined(separator: ", "))"
 }
 

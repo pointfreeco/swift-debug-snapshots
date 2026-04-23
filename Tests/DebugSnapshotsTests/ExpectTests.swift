@@ -167,7 +167,7 @@ private final class Wrapper {
     let blobJr = UserModel(name: "Blob Jr")
     blobJr.referrer = blobJr
 
-    let snapshot = blobJr._debugSnapshot
+    let snapshot = snap(blobJr)
 
     #expect(snapshot.referrer != nil)
     #expect(snapshot.referrer! === snapshot)
@@ -178,7 +178,7 @@ private final class Wrapper {
     _ = blobJr.refer(name: "Blob")
 
     #expect(
-      String(customDumping: blobJr._debugSnapshot)
+      String(customDumping: snap(blobJr))
         == #"""
         #1 UserModel.DebugSnapshot(
           name: "Blob Jr",
@@ -198,12 +198,12 @@ private final class Wrapper {
   @Test func snapshotDiffReferences() {
     let blobJr = UserModel(name: "Blob Jr")
     let blob = blobJr.refer(name: "Blob")
-    let before = blobJr._debugSnapshot
+    let before = snap(blobJr)
 
     blob.name = "Blob!"
-    let after = blobJr._debugSnapshot
+    let after = snap(blobJr)
 
-    let difference = after.difference(from: before)
+    let difference = _diff(before, after)
     #expect(difference?.contains(#"-       name: "Blob""#) == true)
     #expect(difference?.contains(#"+       name: "Blob!""#) == true)
     #expect(difference?.contains(#"referrer: #1 UserModel.DebugSnapshot(↩︎)"#) == true)
