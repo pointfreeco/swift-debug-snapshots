@@ -411,7 +411,7 @@ private func snapshotPropertyLines(
       if property.isDebugSnapshotConvertible {
         return """
           \(indirectPrefix)public var \(property.name): \(snapshotType) = \
-          \(moduleName).snap(\(defaultValue))
+          \(moduleName).snap(\(defaultValue) as \(type))
           """
       } else {
         return "public var \(property.name): \(type) = \(defaultValue)"
