@@ -1,15 +1,6 @@
 {
-  "originHash" : "102d70c7c82eec696ae8e656f427cc37b0000b63d43553616ee83aa9097366a5",
+  "originHash" : "1861c533a6991810d3e6d9facdf8841c9067a0bf804af65ea6e17a93f41e753b",
   "pins" : [
-    {
-      "identity" : "swift-collections",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-collections",
-      "state" : {
-        "revision" : "6675bc0ff86e61436e615df6fc5174e043e57924",
-        "version" : "1.4.1"
-      }
-    },
     {
       "identity" : "swift-custom-dump",
       "kind" : "remoteSourceControl",
@@ -17,15 +8,6 @@
       "state" : {
         "branch" : "main",
         "revision" : "b0b74196750fef785cc3402eb35531e1e2fe7bb7"
-      }
-    },
-    {
-      "identity" : "swift-identified-collections",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-identified-collections",
-      "state" : {
-        "revision" : "322d9ffeeba85c9f7c4984b39422ec7cc3c56597",
-        "version" : "1.1.1"
       }
     },
     {

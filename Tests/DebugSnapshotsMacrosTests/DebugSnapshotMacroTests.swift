@@ -1158,7 +1158,7 @@
           @DebugSnapshotConvertible var child: Child = Child()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = DebugSnapshots.snap(Child())
+            public var child: Child.DebugSnapshot = DebugSnapshots.snap(Child() as Child)
           }
 
           @dynamicMemberLookup
@@ -1219,7 +1219,7 @@
           }
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = DebugSnapshots.snap(FeatureModel.makeChild())
+            public var child: Child.DebugSnapshot = DebugSnapshots.snap(FeatureModel.makeChild() as Child)
           }
 
           @dynamicMemberLookup
@@ -1272,7 +1272,7 @@
           @DebugSnapshotConvertible var child: Child = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = DebugSnapshots.snap(Child.make())
+            public var child: Child.DebugSnapshot = DebugSnapshots.snap(Child.make() as Child)
           }
 
           @dynamicMemberLookup
@@ -1325,7 +1325,7 @@
           @DebugSnapshotConvertible var child: Child? = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot? = DebugSnapshots.snap(Child.make())
+            public var child: Child.DebugSnapshot? = DebugSnapshots.snap(Child.make() as Child?)
           }
 
           @dynamicMemberLookup
@@ -1378,7 +1378,7 @@
           @DebugSnapshotConvertible var child: Child?? = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot?? = DebugSnapshots.snap(Child.make())
+            public var child: Child.DebugSnapshot?? = DebugSnapshots.snap(Child.make() as Child??)
           }
 
           @dynamicMemberLookup
@@ -1431,7 +1431,7 @@
           @DebugSnapshotConvertible var child: Child = Factory<Self>.make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = DebugSnapshots.snap(Factory<FeatureModel>.make())
+            public var child: Child.DebugSnapshot = DebugSnapshots.snap(Factory<FeatureModel>.make() as Child)
           }
 
           @dynamicMemberLookup
@@ -1484,7 +1484,7 @@
           @DebugSnapshotConvertible var child: ChildContainer = ChildContainer(child: .make())
 
           public struct DebugSnapshotValue {
-            public var child: ChildContainer.DebugSnapshot = DebugSnapshots.snap(ChildContainer(child: .make()))
+            public var child: ChildContainer.DebugSnapshot = DebugSnapshots.snap(ChildContainer(child: .make()) as ChildContainer)
           }
 
           @dynamicMemberLookup
