@@ -668,7 +668,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(count: _ = 0) {
+            public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1920,6 +1920,120 @@
 
           public static func _debugSnapshot(_ value: State, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
             DebugSnapshot(child: DebugSnapshots._debugSnapshot(value.child, visitor: &visitor), count: value.count)
+          }
+        }
+
+        extension State: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func literals() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        final class State {
+          var count = 0
+          var opacity = 0.5
+          var text = ""
+        }
+        """
+      } expansion: {
+        """
+        final class State {
+          @DebugSnapshotTracked
+          var count = 0
+          @DebugSnapshotTracked
+          var opacity = 0.5
+          @DebugSnapshotTracked
+          var text = ""
+
+          public struct DebugSnapshotValue {
+            public var count = 0
+            public var opacity = 0.5
+            public var text = ""
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(count: Int = 0, opacity: Double = 0.5, text: String = "") {
+              self._snapshot = DebugSnapshotValue(count: count, opacity: opacity, text: text)
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: State, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(count: value.count, opacity: value.opacity, text: value.text)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension State: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func nilDefault() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        final class State {
+          var child: Child?
+        }
+        """
+      } expansion: {
+        """
+        final class State {
+          @DebugSnapshotTracked
+          var child: Child?
+
+          public struct DebugSnapshotValue {
+            public var child: Child?
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(child: Child? = nil) {
+              self._snapshot = DebugSnapshotValue(child: child)
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: State, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(child: value.child)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
           }
         }
 

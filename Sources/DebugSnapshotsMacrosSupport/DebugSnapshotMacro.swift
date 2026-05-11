@@ -380,10 +380,11 @@ private func snapshotPropertyLines(
       : ""
     switch property.kind {
     case .type(let type):
+      let typeDescription = type.trimmedDescription
       let snapshotType =
         property.isDebugSnapshotConvertible
-        ? snapshotTypeDescription(for: type, snapshotTypeName: snapshotTypeName)
-        : type
+        ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
+        : typeDescription
       return "\(indirectPrefix)public var \(property.name): \(snapshotType)"
     case .initializer(let defaultValue):
       let defaultValue = rewriteDefaultValue(
@@ -398,23 +399,24 @@ private func snapshotPropertyLines(
         return "public var \(property.name) = \(defaultValue)"
       }
     case .pair(let type, initializer: let defaultValue):
+      let typeDescription = type.trimmedDescription
       let snapshotType =
         property.isDebugSnapshotConvertible
-        ? snapshotTypeDescription(for: type, snapshotTypeName: snapshotTypeName)
-        : type
+        ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
+        : typeDescription
       let defaultValue = rewriteDefaultValue(
         defaultValue,
         modelTypeName: modelName,
-        propertyTypeName: type
+        propertyTypeName: typeDescription
       )
       .trimmedDescription
       if property.isDebugSnapshotConvertible {
         return """
           \(indirectPrefix)public var \(property.name): \(snapshotType) = \
-          \(moduleName).snap(\(defaultValue) as \(type))
+          \(moduleName).snap(\(defaultValue) as \(typeDescription))
           """
       } else {
-        return "public var \(property.name): \(type) = \(defaultValue)"
+        return "public var \(property.name): \(typeDescription) = \(defaultValue)"
       }
     }
   }
@@ -438,19 +440,23 @@ private func classInitParamTypeAndDefault(
 ) -> (type: String, default: String?) {
   switch property.kind {
   case .type(let type):
+    let typeDescription = type.trimmedDescription
     let snapshotType =
       property.isDebugSnapshotConvertible
-      ? snapshotTypeDescription(for: type, snapshotTypeName: "DebugSnapshot")
-      : type
+      ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: "DebugSnapshot")
+      : typeDescription
     let defaultValue: String? =
       if property.isDebugSnapshotConvertible {
-        convertibleDefaultValue(for: type)
+        convertibleDefaultValue(for: typeDescription)
+      } else if isOptionalType(type) {
+        "nil"
       } else {
         nil
       }
     return (snapshotType, defaultValue)
 
   case .initializer(let defaultValue):
+    let inferredType = inferredLiteralType(of: defaultValue) ?? "_"
     let defaultValue = rewriteDefaultValue(
       defaultValue,
       modelTypeName: modelName,
@@ -460,22 +466,23 @@ private func classInitParamTypeAndDefault(
     if property.isDebugSnapshotConvertible {
       return ("_", "\(moduleName).snap(\(defaultValue))")
     } else {
-      return ("_", defaultValue)
+      return (inferredType, defaultValue)
     }
 
   case .pair(let type, initializer: let defaultValue):
+    let typeDescription = type.trimmedDescription
     let snapshotType =
       property.isDebugSnapshotConvertible
-      ? snapshotTypeDescription(for: type, snapshotTypeName: "DebugSnapshot")
-      : type
+      ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: "DebugSnapshot")
+      : typeDescription
     let defaultValue = rewriteDefaultValue(
       defaultValue,
       modelTypeName: modelName,
-      propertyTypeName: type
+      propertyTypeName: typeDescription
     )
     .trimmedDescription
     if property.isDebugSnapshotConvertible {
-      if let simpleDefault = convertibleDefaultValue(for: type) {
+      if let simpleDefault = convertibleDefaultValue(for: typeDescription) {
         return (snapshotType, simpleDefault)
       }
       return (snapshotType, "\(moduleName).snap(\(defaultValue))")
@@ -483,6 +490,18 @@ private func classInitParamTypeAndDefault(
       return (snapshotType, defaultValue)
     }
   }
+}
+
+private func isOptionalType(_ type: TypeSyntax) -> Bool {
+  type.is(OptionalTypeSyntax.self) || type.is(ImplicitlyUnwrappedOptionalTypeSyntax.self)
+}
+
+private func inferredLiteralType(of expression: ExprSyntax) -> String? {
+  if expression.is(IntegerLiteralExprSyntax.self) { return "Int" }
+  if expression.is(FloatLiteralExprSyntax.self) { return "Double" }
+  if expression.is(StringLiteralExprSyntax.self) { return "String" }
+  if expression.is(BooleanLiteralExprSyntax.self) { return "Bool" }
+  return nil
 }
 
 private func convertibleDefaultValue(for type: String) -> String? {
@@ -653,9 +672,9 @@ private struct ModelDecl {
     var isDebugSnapshotConvertible: Bool
 
     enum Kind {
-      case type(String)
+      case type(TypeSyntax)
       case initializer(ExprSyntax)
-      case pair(type: String, initializer: ExprSyntax)
+      case pair(type: TypeSyntax, initializer: ExprSyntax)
     }
   }
 
@@ -813,7 +832,7 @@ private struct ModelDecl {
 
           return ModelDecl.Property(
             name: identifier,
-            kind: .type(typeAnnotation.trimmedDescription),
+            kind: .type(typeAnnotation),
             isDebugSnapshotConvertible: isDebugSnapshotConvertible
           )
         case (let typeAnnotation?, let defaultValue?):
@@ -825,7 +844,7 @@ private struct ModelDecl {
           return ModelDecl.Property(
             name: identifier,
             kind: .pair(
-              type: typeAnnotation.trimmedDescription,
+              type: typeAnnotation,
               initializer: defaultValue
             ),
             isDebugSnapshotConvertible: isDebugSnapshotConvertible
