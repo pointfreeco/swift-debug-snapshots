@@ -6,10 +6,48 @@ import IssueReporting
 /// - Parameters:
 ///   - instance: An instance of a snapshottable type.
 ///   - message: An optional description of a failure.
-///   - operation: An optional operation that causes `instance` to change. When provided, you must
-///     "exhaustively" describe how its snapshot changes. When omitted, you can write a
-///     "non-exhaustive" assertion by describing just the fields you want to assert against in the
-///     `changes` closure.
+///   - operation: An operation that causes `instance` to change. When provided, you must
+///     "exhaustively" describe how its snapshot changes.
+///   - updateExpectingResult: A closure that asserts how a snapshot of the model changes by
+///     supplying a mutable version of the initial value. This value must be modified to match the
+///     final value.
+///   - fileID: The file where the expectation occurs.
+///   - filePath: The file where the expectation occurs.
+///   - line: The line number where the expectation occurs.
+///   - column: The column where the expectation occurs.
+public func expect<Value, Result>(
+  _ instance: @autoclosure () -> some DebugSnapshotConvertible<Value>,
+  _ message: @autoclosure () -> String? = nil,
+  operation: () throws -> Result,
+  changes updateExpectingResult: (inout Value) throws -> Void,
+  fileID: StaticString = #fileID,
+  filePath: StaticString = #filePath,
+  line: UInt = #line,
+  column: UInt = #column
+) rethrows -> Result {
+  let original = snap(instance())
+  var expected = snap(instance())
+  let result = try operation()
+  try updateExpectingResult(&expected)
+  expectHelp(
+    original,
+    expected,
+    snap(instance()),
+    isExhaustive: true,
+    message(),
+    fileID: fileID,
+    filePath: filePath,
+    line: line,
+    column: column
+  )
+  return result
+}
+
+/// Expects an instance of a snapshottable type has a given set of changes.
+///
+/// - Parameters:
+///   - instance: An instance of a snapshottable type.
+///   - message: An optional description of a failure.
 ///   - updateExpectingResult: A closure that asserts how a snapshot of the model changes by
 ///     supplying a mutable version of the initial value. This value must be modified to match the
 ///     final value.
@@ -20,7 +58,6 @@ import IssueReporting
 public func expect<Value>(
   _ instance: @autoclosure () -> some DebugSnapshotConvertible<Value>,
   _ message: @autoclosure () -> String? = nil,
-  operation: (() throws -> Void)? = nil,
   changes updateExpectingResult: (inout Value) throws -> Void,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
@@ -29,13 +66,12 @@ public func expect<Value>(
 ) rethrows {
   let original = snap(instance())
   var expected = snap(instance())
-  try operation?()
   try updateExpectingResult(&expected)
   expectHelp(
     original,
     expected,
     snap(instance()),
-    isExhaustive: operation != nil,
+    isExhaustive: false,
     message(),
     fileID: fileID,
     filePath: filePath,
@@ -59,19 +95,19 @@ public func expect<Value>(
 ///   - line: The line number where the expectation occurs.
 ///   - column: The column where the expectation occurs.
 @_disfavoredOverload
-public func expect<Value>(
+public func expect<Value, Result>(
   _ instance: @autoclosure () -> some DebugSnapshotConvertible<Value>,
   _ message: @autoclosure () -> String? = nil,
-  operation: () async throws -> Void,
+  operation: nonisolated(nonsending) () async throws -> Result,
   changes updateExpectingResult: (inout Value) throws -> Void,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
   line: UInt = #line,
   column: UInt = #column
-) async rethrows {
+) async rethrows -> Result {
   let original = snap(instance())
   var expected = snap(instance())
-  try await operation()
+  let result = try await operation()
   try updateExpectingResult(&expected)
   expectHelp(
     original,
@@ -84,6 +120,7 @@ public func expect<Value>(
     line: line,
     column: column
   )
+  return result
 }
 
 private func expectHelp<Value>(

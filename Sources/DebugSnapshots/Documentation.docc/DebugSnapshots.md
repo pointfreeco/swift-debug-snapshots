@@ -47,8 +47,16 @@ final class FeatureModel {
 
 ### Generating snapshots
 
-- ``snapshot(_:)``
+- ``snap(_:)``
+
+### Diffing snapshots
+
+- ``diff(_:operation:)``
 
 ### Exhaustive testing
 
 - ``expect(_:_:operation:changes:fileID:filePath:line:column:)``
+
+### Non-exhaustive testing
+
+- ``expect(_:_:changes:fileID:filePath:line:column:)``
