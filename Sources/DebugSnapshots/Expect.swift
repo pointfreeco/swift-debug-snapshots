@@ -309,17 +309,18 @@ private func isReflectivelyEqual(
 
   guard !lhsChildren.isEmpty else {
     guard path.count > 1 else { return true }
+    lazy var name = path.last?.dropFirst() ?? "_"
     reportIssue(
       """
       Non-equatable '\(lhsType)' found at '\(path.joined())'.
 
       Make the property private to suppress this failure:
 
-        private var \(path.last?.dropFirst() ?? "_"): \(lhsType)
+        private var \(name): \(lhsType)
 
       Or use '@DebugSnapshotIgnored':
 
-        @DebugSnapshotIgnored var \(path.last?.dropFirst() ?? "_"): \(lhsType)
+        @DebugSnapshotIgnored var \(name): \(lhsType)
       """,
       fileID: fileID,
       filePath: filePath,
@@ -352,12 +353,9 @@ private func isReflectivelyEqual(
   return true
 }
 
-private func isEqual(_ lhs: any Equatable, _ rhs: Any) -> Bool {
-  func open<T: Equatable>(_ lhs: T, _ rhs: Any) -> Bool {
-    guard let rhs = rhs as? T else { return false }
-    return lhs == rhs
-  }
-  return open(lhs, rhs)
+private func isEqual<T: Equatable>(_ lhs: T, _ rhs: Any) -> Bool {
+  guard let rhs = rhs as? T else { return false }
+  return lhs == rhs
 }
 
 private func reportReflectiveDifference<Value>(
