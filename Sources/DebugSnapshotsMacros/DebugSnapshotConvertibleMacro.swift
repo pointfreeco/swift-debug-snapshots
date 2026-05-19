@@ -1,5 +1,5 @@
-import SwiftSyntax
-import SwiftSyntaxMacros
+public import SwiftSyntax
+public import SwiftSyntaxMacros
 
 public enum DebugSnapshotConvertibleMacro: PeerMacro {
   public static func expansion(

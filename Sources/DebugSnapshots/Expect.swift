@@ -98,7 +98,7 @@ public func expect<Value>(
 public func expect<Value, Result>(
   _ instance: @autoclosure () -> some DebugSnapshotConvertible<Value>,
   _ message: @autoclosure () -> String? = nil,
-  operation: nonisolated(nonsending) () async throws -> Result,
+  operation: () async throws -> Result,
   changes updateExpectingResult: (inout Value) throws -> Void,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,

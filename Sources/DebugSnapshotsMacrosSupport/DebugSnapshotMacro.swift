@@ -1,6 +1,7 @@
 import SwiftDiagnostics
-import SwiftSyntax
-import SwiftSyntaxMacros
+public import SwiftSyntax
+import SwiftSyntaxBuilder
+public import SwiftSyntaxMacros
 
 public enum DebugSnapshotAttribute {
   case convertible, ignored, tracked
