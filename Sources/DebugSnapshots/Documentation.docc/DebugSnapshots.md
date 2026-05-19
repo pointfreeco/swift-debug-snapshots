@@ -41,22 +41,13 @@ final class FeatureModel {
 ### Defining snapshots
 
 - ``DebugSnapshot()``
-- ``DebugSnapshotTracked()``
-- ``DebugSnapshotIgnored()``
-- ``DebugSnapshotConvertible()``
+
+### Testing and debugging
+
+- ``expect(_:_:operation:changes:fileID:filePath:line:column:)``
+- ``expect(_:_:changes:fileID:filePath:line:column:)``
+- ``diff(_:operation:)``
 
 ### Generating snapshots
 
 - ``snap(_:)``
-
-### Diffing snapshots
-
-- ``diff(_:operation:)``
-
-### Exhaustive testing
-
-- ``expect(_:_:operation:changes:fileID:filePath:line:column:)``
-
-### Non-exhaustive testing
-
-- ``expect(_:_:changes:fileID:filePath:line:column:)``

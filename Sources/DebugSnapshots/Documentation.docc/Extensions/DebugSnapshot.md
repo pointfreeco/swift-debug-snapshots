@@ -5,3 +5,9 @@
 ### Conformance
 
 - ``DebugSnapshotConvertible``
+
+### Tracking and ignoring properties
+
+- ``DebugSnapshotTracked()``
+- ``DebugSnapshotIgnored()``
+- ``DebugSnapshotConvertible()``
