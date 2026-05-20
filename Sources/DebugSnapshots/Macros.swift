@@ -1,10 +1,17 @@
 /// Defines a debug snapshot for a given type.
 ///
-/// When applied to a type, a conformance for ``DebugSnapshotConvertible`` is generated, along with
-/// associated snapshot types. Structs and enums get a nested `DebugSnapshot` value type, while
-/// classes get a nested `DebugSnapshot` reference wrapper backed by `DebugSnapshotValue`.
-/// Instances of these types can be returned from the ``snap(_:)`` function when it is handed a
-/// ``DebugSnapshotConvertible`` type.
+/// When applied to a type, a conformance for ``DebugSnapshotConvertible`` is generated. This
+/// includes a nested ``DebugSnapshotConvertible/DebugSnapshot``, which is a simple type devoid of
+/// logic and behavior. `DebugSnapshot` represents the data of a model instance captured at a
+/// specific moment, _i.e._ when it is passed to the ``snap(_:)`` function (or to functions that
+/// invoke ``snap(_:)`` internally, like
+/// ``expect(_:_:operation:changes:fileID:filePath:line:column:)``).
+///
+/// Structs and enums get a nested `DebugSnapshot` struct or enum, while classes get a nested
+/// `DebugSnapshot` class, preserving the type's ability to hold circular references.
+///
+/// See <doc:Customization> to learn how the macro tracks and ignores certain properties, and how
+/// to customize which properties are tracked and ignored.
 @attached(
   extension,
   conformances: DebugSnapshotConvertible

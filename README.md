@@ -159,7 +159,7 @@ and handles circular references automatically:
 final class UserModel {
   var name: String
   @DebugSnapshotConvertible var friends: [UserModel] = []
-  @DebugSnapshotConvertible var referrer: UserModel? = nil
+  @DebugSnapshotConvertible var referrer: UserModel?
 }
 ```
 

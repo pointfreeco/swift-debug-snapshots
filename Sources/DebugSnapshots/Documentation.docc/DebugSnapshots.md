@@ -40,10 +40,12 @@ final class FeatureModel {
 
 ### Defining snapshots
 
+- <doc:Customization>
 - ``DebugSnapshot()``
 
 ### Testing and debugging
 
+- <doc:Testing>
 - ``expect(_:_:operation:changes:fileID:filePath:line:column:)``
 - ``expect(_:_:changes:fileID:filePath:line:column:)``
 - ``diff(_:operation:)``
