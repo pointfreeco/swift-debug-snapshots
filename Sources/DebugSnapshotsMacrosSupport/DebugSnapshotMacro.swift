@@ -96,7 +96,14 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
       !enumCase.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotTracked"),
       !enumCase.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotConvertible")
     {
-      let attribute = debugSnapshotAttribute(DeclSyntax(enumCase)) ?? .tracked
+      let attribute: DebugSnapshotAttribute
+      if let override = debugSnapshotAttribute(DeclSyntax(enumCase)) {
+        attribute = override
+      } else if enumCase.elements.allSatisfy(isEnumElementTrackedByDefault) {
+        attribute = .tracked
+      } else {
+        attribute = .ignored
+      }
       var attributes: [AttributeSyntax] = []
       switch attribute {
       case .convertible:
@@ -272,7 +279,10 @@ private func structMemberDeclarations(
   let _debugSnapshot =
     DeclSyntax(
       """
-      public static func _debugSnapshot(_ value: \(raw: modelDecl.name), visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
+      public static func _debugSnapshot(\
+      _ value: \(raw: modelDecl.name), \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
       DebugSnapshot(\(raw: visitorInitArguments))
       }
       """
@@ -348,7 +358,9 @@ private func classMemberDeclarations(
   let convertibleAssignments =
     properties
     .filter { $0.isDebugSnapshotConvertible }
-    .map { "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" }
+    .map {
+      "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
+    }
   let convertibleAssignmentsCode =
     convertibleAssignments.isEmpty
     ? ""
@@ -356,7 +368,10 @@ private func classMemberDeclarations(
   let _debugSnapshotMethod =
     DeclSyntax(
       """
-      public static func _debugSnapshot(_ value: \(raw: modelDecl.name), visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
+      public static func _debugSnapshot(\
+      _ value: \(raw: modelDecl.name), \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
       if let existing: DebugSnapshot = visitor.lookup(value) { return existing }
       let snapshot = DebugSnapshot(\(raw: nonConvertibleInitArguments))
       snapshot._originIdentifier = ObjectIdentifier(value)
@@ -376,7 +391,8 @@ private func snapshotPropertyLines(
   applyIndirection: Bool = true
 ) -> [String] {
   properties.map { property in
-    let indirectPrefix = applyIndirection && property.isDebugSnapshotConvertible
+    let indirectPrefix =
+      applyIndirection && property.isDebugSnapshotConvertible
       ? "@\(moduleName)._Indirect "
       : ""
     switch property.kind {
@@ -388,12 +404,8 @@ private func snapshotPropertyLines(
         : typeDescription
       return "\(indirectPrefix)public var \(property.name): \(snapshotType)"
     case .initializer(let defaultValue):
-      let defaultValue = rewriteDefaultValue(
-        defaultValue,
-        modelTypeName: modelName,
-        propertyTypeName: nil
-      )
-      .trimmedDescription
+      let defaultValue = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
+        .trimmedDescription
       if property.isDebugSnapshotConvertible {
         return "\(indirectPrefix)public var \(property.name) = \(moduleName).snap(\(defaultValue))"
       } else {
@@ -405,19 +417,14 @@ private func snapshotPropertyLines(
         property.isDebugSnapshotConvertible
         ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
         : typeDescription
-      let defaultValue = rewriteDefaultValue(
-        defaultValue,
-        modelTypeName: modelName,
-        propertyTypeName: typeDescription
-      )
-      .trimmedDescription
+      let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
       if property.isDebugSnapshotConvertible {
-        return """
-          \(indirectPrefix)public var \(property.name): \(snapshotType) = \
-          \(moduleName).snap(\(defaultValue) as \(typeDescription))
-          """
+        let snapshotDefault = convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault)
+        return "\(indirectPrefix)public var \(property.name): \(snapshotType) = \(snapshotDefault)"
       } else {
-        return "public var \(property.name): \(typeDescription) = \(defaultValue)"
+        return """
+          public var \(property.name): \(typeDescription) = \(rewrittenDefault.trimmedDescription)
+          """
       }
     }
   }
@@ -446,24 +453,13 @@ private func classInitParamTypeAndDefault(
       property.isDebugSnapshotConvertible
       ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: "DebugSnapshot")
       : typeDescription
-    let defaultValue: String? =
-      if property.isDebugSnapshotConvertible {
-        convertibleDefaultValue(for: typeDescription)
-      } else if isOptionalType(type) {
-        "nil"
-      } else {
-        nil
-      }
+    let defaultValue: String? = isOptionalType(type) ? "nil" : nil
     return (snapshotType, defaultValue)
 
   case .initializer(let defaultValue):
     let inferredType = inferredLiteralType(of: defaultValue) ?? "_"
-    let defaultValue = rewriteDefaultValue(
-      defaultValue,
-      modelTypeName: modelName,
-      propertyTypeName: nil
-    )
-    .trimmedDescription
+    let defaultValue = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
+      .trimmedDescription
     if property.isDebugSnapshotConvertible {
       return ("_", "\(moduleName).snap(\(defaultValue))")
     } else {
@@ -476,19 +472,11 @@ private func classInitParamTypeAndDefault(
       property.isDebugSnapshotConvertible
       ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: "DebugSnapshot")
       : typeDescription
-    let defaultValue = rewriteDefaultValue(
-      defaultValue,
-      modelTypeName: modelName,
-      propertyTypeName: typeDescription
-    )
-    .trimmedDescription
+    let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
     if property.isDebugSnapshotConvertible {
-      if let simpleDefault = convertibleDefaultValue(for: typeDescription) {
-        return (snapshotType, simpleDefault)
-      }
-      return (snapshotType, "\(moduleName).snap(\(defaultValue))")
+      return (snapshotType, convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault))
     } else {
-      return (snapshotType, defaultValue)
+      return (snapshotType, rewrittenDefault.trimmedDescription)
     }
   }
 }
@@ -505,14 +493,14 @@ private func inferredLiteralType(of expression: ExprSyntax) -> String? {
   return nil
 }
 
-private func convertibleDefaultValue(for type: String) -> String? {
-  if type.hasSuffix("?") || type.hasSuffix("!") {
+private func convertibleSnapshotDefault(
+  for type: TypeSyntax,
+  defaultValue: ExprSyntax
+) -> String {
+  if isOptionalType(type), defaultValue.is(NilLiteralExprSyntax.self) {
     return "nil"
   }
-  if type.hasPrefix("[") {
-    return "[]"
-  }
-  return nil
+  return "\(moduleName).snap(\(defaultValue.trimmedDescription) as \(type.trimmedDescription))"
 }
 
 private func enumMemberDeclarations(
@@ -551,7 +539,10 @@ private func enumMemberDeclarations(
   let _debugSnapshot =
     DeclSyntax(
       """
-      public static func _debugSnapshot(_ value: \(raw: name), visitor: inout \(raw: moduleName)._DebugSnapshotVisitor) -> DebugSnapshot {
+      public static func _debugSnapshot(\
+      _ value: \(raw: name), \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
       switch value {
       \(raw: switchCases.joined(separator: "\n"))
       }
@@ -573,7 +564,8 @@ private func debugSnapshotCaseDeclaration(_ enumCase: ModelDecl.EnumCase) -> Str
   if enumCase.isDebugSnapshotConvertible {
     for index in parameterClause.parameters.indices {
       parameterClause.parameters[index].type = debugSnapshotType(
-        parameterClause.parameters[index].type)
+        parameterClause.parameters[index].type
+      )
     }
   }
   return "\(indirectPrefix)case \(name)\(parameterClause.trimmedDescription)"
@@ -629,8 +621,8 @@ private func debugSnapshotType(_ type: TypeSyntax) -> TypeSyntax {
     )
   }
   if let implicitlyUnwrappedOptionalType = type.trimmed.as(
-    ImplicitlyUnwrappedOptionalTypeSyntax.self)
-  {
+    ImplicitlyUnwrappedOptionalTypeSyntax.self
+  ) {
     return TypeSyntax(
       ImplicitlyUnwrappedOptionalTypeSyntax(
         wrappedType: debugSnapshotType(implicitlyUnwrappedOptionalType.wrappedType),
@@ -864,23 +856,34 @@ private struct ModelDecl {
       guard let enumCase = member.decl.as(EnumCaseDeclSyntax.self)
       else { return nil }
 
-      let isIgnored = enumCase.hasAttribute(
+      let isExplicitlyIgnored = enumCase.hasAttribute(
         in: \.attributes,
         equivalentTo: "@DebugSnapshotIgnored"
+      )
+      let isExplicitlyTracked = enumCase.hasAttribute(
+        in: \.attributes,
+        equivalentTo: "@DebugSnapshotTracked"
       )
       let hasDebugSnapshotConvertibleAttribute = enumCase.hasAttribute(
         in: \.attributes,
         equivalentTo: "@DebugSnapshotConvertible"
       )
       let attribute = debugSnapshotAttribute(DeclSyntax(enumCase))
+      let hasExplicitAttribute =
+        isExplicitlyIgnored
+        || isExplicitlyTracked
+        || hasDebugSnapshotConvertibleAttribute
+        || attribute != nil
       let isIndirect =
         modifiers(of: enumCase).contains { $0.name.tokenKind == .keyword(.indirect) }
-      return enumCase.elements.map {
-        ModelDecl.EnumCase(
-          element: $0,
+      return enumCase.elements.map { element in
+        let isElementIgnoredByDefault =
+          !hasExplicitAttribute && !isEnumElementTrackedByDefault(element)
+        return ModelDecl.EnumCase(
+          element: element,
           isDebugSnapshotConvertible:
             hasDebugSnapshotConvertibleAttribute || attribute == .convertible,
-          isIgnored: isIgnored || attribute == .ignored,
+          isIgnored: isExplicitlyIgnored || attribute == .ignored || isElementIgnoredByDefault,
           isIndirect: isIndirect
         )
       }
@@ -939,6 +942,15 @@ private func isTrackedByDefault(
   }
 }
 
+private func isEnumElementTrackedByDefault(_ element: EnumCaseElementSyntax) -> Bool {
+  guard !element.name.text.hasPrefix("_") else { return false }
+  if let parameterClause = element.parameterClause {
+    for parameter in parameterClause.parameters where isClosureType(parameter.type) {
+      return false
+    }
+  }
+  return true
+}
 
 private func isClosureType(_ type: TypeSyntax) -> Bool {
   if type.as(FunctionTypeSyntax.self) != nil {
@@ -1212,43 +1224,9 @@ private func rewriteSelf(in expression: ExprSyntax, with typeName: String) -> Ex
 
 private func rewriteDefaultValue(
   _ expression: ExprSyntax,
-  modelTypeName: String,
-  propertyTypeName: String?
+  modelTypeName: String
 ) -> ExprSyntax {
-  let expression = rewriteSelf(in: expression, with: modelTypeName)
-  guard let propertyTypeName else { return expression }
-
-  if let array = expression.as(ArrayExprSyntax.self), array.elements.isEmpty {
-    return ExprSyntax(stringLiteral: "([] as \(propertyTypeName))")
-  }
-
-  let implicitMemberBaseTypeName = optionalWrappedTypeName(in: propertyTypeName)
-
-  if var memberAccess = expression.as(MemberAccessExprSyntax.self),
-    memberAccess.base == nil
-  {
-    memberAccess.base = ExprSyntax(stringLiteral: implicitMemberBaseTypeName)
-    return ExprSyntax(memberAccess)
-  }
-
-  if var functionCall = expression.as(FunctionCallExprSyntax.self),
-    var calledExpression = functionCall.calledExpression.as(MemberAccessExprSyntax.self),
-    calledExpression.base == nil
-  {
-    calledExpression.base = ExprSyntax(stringLiteral: implicitMemberBaseTypeName)
-    functionCall.calledExpression = ExprSyntax(calledExpression)
-    return ExprSyntax(functionCall)
-  }
-
-  return expression
-}
-
-private func optionalWrappedTypeName(in typeName: String) -> String {
-  var typeName = typeName
-  while let last = typeName.last, last == "?" || last == "!" {
-    typeName.removeLast()
-  }
-  return typeName
+  rewriteSelf(in: expression, with: modelTypeName)
 }
 
 private final class SelfRewriter: SyntaxRewriter {
