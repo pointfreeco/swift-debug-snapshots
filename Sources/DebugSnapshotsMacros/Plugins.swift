@@ -9,5 +9,6 @@ struct MacrosPlugin: CompilerPlugin {
     DebugSnapshotMacro.self,
     DebugSnapshotConvertibleMacro.self,
     DebugSnapshotTrackedMacro.self,
+    LogChangesMacro.self,
   ]
 }

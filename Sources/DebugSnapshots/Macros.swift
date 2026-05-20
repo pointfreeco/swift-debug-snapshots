@@ -81,3 +81,7 @@ public macro DebugSnapshotIgnored() =
 @attached(peer)
 public macro DebugSnapshotConvertible() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotConvertibleMacro")
+
+@available(macOS 11, iOS 14, watchOS 7, tvOS 14, *)
+@attached(body)
+public macro LogChanges() = #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesMacro")

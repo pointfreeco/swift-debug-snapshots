@@ -96,3 +96,26 @@ public func _diff<Value>(
   prepareDiffTargets(previous, current)
   return CustomDump.diff(previous, current, format: format)
 }
+
+@available(macOS 11, iOS 14, watchOS 7, tvOS 14, *)
+public func _logChanges<Value>(
+  _ previous: Value,
+  _ current: Value,
+  function: StaticString = #function
+) {
+  let string = """
+  \(function):
+  \((_diff(previous, current) ?? "(No changes)").indenting(by: 2))
+  """
+  if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != nil {
+    print(string)
+  } else {
+    logger.log("\(string)")
+  }
+}
+
+import Foundation
+import os
+@available(macOS 11, iOS 14, watchOS 7, tvOS 14, *)
+private let logger = Logger()
+

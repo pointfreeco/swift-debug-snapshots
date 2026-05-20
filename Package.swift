@@ -52,14 +52,6 @@ let package = Package(
             traits: ["IdentifiedCollections"]
           )
         )
-      ],
-      swiftSettings: [
-        .enableUpcomingFeature("ExistentialAny"),
-        .enableUpcomingFeature("ImmutableWeakCaptures"),
-        .enableUpcomingFeature("InferIsolatedConformances"),
-        .enableUpcomingFeature("InternalImportsByDefault"),
-        .enableUpcomingFeature("MemberImportVisibility"),
-        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
       ]
     ),
     .target(
@@ -95,7 +87,7 @@ let package = Package(
   ],
 )
 
-for target in package.targets where !target.isTest {
+for target in package.targets {
   target.swiftSettings = target.swiftSettings ?? []
   target.swiftSettings?.append(contentsOf: [
     .enableUpcomingFeature("ExistentialAny"),

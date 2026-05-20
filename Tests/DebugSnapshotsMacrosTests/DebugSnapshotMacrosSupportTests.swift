@@ -1,6 +1,7 @@
 #if os(macOS)
   import DebugSnapshotsMacrosSupport
   import MacroTesting
+  import SnapshotTesting
   import SwiftSyntax
   import SwiftSyntaxMacros
   import Testing

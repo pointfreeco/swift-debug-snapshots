@@ -4,79 +4,6 @@ import Foundation
 import Observation
 import Testing
 
-@DebugSnapshot
-@MainActor
-@Observable
-private final class FeatureModel {
-  private var count: Int
-  var title: String
-  var onChange: (Int) -> Void
-  @DebugSnapshotIgnored var id: UUID
-  @DebugSnapshotTracked var isLoading: Bool {
-    task != nil
-  }
-  private var task: Task<Void, Never>?
-
-  init(
-    count: Int = 0,
-    title: String = "",
-    onChange: @escaping (Int) -> Void = { _ in },
-    ignored: UUID = UUID()
-  ) {
-    self.count = count
-    self.title = title
-    self.onChange = onChange
-    self.id = ignored
-  }
-
-  func perturb() {
-    count += 1
-    title += "!"
-    id = UUID()
-  }
-
-  func perturb() async {
-    count += 1
-    title += "!"
-    id = UUID()
-  }
-
-  func load() {
-    task = Task {
-      let never = AsyncStream<Never> { _ in }
-      for await _ in never {}
-    }
-  }
-}
-
-@DebugSnapshot
-@MainActor
-@Observable
-final class UserModel {
-  var name: String
-  @DebugSnapshotConvertible var referred: [UserModel] = []
-  @DebugSnapshotConvertible var referrer: UserModel?
-
-  init(name: String, referred: [UserModel] = [], referrer: UserModel? = nil) {
-    self.name = name
-    self.referred = referred
-    self.referrer = referrer
-  }
-
-  @discardableResult
-  func refer(name: String) -> UserModel {
-    let user = UserModel(name: name, referrer: self)
-    referred.append(user)
-    return user
-  }
-}
-
-@DebugSnapshot
-private final class Wrapper {
-  var keyPath: AnyKeyPath = \Wrapper.keyPath
-}
-
-@MainActor
 @Suite struct ExpectTests {
   @Test func exhaustive() throws {
     let model = FeatureModel()
@@ -143,6 +70,11 @@ private final class Wrapper {
     } changes: {
       $0.title = "!"
     }
+//    customDump(model as Any)
+//    customDump(model)
+//    customDump(snap(model))
+    // customDumpSnapshot(model)
+    // dumpSnapshot(model)
   }
 
   @Test func computed() throws {
@@ -208,4 +140,75 @@ private final class Wrapper {
     #expect(difference?.contains(#"+       name: "Blob!""#) == true)
     #expect(difference?.contains(#"referrer: #1 UserModel.DebugSnapshot(↩︎)"#) == true)
   }
+}
+
+@DebugSnapshot
+@Observable
+private final class FeatureModel: CustomDumpRepresentable {
+  private var privateCount: Int
+  var title: String
+  var onChange: (Int) -> Void
+  @DebugSnapshotIgnored var id: UUID
+  @DebugSnapshotTracked var isLoading: Bool {
+    task != nil
+  }
+  private var task: Task<Void, Never>?
+
+  init(
+    count: Int = 0,
+    title: String = "",
+    onChange: @escaping (Int) -> Void = { _ in },
+    ignored: UUID = UUID()
+  ) {
+    self.privateCount = count
+    self.title = title
+    self.onChange = onChange
+    self.id = ignored
+  }
+
+  func perturb() {
+    privateCount += 1
+    title += "!"
+    id = UUID()
+  }
+
+  //@LogChanges
+  func perturb() async {
+    privateCount += 1
+    title += "!"
+    id = UUID()
+  }
+
+  func load() {
+    task = Task {
+      let never = AsyncStream<Never> { _ in }
+      for await _ in never {}
+    }
+  }
+}
+
+@DebugSnapshot
+@Observable
+final class UserModel {
+  var name: String
+  @DebugSnapshotConvertible var referred: [UserModel] = []
+  @DebugSnapshotConvertible var referrer: UserModel?
+
+  init(name: String, referred: [UserModel] = [], referrer: UserModel? = nil) {
+    self.name = name
+    self.referred = referred
+    self.referrer = referrer
+  }
+
+  @discardableResult
+  func refer(name: String) -> UserModel {
+    let user = UserModel(name: name, referrer: self)
+    referred.append(user)
+    return user
+  }
+}
+
+@DebugSnapshot
+private final class Wrapper {
+  var keyPath: AnyKeyPath = \Wrapper.keyPath
 }

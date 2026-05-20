@@ -5,11 +5,10 @@ Debugging and testing superpowers for your model data.
 ## Overview
 
 DebugSnapshots gives you a powerful macro that converts complex model data types into simple, inert
-values that can be debugged and tested over time.
+values that can be debugged and tested over time. It is capable of snapshotting every field of a
 
 ```swift
 @DebugSnapshot
-@MainActor
 @Observable
 final class FeatureModel {
   var number = 0
@@ -22,7 +21,7 @@ final class FeatureModel {
   }
   private var task: Task<Void, Never>?
   @DebugSnapshotIgnored
-  var id = UUID()
+  let id = UUID()
   func incrementButtonTapped() {
     number += 1
   }
@@ -34,6 +33,10 @@ final class FeatureModel {
     .value
   }
 }
+  
+let model = FeatureModel()
+await model.getNumberFactButtonTapped()
+snap(model)
 ```
 
 ## Topics
