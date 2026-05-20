@@ -1272,7 +1272,7 @@
           @DebugSnapshotConvertible var child: Child = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = DebugSnapshots.snap(Child.make() as Child)
+            public var child: Child.DebugSnapshot = DebugSnapshots.snap(.make() as Child)
           }
 
           @dynamicMemberLookup
@@ -1280,7 +1280,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(Child.make() as Child)) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(.make() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1325,7 +1325,7 @@
           @DebugSnapshotConvertible var child: Child? = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot? = DebugSnapshots.snap(Child.make() as Child?)
+            public var child: Child.DebugSnapshot? = DebugSnapshots.snap(.make() as Child?)
           }
 
           @dynamicMemberLookup
@@ -1333,7 +1333,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot? = DebugSnapshots.snap(Child.make() as Child?)) {
+            public init(child: Child.DebugSnapshot? = DebugSnapshots.snap(.make() as Child?)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1378,7 +1378,7 @@
           @DebugSnapshotConvertible var child: Child?? = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot?? = DebugSnapshots.snap(Child.make() as Child??)
+            public var child: Child.DebugSnapshot?? = DebugSnapshots.snap(.make() as Child??)
           }
 
           @dynamicMemberLookup
@@ -1386,7 +1386,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot?? = DebugSnapshots.snap(Child.make() as Child??)) {
+            public init(child: Child.DebugSnapshot?? = DebugSnapshots.snap(.make() as Child??)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {

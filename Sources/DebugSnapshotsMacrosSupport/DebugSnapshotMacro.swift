@@ -404,12 +404,8 @@ private func snapshotPropertyLines(
         : typeDescription
       return "\(indirectPrefix)public var \(property.name): \(snapshotType)"
     case .initializer(let defaultValue):
-      let defaultValue = rewriteDefaultValue(
-        defaultValue,
-        modelTypeName: modelName,
-        propertyTypeName: nil
-      )
-      .trimmedDescription
+      let defaultValue = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
+        .trimmedDescription
       if property.isDebugSnapshotConvertible {
         return "\(indirectPrefix)public var \(property.name) = \(moduleName).snap(\(defaultValue))"
       } else {
@@ -421,11 +417,7 @@ private func snapshotPropertyLines(
         property.isDebugSnapshotConvertible
         ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
         : typeDescription
-      let rewrittenDefault = rewriteDefaultValue(
-        defaultValue,
-        modelTypeName: modelName,
-        propertyTypeName: typeDescription
-      )
+      let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
       if property.isDebugSnapshotConvertible {
         let snapshotDefault = convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault)
         return "\(indirectPrefix)public var \(property.name): \(snapshotType) = \(snapshotDefault)"
@@ -466,12 +458,8 @@ private func classInitParamTypeAndDefault(
 
   case .initializer(let defaultValue):
     let inferredType = inferredLiteralType(of: defaultValue) ?? "_"
-    let defaultValue = rewriteDefaultValue(
-      defaultValue,
-      modelTypeName: modelName,
-      propertyTypeName: nil
-    )
-    .trimmedDescription
+    let defaultValue = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
+      .trimmedDescription
     if property.isDebugSnapshotConvertible {
       return ("_", "\(moduleName).snap(\(defaultValue))")
     } else {
@@ -484,11 +472,7 @@ private func classInitParamTypeAndDefault(
       property.isDebugSnapshotConvertible
       ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: "DebugSnapshot")
       : typeDescription
-    let rewrittenDefault = rewriteDefaultValue(
-      defaultValue,
-      modelTypeName: modelName,
-      propertyTypeName: typeDescription
-    )
+    let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
     if property.isDebugSnapshotConvertible {
       return (snapshotType, convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault))
     } else {
@@ -1240,39 +1224,9 @@ private func rewriteSelf(in expression: ExprSyntax, with typeName: String) -> Ex
 
 private func rewriteDefaultValue(
   _ expression: ExprSyntax,
-  modelTypeName: String,
-  propertyTypeName: String?
+  modelTypeName: String
 ) -> ExprSyntax {
-  let expression = rewriteSelf(in: expression, with: modelTypeName)
-  guard let propertyTypeName else { return expression }
-
-  let implicitMemberBaseTypeName = optionalWrappedTypeName(in: propertyTypeName)
-
-  if var memberAccess = expression.as(MemberAccessExprSyntax.self),
-    memberAccess.base == nil
-  {
-    memberAccess.base = ExprSyntax(stringLiteral: implicitMemberBaseTypeName)
-    return ExprSyntax(memberAccess)
-  }
-
-  if var functionCall = expression.as(FunctionCallExprSyntax.self),
-    var calledExpression = functionCall.calledExpression.as(MemberAccessExprSyntax.self),
-    calledExpression.base == nil
-  {
-    calledExpression.base = ExprSyntax(stringLiteral: implicitMemberBaseTypeName)
-    functionCall.calledExpression = ExprSyntax(calledExpression)
-    return ExprSyntax(functionCall)
-  }
-
-  return expression
-}
-
-private func optionalWrappedTypeName(in typeName: String) -> String {
-  var typeName = typeName
-  while let last = typeName.last, last == "?" || last == "!" {
-    typeName.removeLast()
-  }
-  return typeName
+  rewriteSelf(in: expression, with: modelTypeName)
 }
 
 private final class SelfRewriter: SyntaxRewriter {
