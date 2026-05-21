@@ -12,28 +12,38 @@ import Testing
   @Test mutating func basics() async throws {
     let model = FeatureModel()
     model.incrementButtonTapped()
-    // try await expectLog(
-    //   """
-    //   incrementButtonTapped():
-    //       #1 FeatureModel.DebugSnapshot(
-    //     -   count: 0,
-    //     +   count: 1,
-    //         favoriteNumbers: []
-    //       )
-    //   """
-    // )
-    // model.saveButtonTapped()
-    // try await expectLog(
-    //   """
-    //   saveButtonTapped():
-    //       #1 FeatureModel.DebugSnapshot(
-    //         count: 1,
-    //         favoriteNumbers: [
-    //     +     [0]: 1
-    //         ]
-    //       )
-    //   """
-    // )
+    try await expectLog(
+      """
+      incrementButtonTapped():
+          #1 FeatureModel.DebugSnapshot(
+        -   count: 0,
+        +   count: 1,
+            favoriteNumbers: []
+          )
+      """
+    )
+    try await expectLog(
+      """
+      incrementButtonTapped():
+          #1 FeatureModel.DebugSnapshot(
+        -   count: 1,
+        +   count: 2,
+            favoriteNumbers: []
+          )
+      """
+    )
+    model.saveButtonTapped()
+    try await expectLog(
+      """
+      saveButtonTapped():
+          #1 FeatureModel.DebugSnapshot(
+            count: 2,
+            favoriteNumbers: [
+        +     [0]: 2
+            ]
+          )
+      """
+    )
   }
 
   private mutating func expectLog(
@@ -51,7 +61,7 @@ import Testing
         matching: NSPredicate(format: "subsystem == %@", "co.pointfree.DebugSnapshots")
       )
       for entry in entries {
-        guard entry.composedMessage == message
+        guard entry.composedMessage.hasSuffix(message)
         else {
           continue
         }

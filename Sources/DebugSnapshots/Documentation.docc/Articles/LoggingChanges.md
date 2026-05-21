@@ -61,3 +61,17 @@ If you prefer to be more precise about which methods log their changes, you can 
   ```
 
 That can help prevent too much from logging to the console at once.
+
+You can also log changes in the middle of your method's execution by invoking `$logChanges()`
+at any point:
+
+  ```swift
+  func onAppear() async {
+    for await value in stream {
+      values.append(value)
+      $logChanges()
+    }
+  }
+  ```
+
+That will print what has changed in the method since the last time `$logChanges()` was invoked.
