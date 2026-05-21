@@ -1,5 +1,14 @@
 package import SwiftSyntax
 
+extension AttributeListSyntax {
+  package func contains(attribute target: AttributeSyntax) -> Bool {
+    contains(where: { element in
+      guard case .attribute(let attr) = element else { return false }
+      return attr.isEquivalent(to: target)
+    })
+  }
+}
+
 extension AttributeSyntax {
   package func isEquivalent(to other: AttributeSyntax) -> Bool {
     let lhs = normalizedAttributeNameComponents(of: attributeName)

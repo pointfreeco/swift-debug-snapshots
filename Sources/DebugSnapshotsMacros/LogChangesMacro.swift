@@ -36,7 +36,7 @@ public struct LogChangesMacro: BodyMacro {
     }
 
     if let enclosingType = enclosingTypeDecl(in: context),
-      !enclosingType.hasDebugSnapshotAttribute
+      !enclosingType.attributes.contains(attribute: "@DebugSnapshot")
     {
       let newAttribute = AttributeListSyntax.Element.attribute(
         AttributeSyntax(
@@ -164,14 +164,6 @@ private func enclosingTypeDecl(
 }
 
 extension DeclGroupSyntax {
-  fileprivate var hasDebugSnapshotAttribute: Bool {
-    let target: AttributeSyntax = "@DebugSnapshot"
-    return attributes.contains { element in
-      guard case .attribute(let attr) = element else { return false }
-      return attr.isEquivalent(to: target)
-    }
-  }
-
   fileprivate var leadingIndentation: Trivia {
     var indent: [TriviaPiece] = []
     for piece in leadingTrivia.reversed() {
