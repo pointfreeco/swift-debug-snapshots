@@ -2161,5 +2161,24 @@
         """
       }
     }
+
+    @Test func actorDiagnostic() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        final actor FeatureModel {
+          var count: Int = 0
+        }
+        """
+      } diagnostics: {
+        """
+        @DebugSnapshot
+        ╰─ 🛑 '@DebugSnapshot' can only be applied to classes, structs, and enums.
+        final actor FeatureModel {
+          var count: Int = 0
+        }
+        """
+      }
+    }
   }
 #endif

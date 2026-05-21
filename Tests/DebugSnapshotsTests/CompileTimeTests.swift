@@ -1,5 +1,9 @@
 import DebugSnapshots
 
+#if canImport(Observation)
+  import Observation
+#endif
+
 private class Model {
   var count = 0
   var isLoading = false
@@ -17,3 +21,12 @@ private class Model {
     static func make() -> Child { Child() }
   }
 }
+
+#if canImport(Observation)
+  @MainActor
+  @DebugSnapshot
+  @Observable
+  private class MainActorObservable {
+    var count = 0
+  }
+#endif

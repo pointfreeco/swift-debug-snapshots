@@ -5,7 +5,7 @@ Debugging and testing superpowers for your model data.
 ## Overview
 
 DebugSnapshots gives you a powerful macro that converts complex model data types into simple, inert
-values that can be debugged and tested over time.
+values that can be easily debugged and tested over time.
 
 ### Debugging
 
@@ -29,47 +29,64 @@ class FeatureModel {
 With the macro applied, every invocation of a method on `FeatureModel` will automatically print
 how the state changed:
 
-@Row(numberOfColumns: 2) {
-  @Column {
-    **Method invocation**
-  }
-  @Column {
-    **Printed to console**
-  }
-  @Column {
-    ```swift
-    model.incrementButtonTapped()
-    ```
-  }
-  @Column {
-    ```
-    incrementButtonTapped():
-        #1 FeatureModel.DebugSnapshot(
-      -   count: 0,
-      +   count: 1,
-          favoriteNumbers: []
-        )
-    ```
-  }
-  @Column {
-    ```swift
-    model.saveButtonTapped()
-    ```
-  }
-  @Column {
-    ```
-    saveButtonTapped():
-        #1 FeatureModel.DebugSnapshot(
-          count: 1,
-          favoriteNumbers: [
-      +     [0]: 1
-          ]
-        )
-    ```
-  }
-}
+```swift
+model.incrementButtonTapped()
+// incrementButtonTapped():
+//     #1 FeatureModel.DebugSnapshot(
+//   -   count: 0,
+//   +   count: 1,
+//       favoriteNumbers: []
+//     )
+
+model.saveButtonTapped()
+// saveButtonTapped():
+//     #1 FeatureModel.DebugSnapshot(
+//       count: 1,
+//       favoriteNumbers: [
+//   +     [0]: 1
+//       ]
+//     )
+```
+
+DebugSnapshots leverages our [CustomDump] library to print minimal and concise differences between
+values, so if an array contains 100 elements and only a single one changes, the diff focuses on
+just element:
+
+[CustomDump]: https://github.com/pointfreeco/swift-custom-dump
+
+```swift
+model.saveButtonTapped()
+// saveButtonTapped():
+//     #1 FeatureModel.DebugSnapshot(
+//       count: 101,
+//       favoriteNumbers: [
+//         … (99 unchanged),
+//   +     [100]: 100
+//       ]
+//     )
+```
 
 ### Testing
+
+The [`@DebugSnapshot`](<doc:DebugSnapshot()>) macro gives you the ability to exhaustively test the
+logic and behavior in your classes using 
+ [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>). Start by applying 
+the macro to your class:
+
+```swift
+@DebugSnapshot(._logChanges)
+class FeatureModel {
+  var count = 0
+  var favoriteNumbers: [Int] = []
+  func incrementButtonTapped() {
+    count += 1
+  }
+  func saveButtonTapped() {
+    favoriteNumbers.append(count)
+  }
+}
+```
+
 
 ---
 
