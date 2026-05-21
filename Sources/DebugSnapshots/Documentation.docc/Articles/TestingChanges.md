@@ -177,7 +177,7 @@ annotate it with the [`@DebugSnapshotConvertible`](<doc:DebugSnapshotConvertible
     }
     var max = 0
     func incrementButtonTapped() {
-      counter.count += 1
+      count += 1
     }
   }
     

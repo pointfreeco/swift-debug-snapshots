@@ -92,7 +92,8 @@ private class FeatureModel {
     count += 1
     $logChanges()
   }
-  @LogChanges
+}
+extension FeatureModel {
   func saveButtonTapped() {
     favoriteNumbers.append(count)
   }

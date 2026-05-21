@@ -11,7 +11,7 @@ your model changes when each method is invoked, or a more focused
 To log changes for every method in your model, supply the `.logChanges` option to the macro:
 
   ```swift
-  @DebugSnapshots(.logChanges)
+  @DebugSnapshot(.logChanges)
   class FeatureModel {
     // ...
   }
@@ -33,11 +33,11 @@ exactly how the state changed once the method finished:
   //     )
   ```
 
-Further, you can apply `@DebugSnapshots(.logChanges)` to an extension of your model to log the 
+Further, you can apply `@DebugSnapshot(.logChanges)` to an extension of your model to log the 
 changes from the methods in the extension:
 
   ```swift
-  @DebugSnapshots(.logChanges)
+  @DebugSnapshot(.logChanges)
   extension FeatureModel {
     func refreshButtonTapped() {
       // Changes logged automatically for this method
@@ -50,7 +50,7 @@ If you prefer to be more precise about which methods log their changes, you can 
 [`@LogChanges`](<doc:LogChanges()>) macro on any method:
 
   ```swift
-  @DebugSnapshots
+  @DebugSnapshot
   class FeatureModel {
     // ...
     @LogChanges

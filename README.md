@@ -62,7 +62,7 @@ model.saveButtonTapped()
 
 DebugSnapshots leverages our [CustomDump] library to print minimal and concise differences between
 values, so if an array contains 100 elements and only a single one changes, the diff focuses on
-just element:
+just the element:
 
 [CustomDump]: https://github.com/pointfreeco/swift-custom-dump
 
@@ -147,7 +147,6 @@ failure message that tells you exactly what went wrong:
 
 That is the basics of using the library, but be sure to read the articles and documentation to learn
 more.
-
 
 ---
 
