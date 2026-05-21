@@ -26,8 +26,7 @@ public struct LogChangesMacro: BodyMacro {
             oldNode: funcDecl.attributes,
             newNode: funcDecl.attributes.filter { element in
               guard case .attribute(let attr) = element else { return true }
-              return attr.attributeName.trimmedDescription
-                != node.attributeName.trimmedDescription
+              return !attr.isEquivalent(to: node)
             }
           )
         )
@@ -78,11 +77,10 @@ public struct LogChangesMacro: BodyMacro {
         of: firstStatement,
         at: .afterLeadingTrivia,
         filePathMode: .filePath
-      ),
-      let line = location.line.as(IntegerLiteralExprSyntax.self)
-        .flatMap({ Int($0.literal.text) })
+      )
     {
-      openDirective = "#sourceLocation(file: \(location.file), line: \(raw: line))"
+      openDirective =
+        "#sourceLocation(file: \(location.file), line: \(raw: location.line.trimmedDescription))"
     } else {
       openDirective = nil
     }
