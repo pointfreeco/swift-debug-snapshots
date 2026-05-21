@@ -60,7 +60,7 @@ import Testing
       }
     }
     Issue.record(
-      Comment(rawValue: "Log not found"),
+      "Log not found",
       sourceLocation: SourceLocation(
         fileID: fileID.description,
         filePath: filePath.description,

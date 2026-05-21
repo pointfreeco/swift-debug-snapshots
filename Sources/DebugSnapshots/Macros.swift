@@ -95,6 +95,9 @@ public macro DebugSnapshotIgnored() =
 public macro DebugSnapshotConvertible() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotConvertibleMacro")
 
+/// Logs the changes from before to after a method is called.
+///
+/// 
 @available(iOS 14, macOS 11, tvOS 14, watchOS 7, *)
 @attached(body)
 public macro LogChanges() = #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesMacro")

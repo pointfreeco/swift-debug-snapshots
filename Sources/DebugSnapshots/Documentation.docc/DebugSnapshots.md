@@ -9,7 +9,7 @@ values that can be easily debugged and tested over time.
 
 ### Debugging
 
-Apply the [`@DebugSnapshot()`](<doc:DebugSnapshot()>) macro with the `.logChanges` option to turn
+Apply the [`@DebugSnapshot`](<doc:DebugSnapshot()>) macro with the `.logChanges` option to turn
 any class into an instantly debuggable object:
 
 ```swift
@@ -74,7 +74,8 @@ logic and behavior in your classes using
 the macro to your class:
 
 ```swift
-@DebugSnapshot(._logChanges)
+@Observable
+@DebugSnapshot
 class FeatureModel {
   var count = 0
   var favoriteNumbers: [Int] = []
@@ -87,41 +88,53 @@ class FeatureModel {
 }
 ```
 
+With that done you can now write tests that invoke the various methods on the class and assert
+exhaustively how the state in the class changes:
 
----
-
-
-```swift
-@DebugSnapshot
-@Observable
-final class FeatureModel {
-  var number = 0
-  var fact: String?
-  @DebugSnapshotConvertible
-  var child: ChildModel?
-  @DebugSnapshotTracked
-  var isLoading: Bool {
-    task != nil
-  }
-  private var task: Task<Void, Never>?
-  @DebugSnapshotIgnored
-  let id = UUID()
-  func incrementButtonTapped() {
-    number += 1
-  }
-  func getNumberFactButtonTapped() async {
-    defer { task = nil }
-    task = await Task {
-      fact = try? await FactClient.default.getFact(for: number)
+  ```swift
+  @Test func testIncrement() {
+    let model = FeatureModel()
+    expect(model) {
+      model.incrementButtonTapped()
+    } changes: {
+      $0.count = 1
     }
-    .value
   }
-}
-  
-let model = FeatureModel()
-await model.getNumberFactButtonTapped()
-snap(model)
-```
+  ```
+
+The first trailing closure of 
+[`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>) allows you to perform
+any number of actions on your model, and the second argument asserts on how the state changes
+after the actions are performed.
+
+If you assert the wrong thing, or do not assert on _everything_ that changed, you will get a test
+failure message that tells you exactly what went wrong:
+
+  ```swift
+  @Test func testIncrement() {
+    let model = FeatureModel()
+    expect(model) {
+      model.incrementButtonTapped()
+    } changes: {
+      $0.count = 2
+    }
+  }
+  ```
+
+> 🛑 Issue recorded: Expected changes do not match: ...
+> 
+> ```
+>     #1 FeatureModel.DebugSnapshot(
+>   −   count: 2,
+>   +   count: 1,
+>       favoriteNumbers: []
+>     )
+> 
+> (Expected: −, Actual: +)
+> ```
+
+That is the basics of using the library, but be sure to read the articles and documentation to learn
+more.
 
 ## Topics
 
@@ -132,7 +145,8 @@ snap(model)
 
 ### Testing and debugging
 
-- <doc:Testing>
+- <doc:TestingChanges>
+- <doc:LoggingChanges>
 - ``expect(_:_:operation:changes:fileID:filePath:line:column:)``
 - ``expect(_:_:changes:fileID:filePath:line:column:)``
 - ``diff(_:operation:)``

@@ -14,170 +14,140 @@ Better debugging and testing for your data model.
 
 ## Overview
 
-DebugSnapshots generates lightweight, test-friendly snapshots of your classes so that you can diff
-state changes and write assertions against them in tests. Apply the `@DebugSnapshot` macro to a
-class, and the library generates a snapshot type that captures only the properties you care about,
-with support for nested models, circular references, enums, `@Observable`, and SwiftData.
+DebugSnapshots gives you a powerful macro that converts complex model data types into simple, inert
+values that can be easily debugged and tested over time.
 
-  * [`@DebugSnapshot`](#debugsnapshot)
-  * [`expect`](#asserting-state-changes)
-  * [`@DebugSnapshotTracked` and `@DebugSnapshotIgnored`](#tracking-and-ignoring-properties)
-  * [`@DebugSnapshotConvertible`](#nested-models)
+### Debugging
 
-## `@DebugSnapshot`
+Apply the [`@DebugSnapshot`] macro with the `._logChanges` option to turn
+any class into an instantly debuggable object:
 
-Apply `@DebugSnapshot` to a class to generate a test-friendly snapshot type that mirrors its stored
-properties:
+[`@DebugSnapshot`]: https://github.com/todo
 
 ```swift
-@DebugSnapshot
-@Observable
-final class FeatureModel {
+@DebugSnapshot(._logChanges)
+class FeatureModel {
   var count = 0
-  var title = ""
-  // Other properties and methods...
+  var favoriteNumbers: [Int] = []
+  func incrementButtonTapped() {
+    count += 1
+  }
+  func saveButtonTapped() {
+    favoriteNumbers.append(count)
+  }
 }
 ```
 
-The macro generates a `FeatureModel.DebugSnapshot` type with `count` and `title` properties. You
-never need to write or maintain this type by hand.
-
-## Asserting state changes
-
-Use `expect` to assert that an operation produces exactly the state changes you describe and nothing
-more:
+With the macro applied, every invocation of a method on `FeatureModel` will automatically print
+how the state changed:
 
 ```swift
-let model = FeatureModel()
+model.incrementButtonTapped()
+// incrementButtonTapped():
+//     #1 FeatureModel.DebugSnapshot(
+//   -   count: 0,
+//   +   count: 1,
+//       favoriteNumbers: []
+//     )
 
-expect(model) {
-  model.incrementTapped()
-} changes: {
-  $0.count = 1
-}
+model.saveButtonTapped()
+// saveButtonTapped():
+//     #1 FeatureModel.DebugSnapshot(
+//       count: 1,
+//       favoriteNumbers: [
+//   +     [0]: 1
+//       ]
+//     )
 ```
 
-If the operation changes a property you didn't account for, or if your expected value doesn't match,
-the test fails with a detailed diff:
+DebugSnapshots leverages our [CustomDump] library to print minimal and concise differences between
+values, so if an array contains 100 elements and only a single one changes, the diff focuses on
+just element:
 
-```diff
-❌ Expected changes do not match: ...
-
-  FeatureModel.DebugSnapshot(
--   count: 2,
-+   count: 1,
-    title: ""
-  )
-
-(Expected: −, Actual: +)
-```
-
-By default you must exhaustively assert on all changes in the object, but the library also supports
-non-exhaustive assertions. By omitting the first trailing closure you can succinctly assert
-on the current state of the object:
+[CustomDump]: https://github.com/pointfreeco/swift-custom-dump
 
 ```swift
-model.incrementTapped()
-expect(model) {
-  $0.count = 1
-}
+model.saveButtonTapped()
+// saveButtonTapped():
+//     #1 FeatureModel.DebugSnapshot(
+//       count: 101,
+//       favoriteNumbers: [
+//         … (99 unchanged),
+//   +     [100]: 100
+//       ]
+//     )
 ```
 
-If there are other changes to the object besides `count` the test will still pass, but if you
-make an incorrect assertion you will still get a test failure:
+### Testing
+
+The [`@DebugSnapshot`](<doc:DebugSnapshot()>) macro gives you the ability to exhaustively test the
+logic and behavior in your classes using 
+ [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>). Start by applying 
+the macro to your class:
 
 ```swift
-model.incrementTapped()
-expect(model) {
-  $0.count = 1
-  $0.title = "Hello!"
-}
-```
-
-```diff
-❌ Expected changes do not match: ...
-
-  FeatureModel.DebugSnapshot(
-    count: 1,
--   title: "Hello!"
-+   title: ""
-  )
-
-(Expected: −, Actual: +)
-``` 
-
-## Tracking and ignoring properties
-
-By default the macro includes stored properties that match the type's access level and excludes
-closures, private properties, and properties prefixed with `_`. You can override these defaults:
-
-```swift
-@DebugSnapshot
 @Observable
-final class FeatureModel {
+@DebugSnapshot
+class FeatureModel {
   var count = 0
-  var title = ""
-  // Automatically ignored
-  var onChange: () -> Void
-
-  // Include a private property:
-  @DebugSnapshotTracked
-  private var secret = ""
-
-  // Include a computed property:
-  @DebugSnapshotTracked
-  var isLoading: Bool { task != nil }
-
-  // Exclude a property:
-  @DebugSnapshotIgnored
-  var id = UUID()
+  var favoriteNumbers: [Int] = []
+  func incrementButtonTapped() {
+    count += 1
+  }
+  func saveButtonTapped() {
+    favoriteNumbers.append(count)
+  }
 }
 ```
 
-Tracking computed properties is particularly powerful because it allows you to get exhaustive test
-coverage on them:
+With that done you can now write tests that invoke the various methods on the class and assert
+exhaustively how the state in the class changes:
 
-```swift
-let model = FeatureModel()
+  ```swift
+  @Test func testIncrement() {
+    let model = FeatureModel()
+    expect(model) {
+      model.incrementButtonTapped()
+    } changes: {
+      $0.count = 1
+    }
+  }
+  ```
 
-await expect(model) {
-  await model.fetchButtonTapped()
-} changes: {
-  $0.isLoading = true
-}
-```
+The first trailing closure of 
+[`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>) allows you to perform
+any number of actions on your model, and the second argument asserts on how the state changes
+after the actions are performed.
 
-## Nested models
+If you assert the wrong thing, or do not assert on _everything_ that changed, you will get a test
+failure message that tells you exactly what went wrong:
 
-When a property is itself a `@DebugSnapshot`-annotated type, mark it with
-`@DebugSnapshotConvertible` so that it snapshots recursively. This works with optionals and arrays,
-and handles circular references automatically:
+  ```swift
+  @Test func testIncrement() {
+    let model = FeatureModel()
+    expect(model) {
+      model.incrementButtonTapped()
+    } changes: {
+      $0.count = 2
+    }
+  }
+  ```
 
-```swift
-@DebugSnapshot
-@Observable
-final class UserModel {
-  var name: String
-  @DebugSnapshotConvertible var friends: [UserModel] = []
-  @DebugSnapshotConvertible var referrer: UserModel?
-}
-```
+> 🛑 Issue recorded: Expected changes do not match: ...
+> 
+> ```
+>     #1 FeatureModel.DebugSnapshot(
+>   −   count: 2,
+>   +   count: 1,
+>       favoriteNumbers: []
+>     )
+> 
+> (Expected: −, Actual: +)
+> ```
 
-## Enums
+That is the basics of using the library, but be sure to read the articles and documentation to learn
+more.
 
-`@DebugSnapshot` works on enums too, generating a parallel snapshot enum. Mark individual cases
-with `@DebugSnapshotConvertible` to convert their associated values:
-
-```swift
-@DebugSnapshot
-enum Destination {
-  @DebugSnapshotConvertible
-  case detail(DetailModel)
-  @DebugSnapshotConvertible
-  case settings(SettingsModel)
-  case dismissed
-}
-```
 
 ---
 
