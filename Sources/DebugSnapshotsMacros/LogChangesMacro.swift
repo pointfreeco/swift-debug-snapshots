@@ -82,37 +82,74 @@ public struct LogChangesMacro: BodyMacro {
       returnsValue
       ? body.statements.withImplicitReturns
       : body.statements
-    let relocated: [CodeBlockItemSyntax] = zip(body.statements, processed)
-      .flatMap { original, item -> [CodeBlockItemSyntax] in
-        guard
-          let location = context.location(
-            of: original,
-            at: .afterLeadingTrivia,
-            filePathMode: .filePath
-          ),
-          let lineLiteral = location.line.as(IntegerLiteralExprSyntax.self),
-          let line = Int(lineLiteral.literal.text)
-        else {
-          return [item]
-        }
-        return Array(
-          CodeBlockItemListSyntax {
-            "#sourceLocation(file: \(location.file), line: \(raw: line))"
-            item.trimmed(matching: \.isNewline)
-            "#sourceLocation()"
-          }
-        )
-      }
-    return [
+    let openDirective: CodeBlockItemSyntax?
+    if let firstStatement = body.statements.first,
+      let location = context.location(
+        of: firstStatement,
+        at: .afterLeadingTrivia,
+        filePathMode: .filePath
+      ),
+      let line = location.line.as(IntegerLiteralExprSyntax.self)
+        .flatMap({ Int($0.literal.text) })
+    {
+      openDirective = "#sourceLocation(file: \(location.file), line: \(raw: line))"
+    } else {
+      openDirective = nil
+    }
+    let calledFlag = context.makeUniqueName("called")
+    let deferLocationArgs: String
+    if let closeBrace = declaration.as(FunctionDeclSyntax.self)?.body?.rightBrace,
+      let closeLocation = context.location(
+        of: closeBrace,
+        at: .afterLeadingTrivia,
+        filePathMode: .fileID
+      ),
+      let closeLine = closeLocation.line.as(IntegerLiteralExprSyntax.self)
+        .flatMap({ Int($0.literal.text) })
+    {
+      deferLocationArgs = ", line: \(closeLine)"
+    } else {
+      deferLocationArgs = ""
+    }
+    var result: [CodeBlockItemSyntax] = [
       #"""
       #if DEBUG
-      let \#(identifier) = \#(raw: moduleName).snap(self)
-      defer {
-      \#(raw: moduleName)._logChanges(\#(identifier), \#(raw: moduleName).snap(self))
+      var \#(identifier) = \#(raw: moduleName).snap(self)
+      var \#(calledFlag) = false
+      func _$logChanges(
+      line: UInt = #line,
+      function: StaticString = #function
+      ) {
+      \#(calledFlag) = true
+      let next = \#(raw: moduleName).snap(self)
+      \#(raw: moduleName)._logChanges(
+      \#(identifier), next, line: line, function: function
+      )
+      \#(identifier) = next
       }
+      defer {
+      let next = \#(raw: moduleName).snap(self)
+      \#(raw: moduleName)._logChanges(
+      \#(identifier), next, suppressIfUnchanged: \#(calledFlag)\#(raw: deferLocationArgs)
+      )
+      }
+      #else
+      @_transparent
+      func _$logChanges(
+      line: UInt = #line,
+      function: StaticString = #function
+      ) {}
       #endif
       """#
-    ] + relocated
+    ]
+    if let openDirective {
+      result.append(openDirective)
+      result.append(contentsOf: processed)
+      result.append("#sourceLocation()")
+    } else {
+      result.append(contentsOf: processed)
+    }
+    return result
   }
 }
 

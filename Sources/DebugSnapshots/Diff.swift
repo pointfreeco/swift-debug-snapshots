@@ -101,11 +101,16 @@ public func _diff<Value>(
 public func _logChanges<Value>(
   _ previous: Value,
   _ current: Value,
+  suppressIfUnchanged: Bool = false,
+  fileID: StaticString = #fileID,
+  line: UInt = #line,
   function: StaticString = #function
 ) {
+  let diff = _diff(previous, current)
+  if suppressIfUnchanged && diff == nil { return }
   let string = """
-  \(function):
-  \((_diff(previous, current) ?? "(No changes)").indenting(by: 2))
+  \(fileID):\(line) \(function):
+  \((diff ?? "(No changes)").indenting(by: 2))
   """
   if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != nil {
     print(string)

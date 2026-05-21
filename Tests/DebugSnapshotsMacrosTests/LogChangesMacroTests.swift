@@ -33,9 +33,31 @@
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG
-            let __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_6calledfMu_ = false
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+              __macro_local_6calledfMu_ = true
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, line: line, function: function
+              )
+              __macro_local_4snapfMu_ = next
+            }
             defer {
-              DebugSnapshots._logChanges(__macro_local_4snapfMu_, DebugSnapshots.snap(self))
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_, line: 7
+              )
+            }
+            #else
+            @_transparent
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
             }
             #endif
             #sourceLocation(file: "Test.swift", line: 6)
@@ -195,9 +217,31 @@
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG
-            let __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_6calledfMu_ = false
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+              __macro_local_6calledfMu_ = true
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, line: line, function: function
+              )
+              __macro_local_4snapfMu_ = next
+            }
             defer {
-              DebugSnapshots._logChanges(__macro_local_4snapfMu_, DebugSnapshots.snap(self))
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_, line: 7
+              )
+            }
+            #else
+            @_transparent
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
             }
             #endif
             #sourceLocation(file: "Test.swift", line: 6)
@@ -260,9 +304,31 @@
         class Model {
           func fetch() async throws -> Int {
             #if DEBUG
-            let __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_6calledfMu_ = false
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+              __macro_local_6calledfMu_ = true
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, line: line, function: function
+              )
+              __macro_local_4snapfMu_ = next
+            }
             defer {
-              DebugSnapshots._logChanges(__macro_local_4snapfMu_, DebugSnapshots.snap(self))
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_, line: 6
+              )
+            }
+            #else
+            @_transparent
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
             }
             #endif
             #sourceLocation(file: "Test.swift", line: 5)
@@ -309,6 +375,191 @@
       }
     }
 
+    @Test func manualLogChangesCall() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        class Model {
+          var count = 0
+          @_LogChanges
+          func incrementButtonTapped() {
+            count += 1
+            _$logChanges()
+            count += 1
+          }
+        }
+        """
+      } expansion: {
+        """
+        class Model {
+          @DebugSnapshotTracked
+          var count = 0
+          func incrementButtonTapped() {
+            #if DEBUG
+            var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_6calledfMu_ = false
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+              __macro_local_6calledfMu_ = true
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, line: line, function: function
+              )
+              __macro_local_4snapfMu_ = next
+            }
+            defer {
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_, line: 9
+              )
+            }
+            #else
+            @_transparent
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+            }
+            #endif
+            #sourceLocation(file: "Test.swift", line: 6)
+            count += 1
+            _$logChanges()
+            count += 1
+            #sourceLocation()
+          }
+
+          public struct DebugSnapshotValue {
+            public var count = 0
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(count: Int = 0) {
+              self._snapshot = DebugSnapshotValue(count: count)
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Model, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension Model: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func logChangesOptionWithManualCall() {
+      assertMacro {
+        """
+        @DebugSnapshot(._logChanges)
+        class Model {
+          var count = 0
+          func incrementButtonTapped() {
+            count += 1
+            _$logChanges()
+            count += 1
+          }
+        }
+        """
+      } expansion: {
+        """
+        class Model {
+          @DebugSnapshotTracked
+          var count = 0
+          func incrementButtonTapped() {
+            #if DEBUG
+            var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_6calledfMu_ = false
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+              __macro_local_6calledfMu_ = true
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, line: line, function: function
+              )
+              __macro_local_4snapfMu_ = next
+            }
+            defer {
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_
+              )
+            }
+            #else
+            @_transparent
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+            }
+            #endif
+            count += 1
+            _$logChanges()
+            count += 1
+          }
+
+          public struct DebugSnapshotValue {
+            public var count = 0
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(count: Int = 0) {
+              self._snapshot = DebugSnapshotValue(count: count)
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Model, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension Model: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
     @Test func logChangesOption() {
       assertMacro {
         """
@@ -328,9 +579,31 @@
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG
-            let __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_6calledfMu_ = false
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+              __macro_local_6calledfMu_ = true
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, line: line, function: function
+              )
+              __macro_local_4snapfMu_ = next
+            }
             defer {
-              DebugSnapshots._logChanges(__macro_local_4snapfMu_, DebugSnapshots.snap(self))
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_
+              )
+            }
+            #else
+            @_transparent
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
             }
             #endif
             count += 1
@@ -432,9 +705,31 @@
         extension Model {
           func incrementButtonTapped() {
             #if DEBUG
-            let __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_6calledfMu_ = false
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+              __macro_local_6calledfMu_ = true
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, line: line, function: function
+              )
+              __macro_local_4snapfMu_ = next
+            }
             defer {
-              DebugSnapshots._logChanges(__macro_local_4snapfMu_, DebugSnapshots.snap(self))
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_
+              )
+            }
+            #else
+            @_transparent
+            func _$logChanges(
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
             }
             #endif
             count += 1
