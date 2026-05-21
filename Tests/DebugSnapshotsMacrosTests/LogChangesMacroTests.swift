@@ -308,5 +308,143 @@
         """
       }
     }
+
+    @Test func logChangesOption() {
+      assertMacro {
+        """
+        @DebugSnapshot(._logChanges)
+        class Model {
+          var count = 0
+          func incrementButtonTapped() {
+            count += 1
+          }
+          static func tick() {}
+        }
+        """
+      } expansion: {
+        """
+        class Model {
+          @DebugSnapshotTracked
+          var count = 0
+          func incrementButtonTapped() {
+            #if DEBUG
+            let __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            defer {
+              DebugSnapshots._logChanges(__macro_local_4snapfMu_, DebugSnapshots.snap(self))
+            }
+            #endif
+            count += 1
+          }
+          static func tick() {}
+
+          public struct DebugSnapshotValue {
+            public var count = 0
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(count: Int = 0) {
+              self._snapshot = DebugSnapshotValue(count: count)
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Model, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension Model: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func logChangesOptionOnExtension() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        class Model {
+          var count = 0
+        }
+
+        @DebugSnapshot(._logChanges)
+        extension Model {
+          func incrementButtonTapped() {
+            count += 1
+          }
+        }
+        """
+      } expansion: {
+        """
+        class Model {
+          @DebugSnapshotTracked
+          var count = 0
+
+          public struct DebugSnapshotValue {
+            public var count = 0
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(count: Int = 0) {
+              self._snapshot = DebugSnapshotValue(count: count)
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Model, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+        extension Model {
+          func incrementButtonTapped() {
+            #if DEBUG
+            let __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            defer {
+              DebugSnapshots._logChanges(__macro_local_4snapfMu_, DebugSnapshots.snap(self))
+            }
+            #endif
+            count += 1
+          }
+        }
+
+        extension Model: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
   }
 #endif

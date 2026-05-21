@@ -17,6 +17,9 @@ extension DebugSnapshotMacro: ExtensionMacro {
     conformingTo protocols: [TypeSyntax],
     in context: some MacroExpansionContext
   ) throws -> [ExtensionDeclSyntax] {
+    guard !declaration.is(ExtensionDeclSyntax.self) else {
+      return []
+    }
     guard !hasDebugSnapshotConvertibleConformance(declaration) else {
       return []
     }
@@ -62,6 +65,19 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
     in context: some MacroExpansionContext,
     debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
   ) throws -> [AttributeSyntax] {
+    let logChanges = hasLogChangesOption(node)
+    if logChanges,
+      let funcDecl = member.as(FunctionDeclSyntax.self),
+      !funcDecl.modifiers.contains(where: {
+        $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
+      }),
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@_LogChanges")
+    {
+      return ["@_LogChanges"]
+    }
+    if declaration.is(ExtensionDeclSyntax.self) {
+      return []
+    }
     let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
     if let variable = member.as(VariableDeclSyntax.self),
       variable.bindings.count == 1,
@@ -140,6 +156,9 @@ extension DebugSnapshotMacro: MemberMacro {
     filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
     debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
   ) throws -> [DeclSyntax] {
+    guard !declaration.is(ExtensionDeclSyntax.self) else {
+      return []
+    }
     guard
       let modelDecl = ModelDecl(
         declaration: declaration,
@@ -1249,6 +1268,25 @@ private func optionalWrappedTypeName(in typeName: String) -> String {
     typeName.removeLast()
   }
   return typeName
+}
+
+func hasLogChangesOption(_ node: AttributeSyntax) -> Bool {
+  guard case .argumentList(let arguments) = node.arguments else { return false }
+  return arguments.contains(where: { argument in
+    containsLogChangesMember(Syntax(argument.expression))
+  })
+}
+
+private func containsLogChangesMember(_ syntax: Syntax) -> Bool {
+  if let access = syntax.as(MemberAccessExprSyntax.self),
+    access.declName.baseName.text == "_logChanges"
+  {
+    return true
+  }
+  for child in syntax.children(viewMode: .sourceAccurate) {
+    if containsLogChangesMember(child) { return true }
+  }
+  return false
 }
 
 private final class SelfRewriter: SyntaxRewriter {

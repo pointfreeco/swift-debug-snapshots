@@ -23,8 +23,21 @@
   named(_debugSnapshot)
 )
 @attached(memberAttribute)
-public macro DebugSnapshot() =
+public macro DebugSnapshot(_ options: DebugSnapshotOptions = []) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotMacro")
+
+/// Options that customize the behavior of ``DebugSnapshot()``.
+public struct DebugSnapshotOptions: OptionSet, Sendable {
+  public let rawValue: Int
+
+  public init(rawValue: Int) {
+    self.rawValue = rawValue
+  }
+
+  /// Applies ``_LogChanges()`` to every instance method in scope, including methods declared in
+  /// extensions when ``DebugSnapshot(_:)`` is applied to the extension.
+  public static let _logChanges = DebugSnapshotOptions(rawValue: 1 << 0)
+}
 
 /// Tells `@DebugSnapshot` to track a property.
 ///
