@@ -1,11 +1,11 @@
 import DebugSnapshots
 
 private class Model {
-   var count = 0
-   var isLoading = false
+  var count = 0
+  var isLoading = false
 }
 
-@DebugSnapshot fileprivate class Parent {
+@DebugSnapshot private class Parent {
   @DebugSnapshotConvertible var child: Child = .init()
   @DebugSnapshotConvertible var children: [Child] = [.init()]
   @DebugSnapshotConvertible var optionalChild: Child? = .init()

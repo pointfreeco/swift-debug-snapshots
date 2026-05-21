@@ -1167,7 +1167,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(Child())) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(Child() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1228,7 +1228,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(FeatureModel.makeChild())) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(FeatureModel.makeChild() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1273,7 +1273,7 @@
           @DebugSnapshotConvertible var child: Child = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot = DebugSnapshots.snap(Child.make() as Child)
+            public var child: Child.DebugSnapshot = DebugSnapshots.snap(.make() as Child)
           }
 
           @dynamicMemberLookup
@@ -1281,7 +1281,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(Child.make())) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(.make() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1326,7 +1326,7 @@
           @DebugSnapshotConvertible var child: Child? = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot? = DebugSnapshots.snap(Child.make() as Child?)
+            public var child: Child.DebugSnapshot? = DebugSnapshots.snap(.make() as Child?)
           }
 
           @dynamicMemberLookup
@@ -1334,7 +1334,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot? = nil) {
+            public init(child: Child.DebugSnapshot? = DebugSnapshots.snap(.make() as Child?)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1379,7 +1379,7 @@
           @DebugSnapshotConvertible var child: Child?? = .make()
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot?? = DebugSnapshots.snap(Child.make() as Child??)
+            public var child: Child.DebugSnapshot?? = DebugSnapshots.snap(.make() as Child??)
           }
 
           @dynamicMemberLookup
@@ -1387,7 +1387,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot?? = nil) {
+            public init(child: Child.DebugSnapshot?? = DebugSnapshots.snap(.make() as Child??)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1440,7 +1440,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(Factory<FeatureModel>.make())) {
+            public init(child: Child.DebugSnapshot = DebugSnapshots.snap(Factory<FeatureModel>.make() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1493,7 +1493,7 @@
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: ChildContainer.DebugSnapshot = DebugSnapshots.snap(ChildContainer(child: .make()))) {
+            public init(child: ChildContainer.DebugSnapshot = DebugSnapshots.snap(ChildContainer(child: .make()) as ChildContainer)) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
@@ -1589,6 +1589,112 @@
       }
     }
 
+    @Test func DebugSnapshotsConvertibleArrayDefaultsToEmpty() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        final class FeatureModel {
+          @DebugSnapshotConvertible var counters: [Counter] = []
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          @DebugSnapshotConvertible var counters: [Counter] = []
+
+          public struct DebugSnapshotValue {
+            public var counters: [Counter.DebugSnapshot] = DebugSnapshots.snap([] as [Counter])
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(counters: [Counter.DebugSnapshot] = DebugSnapshots.snap([] as [Counter])) {
+              self._snapshot = DebugSnapshotValue(counters: counters)
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.counters = DebugSnapshots._debugSnapshot(value.counters, visitor: &visitor)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func DebugSnapshotsConvertibleSetDefaultsToEmpty() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        final class FeatureModel {
+          @DebugSnapshotConvertible var counterSet: Set<Counter> = []
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          @DebugSnapshotConvertible var counterSet: Set<Counter> = []
+
+          public struct DebugSnapshotValue {
+            public var counterSet: Set<Counter>.DebugSnapshot = DebugSnapshots.snap([] as Set<Counter>)
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(counterSet: Set<Counter>.DebugSnapshot = DebugSnapshots.snap([] as Set<Counter>)) {
+              self._snapshot = DebugSnapshotValue(counterSet: counterSet)
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.counterSet = DebugSnapshots._debugSnapshot(value.counterSet, visitor: &visitor)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
     @Test func enumBasics() {
       assertMacro {
         """
@@ -1597,7 +1703,9 @@
           case increment
           @DebugSnapshotConvertible
           case decrement(Bar)
-          case update(Int, String)
+          case update(id: Int, name: String)
+          case log((String) -> Void)
+          case _secret(SecretData)
         }
         """
       } expansion: {
@@ -1608,12 +1716,18 @@
           @DebugSnapshotConvertible
           case decrement(Bar)
           @DebugSnapshotTracked
-          case update(Int, String)
+          case update(id: Int, name: String)
+          @DebugSnapshotIgnored
+          case log((String) -> Void)
+          @DebugSnapshotIgnored
+          case _secret(SecretData)
 
           public enum DebugSnapshot {
             case increment
             case decrement(Bar.DebugSnapshot)
-            case update(Int, String)
+            case update(id: Int, name: String)
+            case log
+            case _secret
           }
 
           public static func _debugSnapshot(_ value: FeatureAction, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -1623,7 +1737,11 @@
             case .decrement(let v1):
               return .decrement(DebugSnapshots._debugSnapshot(v1, visitor: &visitor))
             case .update(let v1, let v2):
-              return .update(v1, v2)
+              return .update(id: v1, name: v2)
+            case .log:
+              return .log
+            case ._secret:
+              return ._secret
             }
           }
         }

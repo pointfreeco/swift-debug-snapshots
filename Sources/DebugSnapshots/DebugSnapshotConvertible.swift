@@ -32,7 +32,7 @@ extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertibl
   }
 }
 
-extension Dictionary where Value: DebugSnapshotConvertible {
+extension Dictionary: DebugSnapshotConvertible where Value: DebugSnapshotConvertible {
   public static func _debugSnapshot(
     _ value: Self,
     visitor: inout _DebugSnapshotVisitor
@@ -57,6 +57,21 @@ extension Optional: DebugSnapshotConvertible where Wrapped: DebugSnapshotConvert
     case .some(let wrapped):
       return Wrapped._debugSnapshot(wrapped, visitor: &visitor)
     }
+  }
+}
+
+extension Set: DebugSnapshotConvertible
+where Element: DebugSnapshotConvertible, Element.DebugSnapshot: Hashable {
+  public static func _debugSnapshot(
+    _ value: Self,
+    visitor: inout _DebugSnapshotVisitor
+  ) -> Set<Element.DebugSnapshot> {
+    var result: Set<Element.DebugSnapshot> = []
+    result.reserveCapacity(value.count)
+    for element in value {
+      result.insert(Element._debugSnapshot(element, visitor: &visitor))
+    }
+    return result
   }
 }
 
