@@ -1,6 +1,9 @@
 public import CustomDump
 import Foundation
-import os
+
+#if canImport(OSLog)
+  import OSLog
+#endif
 
 /// Prints how an instance of a snapshottable type changes over the course of an operation.
 ///
@@ -117,9 +120,15 @@ public func _logChanges<Value>(
   if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != nil {
     print(string)
   } else {
-    logger.log("\(string)")
+    #if canImport(OSLog)
+      logger.log("\(string)")
+    #else
+      print(string)
+    #endif
   }
 }
 
-@available(macOS 11, iOS 14, watchOS 7, tvOS 14, *)
-private let logger = Logger(subsystem: "co.pointfree.DebugSnapshots", category: "DebugSnapshots")
+#if canImport(OSLog)
+  @available(macOS 11, iOS 14, watchOS 7, tvOS 14, *)
+  private let logger = Logger(subsystem: "DebugSnapshots", category: "LogChanges")
+#endif

@@ -12,28 +12,28 @@ import Testing
   @Test mutating func basics() async throws {
     let model = FeatureModel()
     model.incrementButtonTapped()
-//    try await expectLog(
-//      """
-//      incrementButtonTapped():
-//          #1 FeatureModel.DebugSnapshot(
-//        -   count: 0,
-//        +   count: 1,
-//            favoriteNumbers: []
-//          )
-//      """
-//    )
-//    model.saveButtonTapped()
-//    try await expectLog(
-//      """
-//      saveButtonTapped():
-//          #1 FeatureModel.DebugSnapshot(
-//            count: 1,
-//            favoriteNumbers: [
-//        +     [0]: 1
-//            ]
-//          )
-//      """
-//    )
+    // try await expectLog(
+    //   """
+    //   incrementButtonTapped():
+    //       #1 FeatureModel.DebugSnapshot(
+    //     -   count: 0,
+    //     +   count: 1,
+    //         favoriteNumbers: []
+    //       )
+    //   """
+    // )
+    // model.saveButtonTapped()
+    // try await expectLog(
+    //   """
+    //   saveButtonTapped():
+    //       #1 FeatureModel.DebugSnapshot(
+    //         count: 1,
+    //         favoriteNumbers: [
+    //     +     [0]: 1
+    //         ]
+    //       )
+    //   """
+    // )
   }
 
   private mutating func expectLog(
