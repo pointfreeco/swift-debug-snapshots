@@ -1,6 +1,7 @@
 #if os(macOS)
   import DebugSnapshotsMacros
   import MacroTesting
+  import SnapshotTesting
   import Testing
 
   @Suite(

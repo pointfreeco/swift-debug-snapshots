@@ -144,7 +144,7 @@ import Testing
 
 @DebugSnapshot
 @Observable
-private final class FeatureModel: CustomDumpRepresentable {
+private final class FeatureModel {
   private var privateCount: Int
   var title: String
   var onChange: (Int) -> Void
