@@ -3,8 +3,8 @@
 /// When applied to a type, a conformance for ``DebugSnapshotConvertible`` is generated. This
 /// includes a nested ``DebugSnapshotConvertible/DebugSnapshot``, which is a simple type devoid of
 /// logic and behavior. `DebugSnapshot` represents the data of a model instance captured at a
-/// specific moment, _i.e._ when it is passed to the ``snap(_:)`` function (or to functions that
-/// invoke ``snap(_:)`` internally, like
+/// specific moment, _i.e._ when it is passed to the ``snap(_:)`` function (or in macros or
+/// functions that invoke ``snap(_:)`` internally, like ``LogChanges()`` and
 /// ``expect(_:_:operation:changes:fileID:filePath:line:column:)``).
 ///
 /// Structs and enums get a nested `DebugSnapshot` struct or enum, while classes get a nested
