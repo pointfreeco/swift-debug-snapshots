@@ -150,6 +150,35 @@ failure message that tells you exactly what went wrong:
 That is the basics of using the library, but be sure to read the articles and documentation to learn
 more.
 
+## Installation
+
+Add DebugSnapshots to your `Package.swift` dependencies:
+
+```swift
+dependencies: [
+  .package(
+    url: "https://github.com/pointfreeco/swift-debug-snapshots", 
+    from: "0.0.1"
+  )
+]
+```
+
+And add the product to your target:
+
+```swift
+targets: [
+  .target(
+    name: "MyFeature",
+    dependencies: [
+      .product(name: "DebugSnapshots", package: "swift-debug-snapshots")
+    ]
+  )
+]
+```
+
+This package currently requires Swift 6.2 or later and supports iOS 13+, macOS 10.15+, tvOS 13+,
+and watchOS 6+.
+
 ---
 
 <!--
