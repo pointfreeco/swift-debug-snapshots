@@ -15,25 +15,20 @@ public struct LogChangesMacro: BodyMacro {
         $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
       })
     {
-      let newAttributes = funcDecl.attributes.filter { element in
-        guard case .attribute(let attr) = element else { return true }
-        return attr.attributeName.trimmedDescription
-          != node.attributeName.trimmedDescription
-      }
       context.diagnose(
         Diagnostic(
           node: Syntax(staticModifier),
           message: MacroExpansionErrorMessage(
             "'@LogChanges' can only be applied to instance methods"
           ),
-          fixIt: FixIt(
+          fixIt: .replace(
             message: MacroExpansionFixItMessage("Remove '@LogChanges'"),
-            changes: [
-              .replace(
-                oldNode: Syntax(funcDecl.attributes),
-                newNode: Syntax(newAttributes)
-              )
-            ]
+            oldNode: funcDecl.attributes,
+            newNode: funcDecl.attributes.filter { element in
+              guard case .attribute(let attr) = element else { return true }
+              return attr.attributeName.trimmedDescription
+                != node.attributeName.trimmedDescription
+            }
           )
         )
       )
@@ -49,25 +44,20 @@ public struct LogChangesMacro: BodyMacro {
         )
         .with(\.trailingTrivia, .newline + enclosingType.leadingIndentation)
       )
-      let newAttributes = AttributeListSyntax(
-        [newAttribute] + Array(enclosingType.attributes)
-      )
       context.diagnose(
         Diagnostic(
           node: Syntax(node),
           message: MacroExpansionErrorMessage(
             "'@LogChanges' requires the enclosing type to apply '@DebugSnapshot'"
           ),
-          fixIt: FixIt(
+          fixIt: .replace(
             message: MacroExpansionFixItMessage(
               "Apply '@DebugSnapshot' to '\(enclosingType.name.text)'"
             ),
-            changes: [
-              .replace(
-                oldNode: Syntax(enclosingType.attributes),
-                newNode: Syntax(newAttributes)
-              )
-            ]
+            oldNode: enclosingType.attributes,
+            newNode: AttributeListSyntax(
+              [newAttribute] + Array(enclosingType.attributes)
+            )
           )
         )
       )
