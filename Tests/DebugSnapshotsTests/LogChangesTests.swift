@@ -58,7 +58,7 @@ import Testing
       try await Task.sleep(for: .seconds(0.1))
       let entries = try store.getEntries(
         at: startPosition,
-        matching: NSPredicate(format: "subsystem == %@", "co.pointfree.DebugSnapshots")
+        matching: NSPredicate(format: "subsystem == %@", "DebugSnapshots")
       )
       for entry in entries {
         guard entry.composedMessage.hasSuffix(message)
