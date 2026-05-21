@@ -26,8 +26,8 @@ class FeatureModel {
 }
 ```
 
-With the macro applied, every invocation of a method on `FeatureModel` will automatically print
-how the state changed:
+With the macro applied, every invocation of a method on `FeatureModel` will automatically print how
+the state changed:
 
 ```swift
 model.incrementButtonTapped()
@@ -49,8 +49,8 @@ model.saveButtonTapped()
 ```
 
 DebugSnapshots leverages our [CustomDump] library to print minimal and concise differences between
-values, so if an array contains 100 elements and only a single one changes, the diff focuses on
-just element:
+values, so if an array contains 100 elements and only a single one changes, the diff focuses on just
+that element:
 
 [CustomDump]: https://github.com/pointfreeco/swift-custom-dump
 
