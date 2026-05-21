@@ -14,7 +14,7 @@ import Testing
     model.incrementButtonTapped()
     try await expectLog(
       """
-      incrementButtonTapped():
+      incrementButtonTapped(): After first count
           #1 FeatureModel.DebugSnapshot(
         -   count: 0,
         +   count: 1,
@@ -88,12 +88,11 @@ private class FeatureModel {
   @LogChanges
   func incrementButtonTapped() {
     count += 1
-    $logChanges()
+    $logChanges("After first count")
     count += 1
     $logChanges()
   }
-}
-extension FeatureModel {
+  @LogChanges
   func saveButtonTapped() {
     favoriteNumbers.append(count)
   }
