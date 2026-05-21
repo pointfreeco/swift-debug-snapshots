@@ -50,7 +50,7 @@
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: 7
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: __macro_local_6calledfMu_ ? 7 : 4
               )
             }
             #else
@@ -236,7 +236,7 @@
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: 7
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: __macro_local_6calledfMu_ ? 7 : 4
               )
             }
             #else
@@ -325,7 +325,7 @@
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: 6
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: __macro_local_6calledfMu_ ? 6 : 3
               )
             }
             #else
@@ -419,7 +419,7 @@
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: 9
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: __macro_local_6calledfMu_ ? 9 : 4
               )
             }
             #else

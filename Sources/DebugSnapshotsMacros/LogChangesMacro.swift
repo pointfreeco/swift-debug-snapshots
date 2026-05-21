@@ -87,18 +87,25 @@ public struct LogChangesMacro: BodyMacro {
       openDirective = nil
     }
     let calledFlag = context.makeUniqueName("called")
+    let attributeLine = context.location(
+      of: node,
+      at: .afterLeadingTrivia,
+      filePathMode: .fileID
+    )?.line.trimmedDescription
+    let closeBraceLine = context.location(
+      of: body.rightBrace,
+      at: .afterLeadingTrivia,
+      filePathMode: .fileID
+    )?.line.trimmedDescription
     let deferLocationArgs: String
-    if let closeBrace = declaration.as(FunctionDeclSyntax.self)?.body?.rightBrace,
-      let closeLocation = context.location(
-        of: closeBrace,
-        at: .afterLeadingTrivia,
-        filePathMode: .fileID
-      ),
-      let closeLine = closeLocation.line.as(IntegerLiteralExprSyntax.self)
-        .flatMap({ Int($0.literal.text) })
-    {
-      deferLocationArgs = ", line: \(closeLine)"
-    } else {
+    switch (attributeLine, closeBraceLine) {
+    case let (attr?, close?):
+      deferLocationArgs = ", line: \(calledFlag) ? \(close) : \(attr)"
+    case let (attr?, nil):
+      deferLocationArgs = ", line: \(attr)"
+    case let (nil, close?):
+      deferLocationArgs = ", line: \(close)"
+    case (nil, nil):
       deferLocationArgs = ""
     }
     var result: [CodeBlockItemSyntax] = [

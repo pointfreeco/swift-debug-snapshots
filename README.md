@@ -19,8 +19,8 @@ values that can be easily debugged and tested over time.
 
 ### Debugging
 
-Apply the [`@DebugSnapshot`] macro with the `.logChanges` option to turn
-any class into an instantly debuggable object:
+Apply the [`@DebugSnapshot`] macro with the `.logChanges` option to turn any class into an instantly
+debuggable object:
 
 [`@DebugSnapshot`]: https://github.com/todo
 
@@ -86,7 +86,6 @@ logic and behavior in your classes using
 the macro to your class:
 
 ```swift
-@Observable
 @DebugSnapshot
 class FeatureModel {
   var count = 0
