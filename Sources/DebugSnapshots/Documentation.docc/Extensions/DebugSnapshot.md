@@ -1,4 +1,4 @@
-# ``DebugSnapshots/DebugSnapshot()``
+# ``DebugSnapshots/DebugSnapshot(_:)``
 
 ## Topics
 

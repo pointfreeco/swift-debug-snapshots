@@ -26,7 +26,7 @@
 public macro DebugSnapshot(_ options: DebugSnapshotOptions = []) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotMacro")
 
-/// Options that customize the behavior of ``DebugSnapshot()``.
+/// Options that customize the behavior of ``DebugSnapshot(_:)``.
 public struct DebugSnapshotOptions: OptionSet, Sendable {
   public let rawValue: Int
 
@@ -40,7 +40,7 @@ public struct DebugSnapshotOptions: OptionSet, Sendable {
 
 /// Tells `@DebugSnapshot` to track a property.
 ///
-/// ``DebugSnapshot()`` automatically applies this macro to most of a type's stored properties, as
+/// ``DebugSnapshot(_:)`` automatically applies this macro to most of a type's stored properties, as
 /// long as the property matches the enclosing type's access control, is not underscored, is not a
 /// closure, and is not explicitly ignored using ``DebugSnapshotIgnored()``.
 ///
@@ -59,7 +59,7 @@ public macro DebugSnapshotTracked() =
 
 /// Tells `@DebugSnapshot` to ignore a property.
 ///
-/// ``DebugSnapshot()`` automatically applies this macro to properties with less access control than
+/// ``DebugSnapshot(_:)`` automatically applies this macro to properties with less access control than
 /// the enclosing type, as well as underscored properties, computed properties, and closures.
 ///
 /// To explicitly ignore ``DebugSnapshotTracked()`` properties, apply `@DebugSnapshotIgnored`:
@@ -96,8 +96,24 @@ public macro DebugSnapshotConvertible() =
 
 /// Add change-logging to a method of a snapshottable type.
 ///
-/// This macro is automatically applied to every method in a `@DebugSnapshot` declaration when using
-/// the ``DebugSnapshotOptions/logChanges`` option.
+/// This macro will capture a snapshot of your model at the beginning of your method and again
+/// at the end, and then log a concise diff of what changed (using an `os.Logger` with subsystem
+/// "DebugSnapshots"). The macro can be applied to any method of a `@DebugSnapshot` type, or all
+/// methods can be logged by using the ``DebugSnapshotOptions/logChanges`` option when specifying
+/// `@DebugSnapshot`.
+///
+/// If you want to print a snapshot diff at multiple points in a method, you can invoke
+/// `$logChanges()` at any time:
+///
+/// ```swift
+/// func refreshButtonTapped() async {
+///   data = cache.fetch()
+///   $logChanges("cache")
+///   data = await client.fetch()
+/// }
+/// ```
+///
+/// See <doc:LoggingChanges> for more information.
 @available(iOS 14, macOS 11, tvOS 14, watchOS 7, *)
 @attached(body)
 public macro LogChanges() = #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesMacro")

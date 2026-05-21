@@ -3,6 +3,49 @@ import IssueReporting
 
 /// Expects an instance of a snapshottable type has a given set of changes.
 ///
+/// This function allows you exhaustively assert how a model changes after executing a series of
+/// actions:
+///
+/// ```swift
+/// expect(model) {
+///   $0.incrementButtonTapped()
+/// } changes: {
+///   $0.count = 1
+///   $0.countIsEven = false
+/// }
+/// ```
+///
+/// It performs the following steps:
+///
+/// * Takes a snapshot of the model.
+/// * Executes the first trailing closure.
+/// * Takes another snapshot of the model.
+/// * Passes a mutable version of the first snapshot to the second trailing closure.
+///
+/// In the second trailing closure you must mutate the previous snapshot to match the current
+/// snapshot, otherwise the test will fail. Failures are presented as a nicely formatted diff:
+///
+/// ```swift, highlight=[1]
+/// 🛑 expect(model) {
+///      $0.incrementButtonTapped()
+///    } changes: {
+///      $0.count = 1
+///      $0.countIsEven = true
+///    }
+/// ```
+///
+/// > 🛑 Issue recorded: Expected changes do not match: ...
+/// >
+/// > ```
+/// >     #1 FeatureModel.DebugSnapshot(
+/// >       count: 1,
+/// >   -   countIsEvent: true
+/// >   +   countIsEvent: false
+/// >     )
+/// >
+/// > (Expected: −, Actual: +)
+/// > ```
+///
 /// - Parameters:
 ///   - instance: An instance of a snapshottable type.
 ///   - message: An optional description of a failure.
@@ -45,6 +88,20 @@ public func expect<Value, Result>(
 
 /// Expects an instance of a snapshottable type has a given set of changes.
 ///
+/// Takes a snapshot of the model so that you can assert against it's current state:
+///
+/// ```swift
+/// let model = FeatureModel()
+/// expect(model) {
+///   $0.count = 1
+///   $0.isLoading = false
+///   $0.fact = nil
+/// }
+/// ```
+///
+/// The argument handed to the trailing closure is the current snap, and so only changes you perform
+/// in that closure as taken into consideration for the assertion.
+///
 /// - Parameters:
 ///   - instance: An instance of a snapshottable type.
 ///   - message: An optional description of a failure.
@@ -81,6 +138,8 @@ public func expect<Value>(
 }
 
 /// Expects an instance of a snapshottable type has a given set of changes.
+///
+/// See <doc:expect(_:_:operation:changes:fileID:filePath:line:column:)-6w0fd> for more information.
 ///
 /// - Parameters:
 ///   - instance: An instance of a snapshottable type.

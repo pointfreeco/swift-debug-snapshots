@@ -5,13 +5,13 @@ Configure your debug snapshots to precisely track the data you want to test and 
 ## Overview
 
 Add snapshots to your model data to unlock exhaustive testability and powerful debug tools. Apply
-the ``DebugSnapshot()`` macro to a type to define its snapshot, and use the
+the ``DebugSnapshot(_:)`` macro to a type to define its snapshot, and use the
 ``DebugSnapshotTracked()``, ``DebugSnapshotIgnored()``, and ``DebugSnapshotConvertible()``
 attributes to customize the snapshot's definition.
 
 ## Snapshot defaults
 
-By default the ``DebugSnapshot()`` macro uses a few rules to determine if a property should be
+By default the ``DebugSnapshot(_:)`` macro uses a few rules to determine if a property should be
 tracked or ignored:
 
   - Private properties, or properties with access control that is less than the access control of

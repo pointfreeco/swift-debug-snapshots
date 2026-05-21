@@ -2,7 +2,7 @@ public import CustomDump
 
 /// A type with a debug snapshot representation.
 ///
-/// This conformance is automatically applied to a type using the ``DebugSnapshot()`` macro.
+/// This conformance is automatically applied to a type using the ``DebugSnapshot(_:)`` macro.
 public protocol DebugSnapshotConvertible<DebugSnapshot> {
   /// A type representing a "snapshot" of this type.
   associatedtype DebugSnapshot

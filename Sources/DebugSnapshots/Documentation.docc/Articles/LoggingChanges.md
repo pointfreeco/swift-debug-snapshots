@@ -4,7 +4,7 @@ Automatically log changes to your model when methods are invoked.
 
 ## Overview
 
-The [`@DebugSnapshot`](<doc:DebugSnapshot()>) macro can be customized to automatically log how
+The [`@DebugSnapshot`](<doc:DebugSnapshot(_:)>) macro can be customized to automatically log how
 your model changes when each method is invoked, or a more focused 
  [`@LogChanges`](<doc:LogChanges()>) macro can be applied on a per-method basis.
 

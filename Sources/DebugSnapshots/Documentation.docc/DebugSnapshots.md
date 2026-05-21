@@ -9,7 +9,7 @@ values that can be easily debugged and tested over time.
 
 ### Debugging
 
-Apply the [`@DebugSnapshot`](<doc:DebugSnapshot()>) macro with the `.logChanges` option to turn
+Apply the [`@DebugSnapshot`](<doc:DebugSnapshot(_:)>) macro with the `.logChanges` option to turn
 any class into an instantly debuggable object:
 
 ```swift
@@ -68,7 +68,7 @@ model.saveButtonTapped()
 
 ### Testing
 
-The [`@DebugSnapshot`](<doc:DebugSnapshot()>) macro gives you the ability to exhaustively test the
+The [`@DebugSnapshot`](<doc:DebugSnapshot(_:)>) macro gives you the ability to exhaustively test the
 logic and behavior in your classes using 
  [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>). Start by applying 
 the macro to your class:
@@ -141,12 +141,13 @@ more.
 ### Defining snapshots
 
 - <doc:Customization>
-- ``DebugSnapshot()``
+- ``DebugSnapshot(_:)``
 
 ### Testing and debugging
 
 - <doc:TestingChanges>
 - <doc:LoggingChanges>
+- ``LogChanges()``
 - ``expect(_:_:operation:changes:fileID:filePath:line:column:)``
 - ``expect(_:_:changes:fileID:filePath:line:column:)``
 - ``diff(_:operation:)``

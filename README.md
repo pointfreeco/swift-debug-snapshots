@@ -80,7 +80,7 @@ model.saveButtonTapped()
 
 ### Testing
 
-The [`@DebugSnapshot`](<doc:DebugSnapshot()>) macro gives you the ability to exhaustively test the
+The [`@DebugSnapshot`](<doc:DebugSnapshot(_:)>) macro gives you the ability to exhaustively test the
 logic and behavior in your classes using 
  [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>). Start by applying 
 the macro to your class:
