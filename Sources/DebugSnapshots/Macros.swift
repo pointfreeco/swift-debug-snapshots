@@ -34,9 +34,9 @@ public struct DebugSnapshotOptions: OptionSet, Sendable {
     self.rawValue = rawValue
   }
 
-  /// Applies ``_LogChanges()`` to every instance method in scope, including methods declared in
+  /// Applies ``LogChanges()`` to every instance method in scope, including methods declared in
   /// extensions when ``DebugSnapshot(_:)`` is applied to the extension.
-  public static let _logChanges = DebugSnapshotOptions(rawValue: 1 << 0)
+  public static let logChanges = DebugSnapshotOptions(rawValue: 1 << 0)
 }
 
 /// Tells `@DebugSnapshot` to track a property.
@@ -97,4 +97,4 @@ public macro DebugSnapshotConvertible() =
 
 @available(iOS 14, macOS 11, tvOS 14, watchOS 7, *)
 @attached(body)
-public macro _LogChanges() = #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesMacro")
+public macro LogChanges() = #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesMacro")

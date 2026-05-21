@@ -24,10 +24,10 @@ public struct LogChangesMacro: BodyMacro {
         Diagnostic(
           node: Syntax(staticModifier),
           message: MacroExpansionErrorMessage(
-            "'@_LogChanges' can only be applied to instance methods"
+            "'@LogChanges' can only be applied to instance methods"
           ),
           fixIt: FixIt(
-            message: MacroExpansionFixItMessage("Remove '@_LogChanges'"),
+            message: MacroExpansionFixItMessage("Remove '@LogChanges'"),
             changes: [
               .replace(
                 oldNode: Syntax(funcDecl.attributes),
@@ -56,7 +56,7 @@ public struct LogChangesMacro: BodyMacro {
         Diagnostic(
           node: Syntax(node),
           message: MacroExpansionErrorMessage(
-            "'@_LogChanges' requires the enclosing type to apply '@DebugSnapshot'"
+            "'@LogChanges' requires the enclosing type to apply '@DebugSnapshot'"
           ),
           fixIt: FixIt(
             message: MacroExpansionFixItMessage(
@@ -116,7 +116,7 @@ public struct LogChangesMacro: BodyMacro {
       #if DEBUG
       var \#(identifier) = \#(raw: moduleName).snap(self)
       var \#(calledFlag) = false
-      func _$logChanges(
+      func $logChanges(
       line: UInt = #line,
       function: StaticString = #function
       ) {
@@ -135,7 +135,7 @@ public struct LogChangesMacro: BodyMacro {
       }
       #else
       @_transparent
-      func _$logChanges(
+      func $logChanges(
       line: UInt = #line,
       function: StaticString = #function
       ) {}

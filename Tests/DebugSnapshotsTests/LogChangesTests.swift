@@ -13,14 +13,14 @@ import Testing
 fileprivate class FeatureModel {
   var count = 0
   var favoriteNumbers: [Int] = []
-  @_LogChanges
+  @LogChanges
   func incrementButtonTapped() {
     count += 1
-    _$logChanges()
+    $logChanges()
     count += 1
-    _$logChanges()
+    $logChanges()
   }
-  @_LogChanges
+  @LogChanges
   func saveButtonTapped() {
     favoriteNumbers.append(count)
   }

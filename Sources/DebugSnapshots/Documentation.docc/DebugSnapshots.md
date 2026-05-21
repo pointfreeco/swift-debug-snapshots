@@ -9,11 +9,11 @@ values that can be debugged and tested over time.
 
 ### Debugging
 
-Apply the [`@DebugSnapshot()`](<doc:DebugSnapshot()>) macro with the `._logChanges` option to turn
+Apply the [`@DebugSnapshot()`](<doc:DebugSnapshot()>) macro with the `.logChanges` option to turn
 any class into an instantly debuggable object:
 
 ```swift
-@DebugSnapshot(._logChanges)
+@DebugSnapshot(.logChanges)
 class FeatureModel {
   var count = 0
   var favoriteNumbers: [Int] = []

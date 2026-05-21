@@ -8,7 +8,7 @@
     .macros(
       [
         "DebugSnapshot": DebugSnapshotMacro.self,
-        "_LogChanges": LogChangesMacro.self,
+        "LogChanges": LogChangesMacro.self,
       ],
       record: .failed
     )
@@ -20,7 +20,7 @@
         @DebugSnapshot
         class Model {
           var count = 0
-          @_LogChanges
+          @LogChanges
           func incrementButtonTapped() {
             count += 1
           }
@@ -35,7 +35,7 @@
             #if DEBUG
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -54,7 +54,7 @@
             }
             #else
             @_transparent
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -109,7 +109,7 @@
         """
         @DebugSnapshot
         class Model {
-          @_LogChanges
+          @LogChanges
           static func tick() {}
         }
         """
@@ -117,11 +117,11 @@
         """
         @DebugSnapshot
         class Model {
-          @_LogChanges
+          @LogChanges
           static func tick() {}
           ┬─────
-          ╰─ 🛑 '@_LogChanges' can only be applied to instance methods
-             ✏️ Remove '@_LogChanges'
+          ╰─ 🛑 '@LogChanges' can only be applied to instance methods
+             ✏️ Remove '@LogChanges'
         }
         """
       } fixes: {
@@ -180,7 +180,7 @@
         """
         class Model {
           var count = 0
-          @_LogChanges
+          @LogChanges
           func incrementButtonTapped() {
             count += 1
           }
@@ -190,9 +190,9 @@
         """
         class Model {
           var count = 0
-          @_LogChanges
-          ┬───────────
-          ╰─ 🛑 '@_LogChanges' requires the enclosing type to apply '@DebugSnapshot'
+          @LogChanges
+          ┬──────────
+          ╰─ 🛑 '@LogChanges' requires the enclosing type to apply '@DebugSnapshot'
              ✏️ Apply '@DebugSnapshot' to 'Model'
           func incrementButtonTapped() {
             count += 1
@@ -204,7 +204,7 @@
         @DebugSnapshot
         class Model {
           var count = 0
-          @_LogChanges
+          @LogChanges
           func incrementButtonTapped() {
             count += 1
           }
@@ -219,7 +219,7 @@
             #if DEBUG
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -238,7 +238,7 @@
             }
             #else
             @_transparent
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -293,7 +293,7 @@
         """
         @DebugSnapshot
         class Model {
-          @_LogChanges
+          @LogChanges
           func fetch() async throws -> Int {
             42
           }
@@ -306,7 +306,7 @@
             #if DEBUG
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -325,7 +325,7 @@
             }
             #else
             @_transparent
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -381,7 +381,7 @@
         @DebugSnapshot
         class Model {
           var count = 0
-          @_LogChanges
+          @LogChanges
           func incrementButtonTapped() {
             count += 1
             _$logChanges()
@@ -398,7 +398,7 @@
             #if DEBUG
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -417,7 +417,7 @@
             }
             #else
             @_transparent
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -472,7 +472,7 @@
     @Test func logChangesOptionWithManualCall() {
       assertMacro {
         """
-        @DebugSnapshot(._logChanges)
+        @DebugSnapshot(.logChanges)
         class Model {
           var count = 0
           func incrementButtonTapped() {
@@ -491,7 +491,7 @@
             #if DEBUG
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -510,7 +510,7 @@
             }
             #else
             @_transparent
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -563,7 +563,7 @@
     @Test func logChangesOption() {
       assertMacro {
         """
-        @DebugSnapshot(._logChanges)
+        @DebugSnapshot(.logChanges)
         class Model {
           var count = 0
           func incrementButtonTapped() {
@@ -581,7 +581,7 @@
             #if DEBUG
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -600,7 +600,7 @@
             }
             #else
             @_transparent
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -657,7 +657,7 @@
           var count = 0
         }
 
-        @DebugSnapshot(._logChanges)
+        @DebugSnapshot(.logChanges)
         extension Model {
           func incrementButtonTapped() {
             count += 1
@@ -707,7 +707,7 @@
             #if DEBUG
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -726,7 +726,7 @@
             }
             #else
             @_transparent
-            func _$logChanges(
+            func $logChanges(
               line: UInt = #line,
               function: StaticString = #function
             ) {

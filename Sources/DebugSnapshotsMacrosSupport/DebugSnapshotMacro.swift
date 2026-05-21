@@ -71,9 +71,9 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
       !funcDecl.modifiers.contains(where: {
         $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
       }),
-      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@_LogChanges")
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges")
     {
-      return ["@_LogChanges"]
+      return ["@LogChanges"]
     }
     if declaration.is(ExtensionDeclSyntax.self) {
       return []
@@ -1279,7 +1279,7 @@ func hasLogChangesOption(_ node: AttributeSyntax) -> Bool {
 
 private func containsLogChangesMember(_ syntax: Syntax) -> Bool {
   if let access = syntax.as(MemberAccessExprSyntax.self),
-    access.declName.baseName.text == "_logChanges"
+    access.declName.baseName.text == "logChanges"
   {
     return true
   }
