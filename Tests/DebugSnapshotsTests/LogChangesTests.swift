@@ -25,9 +25,6 @@
 //
 //// TODO: optional for @DebugSnapshot to log changes on all methods/inits? '@DebugSnapshot(._logChanges)'
 //// TODO: should you be able to log changes in the middle of the method too?
-//// TODO: diagnose static functions
-//// TODO: diagnose that we are in a `@DebugSnapshot` if possible
-//// TODO: Rename to @_LogChanges? @DebugChanges? @DebugSnapshotChanges?
 ////@DebugSnapshot
 ////fileprivate class Model {
 ////  var count = 0
