@@ -1,7 +1,7 @@
-import SwiftSyntax
+package import SwiftSyntax
 
 extension AttributeSyntax {
-  func isEquivalent(to other: AttributeSyntax) -> Bool {
+  package func isEquivalent(to other: AttributeSyntax) -> Bool {
     let lhs = normalizedAttributeNameComponents(of: attributeName)
     let rhs = normalizedAttributeNameComponents(of: other.attributeName)
 
