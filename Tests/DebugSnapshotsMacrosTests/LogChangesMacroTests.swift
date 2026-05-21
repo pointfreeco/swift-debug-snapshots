@@ -36,25 +36,27 @@
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
               __macro_local_6calledfMu_ = true
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, line: line, function: function
+                __macro_local_4snapfMu_, next, message, line: line, function: function
               )
               __macro_local_4snapfMu_ = next
             }
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_, line: 7
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: 7
               )
             }
             #else
             @_transparent
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -220,25 +222,27 @@
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
               __macro_local_6calledfMu_ = true
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, line: line, function: function
+                __macro_local_4snapfMu_, next, message, line: line, function: function
               )
               __macro_local_4snapfMu_ = next
             }
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_, line: 7
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: 7
               )
             }
             #else
             @_transparent
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -307,25 +311,27 @@
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
               __macro_local_6calledfMu_ = true
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, line: line, function: function
+                __macro_local_4snapfMu_, next, message, line: line, function: function
               )
               __macro_local_4snapfMu_ = next
             }
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_, line: 6
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: 6
               )
             }
             #else
             @_transparent
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -399,25 +405,27 @@
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
               __macro_local_6calledfMu_ = true
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, line: line, function: function
+                __macro_local_4snapfMu_, next, message, line: line, function: function
               )
               __macro_local_4snapfMu_ = next
             }
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_, line: 9
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: 9
               )
             }
             #else
             @_transparent
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -492,25 +500,27 @@
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
               __macro_local_6calledfMu_ = true
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, line: line, function: function
+                __macro_local_4snapfMu_, next, message, line: line, function: function
               )
               __macro_local_4snapfMu_ = next
             }
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_
               )
             }
             #else
             @_transparent
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
@@ -582,25 +592,27 @@
             var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
             var __macro_local_6calledfMu_ = false
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {
               __macro_local_6calledfMu_ = true
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, line: line, function: function
+                __macro_local_4snapfMu_, next, message, line: line, function: function
               )
               __macro_local_4snapfMu_ = next
             }
             defer {
               let next = DebugSnapshots.snap(self)
               DebugSnapshots._logChanges(
-                __macro_local_4snapfMu_, next, suppressIfUnchanged: __macro_local_6calledfMu_
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_
               )
             }
             #else
             @_transparent
             func $logChanges(
+              _ message: String = "",
               line: UInt = #line,
               function: StaticString = #function
             ) {

@@ -107,25 +107,27 @@ public struct LogChangesMacro: BodyMacro {
       var \#(identifier) = \#(raw: moduleName).snap(self)
       var \#(calledFlag) = false
       func $logChanges(
+      _ message: String = "",
       line: UInt = #line,
       function: StaticString = #function
       ) {
       \#(calledFlag) = true
       let next = \#(raw: moduleName).snap(self)
       \#(raw: moduleName)._logChanges(
-      \#(identifier), next, line: line, function: function
+      \#(identifier), next, message, line: line, function: function
       )
       \#(identifier) = next
       }
       defer {
       let next = \#(raw: moduleName).snap(self)
       \#(raw: moduleName)._logChanges(
-      \#(identifier), next, suppressIfUnchanged: \#(calledFlag)\#(raw: deferLocationArgs)
+      \#(identifier), next, quiet: \#(calledFlag)\#(raw: deferLocationArgs)
       )
       }
       #else
       @_transparent
       func $logChanges(
+      _ message: String = "",
       line: UInt = #line,
       function: StaticString = #function
       ) {}
