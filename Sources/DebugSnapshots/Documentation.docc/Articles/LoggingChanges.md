@@ -33,6 +33,8 @@ exactly how the state changed once the method finished:
   //     )
   ```
 
+> Note: Changes are logged only in debug builds. All logging is disabled in release builds.
+
 Further, you can apply `@DebugSnapshot(.logChanges)` to an extension of your model to log the 
 changes from the methods in the extension:
 

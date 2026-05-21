@@ -60,6 +60,9 @@ model.saveButtonTapped()
 //     )
 ```
 
+> [!NOTE]
+> Changes are logged only in debug builds. All logging is disabled in release builds.
+
 DebugSnapshots leverages our [CustomDump] library to print minimal and concise differences between
 values, so if an array contains 100 elements and only a single one changes, the diff focuses on
 just that element:

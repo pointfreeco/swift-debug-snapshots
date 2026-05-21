@@ -9,8 +9,8 @@ values that can be easily debugged and tested over time.
 
 ### Debugging
 
-Apply the [`@DebugSnapshot`](<doc:DebugSnapshot(_:)>) macro with the `.logChanges` option to turn
-any class into an instantly debuggable object:
+Apply the [`@DebugSnapshot`](<doc:DebugSnapshot(_:)>) macro with the 
+``DebugSnapshotOptions/logChanges`` option to turn any class into an instantly debuggable object:
 
 ```swift
 @DebugSnapshot(.logChanges)
@@ -48,6 +48,8 @@ model.saveButtonTapped()
 //     )
 ```
 
+> Note: Changes are logged only in debug builds. All logging is disabled in release builds.
+
 DebugSnapshots leverages our [CustomDump] library to print minimal and concise differences between
 values, so if an array contains 100 elements and only a single one changes, the diff focuses on just
 that element:
@@ -64,6 +66,16 @@ model.saveButtonTapped()
 //   +     [100]: 100
 //       ]
 //     )
+```
+
+You can also log changes in the middle of a method by invoking `$logChanges()`:
+
+```swift
+func refreshButtonTapped() async {
+  data = cache.fetch()
+  $logChanges("cache")
+  data = await client.fetch()
+}
 ```
 
 ### Testing
