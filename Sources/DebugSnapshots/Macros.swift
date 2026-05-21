@@ -34,8 +34,7 @@ public struct DebugSnapshotOptions: OptionSet, Sendable {
     self.rawValue = rawValue
   }
 
-  /// Applies ``LogChanges()`` to every instance method in scope, including methods declared in
-  /// extensions when ``DebugSnapshot(_:)`` is applied to the extension.
+  /// Applies ``LogChanges()`` to every instance method declared directly on the type.
   public static let logChanges = DebugSnapshotOptions(rawValue: 1 << 0)
 }
 

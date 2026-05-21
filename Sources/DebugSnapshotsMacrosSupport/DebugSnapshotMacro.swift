@@ -17,9 +17,6 @@ extension DebugSnapshotMacro: ExtensionMacro {
     conformingTo protocols: [TypeSyntax],
     in context: some MacroExpansionContext
   ) throws -> [ExtensionDeclSyntax] {
-    guard !declaration.is(ExtensionDeclSyntax.self) else {
-      return []
-    }
     guard !hasDebugSnapshotConvertibleConformance(declaration) else {
       return []
     }
@@ -74,9 +71,6 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
       !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges")
     {
       return ["@LogChanges"]
-    }
-    if declaration.is(ExtensionDeclSyntax.self) {
-      return []
     }
     let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
     if let variable = member.as(VariableDeclSyntax.self),
@@ -163,9 +157,6 @@ extension DebugSnapshotMacro: MemberMacro {
     filterPropagatedAttributes: (AttributeListSyntax) -> AttributeListSyntax,
     debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
   ) throws -> [DeclSyntax] {
-    guard !declaration.is(ExtensionDeclSyntax.self) else {
-      return []
-    }
     guard
       let modelDecl = ModelDecl(
         declaration: declaration,
