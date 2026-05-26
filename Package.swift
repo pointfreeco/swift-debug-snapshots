@@ -74,6 +74,7 @@ let package = Package(
       dependencies: [
         "DebugSnapshots",
         "DebugSnapshotsMacrosSupport",
+        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
       ]
     ),
     .testTarget(
