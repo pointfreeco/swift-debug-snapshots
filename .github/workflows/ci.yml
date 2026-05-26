@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  library:
+  macos:
     name: macOS
     strategy:
       matrix:
@@ -21,5 +21,18 @@ jobs:
       - uses: actions/checkout@v5
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      - name: Run ${{ matrix.config }} tests
+        run: swift test -c ${{ matrix.config }}
+
+  linux:
+    name: Linux
+    strategy:
+      matrix:
+        swift: ['6.3']
+        config: ['debug', 'release']
+    runs-on: ubuntu-latest
+    container: swift:${{ matrix.swift }}
+    steps:
+      - uses: actions/checkout@v5
       - name: Run ${{ matrix.config }} tests
         run: swift test -c ${{ matrix.config }}
