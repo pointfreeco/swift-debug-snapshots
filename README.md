@@ -185,6 +185,6 @@ targets: [
 This package currently requires Swift 6.2 or later and supports iOS 13+, macOS 10.15+, tvOS 13+,
 and watchOS 6+.
 
----
+## License
 
-© 2026 Point-Free, Inc. All rights reserved.
+This library is released under the MIT license. See [LICENSE](LICENSE) for details.
