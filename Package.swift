@@ -28,7 +28,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-custom-dump", branch: "main"),
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.6.0"),
     .package(
       url: "https://github.com/pointfreeco/swift-identified-collections",
       from: "1.0.0"
