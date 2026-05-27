@@ -1,5 +1,10 @@
 # DebugSnapshots
 
+[![CI](https://github.com/pointfreeco/swift-debug-snapshots/actions/workflows/ci.yml/badge.svg)](https://github.com/pointfreeco/swift-debug-snapshots/actions/workflows/ci.yml)
+[![Slack](https://img.shields.io/badge/slack-chat-informational.svg?label=Slack&logo=slack)](https://www.pointfree.co/slack-invite)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpointfreeco%2Fswift-debug-snapshots%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpointfreeco%2Fswift-debug-snapshots%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots)
+
 Better debugging and testing for your data model.
 
 ## A Point-Free Production
@@ -28,7 +33,7 @@ values that can be easily debugged and tested over time.
 Apply the [`@DebugSnapshot`] macro with the `.logChanges` option to turn any class into an instantly
 debuggable object:
 
-[`@DebugSnapshot`]: https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots/main/documentation/debugsnapshots/debugsnapshot()
+[`@DebugSnapshot`]: https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots/main/documentation/debugsnapshots/debugsnapshot(_:)
 
 ```swift
 @DebugSnapshot(.logChanges)
@@ -155,6 +160,13 @@ failure message that tells you exactly what went wrong:
 
 That is the basics of using the library, but be sure to read the articles and documentation to learn
 more.
+
+## Documentation
+
+The documentation for the latest unstable and stable releases are available here:
+
+  * [`main`](https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots/main/documentation/debugsnapshots/)
+  * [0.x.x](https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots/~/documentation/debugsnapshots/)
 
 ## Installation
 
