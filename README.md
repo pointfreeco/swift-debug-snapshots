@@ -33,7 +33,7 @@ values that can be easily debugged and tested over time.
 Apply the [`@DebugSnapshot`] macro with the `.logChanges` option to turn any class into an instantly
 debuggable object:
 
-[`@DebugSnapshot`]: https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots/main/documentation/debugsnapshots/debugsnapshot()
+[`@DebugSnapshot`]: https://swiftpackageindex.com/pointfreeco/swift-debug-snapshots/main/documentation/debugsnapshots/debugsnapshot(_:)
 
 ```swift
 @DebugSnapshot(.logChanges)
