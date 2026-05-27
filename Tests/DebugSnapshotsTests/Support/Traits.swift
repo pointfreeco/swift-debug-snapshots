@@ -6,7 +6,7 @@ extension Trait where Self == ConditionTrait {
     .disabled(if: !isXcodeTestRunner, "Requires Xcode's test runner")
   }
 }
- 
+
 private let isXcodeTestRunner: Bool = {
   ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
 }()

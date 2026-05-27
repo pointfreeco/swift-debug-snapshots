@@ -5,7 +5,7 @@ Automatically log changes to your model when methods are invoked.
 ## Overview
 
 The [`@DebugSnapshot`](<doc:DebugSnapshot(_:)>) macro can be customized to automatically log how
-your model changes when each method is invoked, or a more focused 
+your model changes when each method is invoked, or a more focused
  [`@LogChanges`](<doc:LogChanges()>) macro can be applied on a per-method basis.
 
 To log changes for every method in your model, supply the `.logChanges` option to the macro:
@@ -36,7 +36,7 @@ await model.searchButtonTapped()
 > Note: Changes are logged to an `OSLog` so that they are easy to filter for (or filter out), and
 > logging only happens in debug builds and never in release.
 
-Further, you can apply `@DebugSnapshot(.logChanges)` to an extension of your model to log the 
+Further, you can apply `@DebugSnapshot(.logChanges)` to an extension of your model to log the
 changes from the methods in the extension:
 
 ```swift
@@ -49,7 +49,7 @@ extension FeatureModel {
 }
 ```
 
-If you prefer to be more precise about which methods log their changes, you can use the 
+If you prefer to be more precise about which methods log their changes, you can use the
 [`@LogChanges`](<doc:LogChanges()>) macro on any method:
 
 ```swift
@@ -80,12 +80,12 @@ func onAppear() async {
 That will print what has changed in the method since the last time `$logChanges()` was invoked.
 
 > Note: You can also supply a string message to `$logChanges` to make the output clearer:
-> 
+>
 > ```swift
 > func onAppear() async {
 >   data = cache.fetch()
 >   $logChanges("Cached result")
->   data = await client.fetch() 
+>   data = await client.fetch()
 >   $logChanges("Fresh result")
 > }
 > ```

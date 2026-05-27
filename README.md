@@ -95,8 +95,8 @@ model.saveButtonTapped()
 ### Testing
 
 The [`@DebugSnapshot`](<doc:DebugSnapshot(_:)>) macro gives you the ability to exhaustively test the
-logic and behavior in your classes using 
- [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>). Start by applying 
+logic and behavior in your classes using
+ [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>). Start by applying
 the macro to your class:
 
 ```swift
@@ -127,7 +127,7 @@ exhaustively how the state in the class changes:
 }
 ```
 
-The first trailing closure of 
+The first trailing closure of
 [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>) allows you to perform
 any number of actions on your model, and the second argument asserts on how the state changes
 after the actions are performed.
@@ -147,14 +147,14 @@ failure message that tells you exactly what went wrong:
 ```
 
 > ❌ Issue recorded: Expected changes do not match: ...
-> 
+>
 > ```diff
 >     #1 FeatureModel.DebugSnapshot(
 > -     count: 2,
 > +     count: 1,
 >       favoriteNumbers: []
 >     )
-> 
+>
 > (Expected: −, Actual: +)
 > ```
 
@@ -175,7 +175,7 @@ Add DebugSnapshots to your `Package.swift` dependencies:
 ```swift
 dependencies: [
   .package(
-    url: "https://github.com/pointfreeco/swift-debug-snapshots", 
+    url: "https://github.com/pointfreeco/swift-debug-snapshots",
     from: "0.1.0"
   )
 ]

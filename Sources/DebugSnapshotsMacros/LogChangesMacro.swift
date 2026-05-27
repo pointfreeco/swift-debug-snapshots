@@ -78,11 +78,11 @@ public struct LogChangesMacro: BodyMacro {
     let closeBraceLine = context.fileIDLine(of: body.rightBrace)
     let deferLocationArgs: String
     switch (declarationLine, closeBraceLine) {
-    case let (decl?, close?):
+    case (let decl?, let close?):
       deferLocationArgs = ", line: \(calledFlag) ? \(close) : \(decl)"
-    case let (decl?, nil):
+    case (let decl?, nil):
       deferLocationArgs = ", line: \(decl)"
-    case let (nil, close?):
+    case (nil, let close?):
       deferLocationArgs = ", line: \(close)"
     case (nil, nil):
       deferLocationArgs = ""
