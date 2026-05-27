@@ -32,7 +32,8 @@ import Testing
         $0 = .two("Forty two")
       }
     } matching: {
-      $0.description.hasSuffix("""
+      $0.description.hasSuffix(
+        """
         Expected changes do not match: ...
 
           − Destination.DebugSnapshot.two("Forty two")

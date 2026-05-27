@@ -51,7 +51,7 @@ let package = Package(
           condition: .when(
             traits: ["IdentifiedCollections"]
           )
-        )
+        ),
       ]
     ),
     .target(

@@ -5,7 +5,7 @@ Ergonomically and exhaustively test how your model data evolves over time.
 ## Overview
 
 A primary benefit of adding debug snapshots to your model data is the ability to write more
-ergonomic and "[exhaustive](#exhaustive-testing)" tests using the 
+ergonomic and "[exhaustive](#exhaustive-testing)" tests using the
 [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>) function. It snapshots
 the state of your model before and after a series of actions are executed, and then you assert
 on exactly how the state changed in the process.
@@ -46,7 +46,7 @@ This can be tested using `expect` like so:
 }
 ```
 
-The first trailing closure allows you to execute any number of actions you want to. The second 
+The first trailing closure allows you to execute any number of actions you want to. The second
 trailing closure is handed a mutable representation of the snapshot data in the model, and it's your
 job to mutate it to match the state of the model after the actions execute.
 
@@ -65,14 +65,14 @@ This may not seem too different from using `#expect`. In fact, `#expect` is a li
 However, there are some differences. First, when an assertion is incorrect, the resulting failure
 message can be inscrutable. For example, if `favoriteNumbers` has 100 numbers and you get one wrong,
 you will be met with the following error message:
-  
+
 > ❌ Expectation failed: (model.favoriteNumbers → [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100]) == (Array(0...100) → [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100])
 
 In contrast, `expect` shows you exactly what went wrong with the assertion (there's an extra 0 at
 the beginning of the array that should not be there):
 
 > ❌ Issue recorded: Expected changes do not match: ...
-> 
+>
 > ```diff
 >     #1 FeatureModel.DebugSnapshot(
 >       count: 100,
@@ -81,11 +81,11 @@ the beginning of the array that should not be there):
 >         … (100 unchanged)
 >       ]
 >     )
-> 
+>
 > (Expected: −, Actual: +)
 > ```
 
-The second difference is that `expect` forces you to assert on all changes in the model. If 
+The second difference is that `expect` forces you to assert on all changes in the model. If
 something else changes that you did not assert on, you will get a test failure. For example,
 suppose the model is updated to keep track of the max `count` ever seen:
 
@@ -122,7 +122,7 @@ That change will instantly cause this test to fail:
 …with the following failure message:
 
 > ❌ Issue recorded: Expected changes do not match: ...
-> 
+>
 > ```diff
 >     #1 FeatureModel.DebugSnapshot(
 >       count: 1,
@@ -130,7 +130,7 @@ That change will instantly cause this test to fail:
 > +     max: 1,
 >       favoriteNumbers: []
 >     )
-> 
+>
 > (Expected: −, Actual: +)
 > ```
 
@@ -151,7 +151,7 @@ new features are added. To fix the failure we must assert on the `max` state in 
 ```
 
 In contrast, this is not possible with `#expect`. It is your responsibility to assert on each
-piece of state individually, and nothing is keeping you in check to make sure you assert on new 
+piece of state individually, and nothing is keeping you in check to make sure you assert on new
 state when it is added to your feature:
 
 ```swift, highlight=[5]
@@ -180,7 +180,7 @@ class Counter {
     count += 1
   }
 }
-  
+
 @DebugSnapshot
 class FeatureModel {
   @DebugSnapshotConvertible var counters: [Counter] = []
