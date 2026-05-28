@@ -7,6 +7,17 @@ public func _debugSnapshot<T: DebugSnapshotConvertible>(
   T._debugSnapshot(value, visitor: &visitor)
 }
 
+public protocol _DebugSnapshotCopyable {
+  static func _copySnapshot(_ value: Self, visitor: inout _DebugSnapshotVisitor) -> Self
+}
+
+public func _copySnapshot<T: _DebugSnapshotCopyable>(
+  _ value: T,
+  visitor: inout _DebugSnapshotVisitor
+) -> T {
+  T._copySnapshot(value, visitor: &visitor)
+}
+
 public protocol _DebugSnapshotObject<Snapshot>: AnyObject, CustomDumpReflectable, _CustomDiffObject
 {
   associatedtype Snapshot
