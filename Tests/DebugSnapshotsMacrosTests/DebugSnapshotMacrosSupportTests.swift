@@ -100,8 +100,14 @@
 
           @CasePathable
           @dynamicMemberLookup
-          public enum DebugSnapshot: CasePaths.CasePathable, CasePaths.CasePathIterable {
+          public enum DebugSnapshot: CasePaths.CasePathable, CasePaths.CasePathIterable, DebugSnapshots._DebugSnapshotCopyable {
             case increment
+            public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              switch value {
+              case .increment:
+                return .increment
+              }
+            }
           }
 
           public static func _debugSnapshot(_ value: FeatureAction, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
