@@ -46,6 +46,9 @@ This can be tested using `expect` like so:
 }
 ```
 
+> Important: If your code is in an Xcode app target with default settings (i.e. main actor isolation
+and Swift 5 mode), then you will have to additionally mark all tests as `@MainActor`.
+
 The first trailing closure allows you to execute any number of actions you want to. The second
 trailing closure is handed a mutable representation of the snapshot data in the model, and it's your
 job to mutate it to match the state of the model after the actions execute.
