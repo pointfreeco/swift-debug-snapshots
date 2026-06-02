@@ -46,3 +46,13 @@ class RedundantLogChanges {
 final class MainActorWithNonisolatedMethod {
   nonisolated func noop() {}
 }
+
+@globalActor actor MyGlobalActor: GlobalActor {
+  static let shared = MyGlobalActor()
+}
+@MyGlobalActor
+@DebugSnapshot(.logChanges)
+final class CustomGlobalActor {
+  var count = 0
+  func increment() { count += 1 }
+}
