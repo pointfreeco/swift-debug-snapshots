@@ -72,21 +72,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -143,21 +134,12 @@
 
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init() {
               self._snapshot = DebugSnapshotValue()
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -258,21 +240,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -342,21 +315,12 @@
 
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init() {
               self._snapshot = DebugSnapshotValue()
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -417,21 +381,12 @@
 
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init() {
               self._snapshot = DebugSnapshotValue()
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -506,21 +461,12 @@
 
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init() {
               self._snapshot = DebugSnapshotValue()
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -602,21 +548,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -695,21 +632,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -786,21 +714,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 
@@ -882,21 +801,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
           }
 

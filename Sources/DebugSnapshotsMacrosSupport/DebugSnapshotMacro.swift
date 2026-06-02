@@ -348,17 +348,12 @@ private func classMemberDeclarations(
   let debugSnapshotClass =
     DeclSyntax(
       """
-      @dynamicMemberLookup
       public final class DebugSnapshot: \(raw: moduleName)._DebugSnapshotObject {
       public var _snapshot: DebugSnapshotValue
       public var _originIdentifier: ObjectIdentifier?
       public var _diffSnapshot: (any \(raw: moduleName)._DebugSnapshotObject)?
       public init(\(raw: initParams)) {
       self._snapshot = DebugSnapshotValue(\(raw: snapshotInitArguments))
-      }
-      public subscript<T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-      get { _snapshot[keyPath: keyPath] }
-      set { _snapshot[keyPath: keyPath] = newValue }
       }
       }
       """
