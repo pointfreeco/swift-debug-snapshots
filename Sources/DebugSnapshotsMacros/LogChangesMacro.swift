@@ -36,6 +36,30 @@ public struct LogChangesMacro: BodyMacro {
       return []
     }
 
+    if let funcDecl,
+      isNonisolated(funcDecl),
+      let enclosingType = enclosingTypeDecl(in: context),
+      hasMainActorAnnotation(enclosingType)
+    {
+      context.diagnose(
+        Diagnostic(
+          node: Syntax(node),
+          message: MacroExpansionErrorMessage(
+            "'@LogChanges' cannot be applied to 'nonisolated' methods of '@MainActor' types"
+          ),
+          fixIt: .replace(
+            message: MacroExpansionFixItMessage("Remove '@LogChanges'"),
+            oldNode: funcDecl.attributes,
+            newNode: funcDecl.attributes.filter { element in
+              guard case .attribute(let attr) = element else { return true }
+              return !attr.isEquivalent(to: node)
+            }
+          )
+        )
+      )
+      return []
+    }
+
     if let enclosingType = enclosingTypeDecl(in: context),
       !enclosingType.attributes.contains(attribute: "@DebugSnapshot")
     {
@@ -134,6 +158,20 @@ public struct LogChangesMacro: BodyMacro {
       result.append(contentsOf: processed)
     }
     return result
+  }
+}
+
+private func isNonisolated(_ declaration: FunctionDeclSyntax) -> Bool {
+  declaration.modifiers.contains { modifier in
+    modifier.name.text == "nonisolated"
+  }
+}
+
+private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool {
+  declaration.attributes.contains { element in
+    guard case .attribute(let attribute) = element else { return false }
+    let name = attribute.attributeName.trimmedDescription
+    return name.split(separator: ".").last == "MainActor"
   }
 }
 

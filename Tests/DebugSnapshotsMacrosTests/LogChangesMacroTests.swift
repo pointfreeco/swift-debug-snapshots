@@ -292,6 +292,81 @@
       }
     }
 
+    @Test func `diagnose nonisolated method on main actor`() {
+      assertMacro {
+        """
+        @MainActor
+        @DebugSnapshot
+        class Model {
+          @LogChanges
+          nonisolated func noop() {}
+        }
+        """
+      } diagnostics: {
+        """
+        @MainActor
+        @DebugSnapshot
+        class Model {
+          @LogChanges
+          ┬──────────
+          ╰─ 🛑 '@LogChanges' cannot be applied to 'nonisolated' methods of '@MainActor' types
+             ✏️ Remove '@LogChanges'
+          nonisolated func noop() {}
+        }
+        """
+      } fixes: {
+        """
+        @MainActor
+        @DebugSnapshot
+        class Model {
+          nonisolated func noop() {}
+        }
+        """
+      } expansion: {
+        """
+        @MainActor
+        class Model {
+          nonisolated func noop() {}
+
+          public struct DebugSnapshotValue {
+
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init() {
+              self._snapshot = DebugSnapshotValue()
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Model, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension Model: @MainActor DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
     @Test func implicitReturnValue() {
       assertMacro {
         """
