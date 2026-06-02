@@ -40,3 +40,9 @@ class RedundantLogChanges {
     var count = 0
   }
 #endif
+
+@MainActor
+@DebugSnapshot(.logChanges)
+final class MainActorWithNonisolatedMethod {
+  nonisolated func noop() {}
+}
