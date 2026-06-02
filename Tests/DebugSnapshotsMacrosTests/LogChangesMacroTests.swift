@@ -292,6 +292,90 @@
       }
     }
 
+    @Test func `allow nonisolated method on non-@MainActor`() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        class Model {
+          @LogChanges
+          nonisolated func noop() {}
+        }
+        """
+      } expansion: {
+        """
+        class Model {
+          nonisolated func noop() {
+            #if DEBUG
+            var __macro_local_4snapfMu_ = DebugSnapshots.snap(self)
+            var __macro_local_6calledfMu_ = false
+            func $logChanges(
+              _ message: String = "",
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+              __macro_local_6calledfMu_ = true
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, message, line: line, function: function
+              )
+              __macro_local_4snapfMu_ = next
+            }
+            defer {
+              let next = DebugSnapshots.snap(self)
+              DebugSnapshots._logChanges(
+                __macro_local_4snapfMu_, next, quiet: __macro_local_6calledfMu_, line: __macro_local_6calledfMu_ ? 4 : 4
+              )
+            }
+            #else
+            @_transparent
+            func $logChanges(
+              _ message: String = "",
+              line: UInt = #line,
+              function: StaticString = #function
+            ) {
+            }
+            #endif
+          }
+
+          public struct DebugSnapshotValue {
+
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init() {
+              self._snapshot = DebugSnapshotValue()
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Model, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension Model: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
     @Test func `diagnose nonisolated method on main actor`() {
       assertMacro {
         """
