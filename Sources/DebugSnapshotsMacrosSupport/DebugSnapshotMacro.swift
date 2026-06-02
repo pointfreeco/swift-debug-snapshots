@@ -65,12 +65,15 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
     let logChanges = hasLogChangesOption(node)
     if logChanges,
       let funcDecl = member.as(FunctionDeclSyntax.self),
-      !(hasMainActorAnnotation(declaration) && isNonisolated(funcDecl)),
       !funcDecl.modifiers.contains(where: {
         $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
       }),
-      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges")
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges"),
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChangesIgnored")
     {
+      if hasMainActorAnnotation(declaration) && funcDecl.isNonisolated {
+        return ["@LogChangesIgnored"]
+      }
       return ["@LogChanges"]
     }
     let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
@@ -1147,12 +1150,6 @@ private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
     let name = attribute.attributeName.trimmedDescription
     return name.split(separator: ".").last == "MainActor"
-  }
-}
-
-private func isNonisolated(_ declaration: FunctionDeclSyntax) -> Bool {
-  declaration.modifiers.contains { modifier in
-    modifier.name.text == "nonisolated"
   }
 }
 

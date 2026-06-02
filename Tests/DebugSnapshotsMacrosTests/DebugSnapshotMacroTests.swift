@@ -2478,6 +2478,7 @@
         """
         @MainActor
         class FeatureModel {
+          @LogChangesIgnored
           nonisolated func noop() {}
 
           public struct DebugSnapshotValue {

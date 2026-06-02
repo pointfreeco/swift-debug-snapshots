@@ -116,3 +116,11 @@ public macro DebugSnapshotConvertible() =
 @available(iOS 14, macOS 11, tvOS 14, watchOS 7, *)
 @attached(body)
 public macro LogChanges() = #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesMacro")
+
+/// Disables change logging of a method.
+///
+/// Useful when providing the ``DebugSnapshotOptions/logChanges`` option to ``DebugSnapshot(_:)``,
+/// which automatically applies ``LogChanges()`` to all methods.
+@attached(peer)
+public macro LogChangesIgnored() =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesIgnoredMacro")

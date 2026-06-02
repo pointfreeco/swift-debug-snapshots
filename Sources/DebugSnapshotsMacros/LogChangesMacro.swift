@@ -37,7 +37,7 @@ public struct LogChangesMacro: BodyMacro {
     }
 
     if let funcDecl,
-      isNonisolated(funcDecl),
+      funcDecl.isNonisolated,
       let enclosingType = enclosingTypeDecl(in: context),
       hasMainActorAnnotation(enclosingType)
     {
@@ -158,12 +158,6 @@ public struct LogChangesMacro: BodyMacro {
       result.append(contentsOf: processed)
     }
     return result
-  }
-}
-
-private func isNonisolated(_ declaration: FunctionDeclSyntax) -> Bool {
-  declaration.modifiers.contains { modifier in
-    modifier.name.text == "nonisolated"
   }
 }
 
