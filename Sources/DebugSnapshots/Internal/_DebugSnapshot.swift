@@ -7,12 +7,21 @@ public func _debugSnapshot<T: DebugSnapshotConvertible>(
   T._debugSnapshot(value, visitor: &visitor)
 }
 
+@dynamicMemberLookup
 public protocol _DebugSnapshotObject<Snapshot>: AnyObject, CustomDumpReflectable, _CustomDiffObject
 {
   associatedtype Snapshot
   var _snapshot: Snapshot { get set }
   var _originIdentifier: ObjectIdentifier? { get set }
   var _diffSnapshot: (any _DebugSnapshotObject)? { get set }
+  subscript<T>(dynamicMember keyPath: WritableKeyPath<Snapshot, T>) -> T { get set }
+}
+
+extension _DebugSnapshotObject {
+  public subscript<T>(dynamicMember keyPath: WritableKeyPath<Snapshot, T>) -> T {
+    get { _snapshot[keyPath: keyPath] }
+    set { _snapshot[keyPath: keyPath] = newValue }
+  }
 }
 
 extension _DebugSnapshotObject {
