@@ -2412,6 +2412,114 @@
       }
     }
 
+    @Test func `allow @LogChanges on nonisolated methods of non-@MainActor`() {
+      assertMacro {
+        """
+        @DebugSnapshot(.logChanges)
+        class FeatureModel {
+          nonisolated func noop() {}
+        }
+        """
+      } expansion: {
+        """
+        class FeatureModel {
+          @LogChanges
+          nonisolated func noop() {}
+
+          public struct DebugSnapshotValue {
+
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init() {
+              self._snapshot = DebugSnapshotValue()
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func `do not apply @LogChanges to nonisolated methods of main actors`() {
+      assertMacro {
+        """
+        @MainActor
+        @DebugSnapshot(.logChanges)
+        class FeatureModel {
+          nonisolated func noop() {}
+        }
+        """
+      } expansion: {
+        """
+        @MainActor
+        class FeatureModel {
+          @LogChangesIgnored
+          nonisolated func noop() {}
+
+          public struct DebugSnapshotValue {
+
+          }
+
+          @dynamicMemberLookup
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init() {
+              self._snapshot = DebugSnapshotValue()
+            }
+            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
+              get {
+                _snapshot[keyPath: keyPath]
+              }
+              set {
+                _snapshot[keyPath: keyPath] = newValue
+              }
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: @MainActor DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
     @Test func withoutTypeAnnotation() {
       assertMacro {
         """

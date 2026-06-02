@@ -68,8 +68,12 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
       !funcDecl.modifiers.contains(where: {
         $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
       }),
-      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges")
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges"),
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChangesIgnored")
     {
+      if hasMainActorAnnotation(declaration) && funcDecl.isNonisolated {
+        return ["@LogChangesIgnored"]
+      }
       return ["@LogChanges"]
     }
     let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
