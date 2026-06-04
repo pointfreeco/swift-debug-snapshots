@@ -2477,5 +2477,49 @@
         """
       }
     }
+
+    @Test func fileprivateSet() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        class FeatureModel {
+          fileprivate(set) var count = 0
+        }
+        """
+      } expansion: {
+        """
+        class FeatureModel {
+          @DebugSnapshotTracked
+          fileprivate(set) var count = 0
+
+          public struct DebugSnapshotValue {
+            public var count = 0
+          }
+
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(count: Int = 0) {
+              self._snapshot = DebugSnapshotValue(count: count)
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
   }
 #endif

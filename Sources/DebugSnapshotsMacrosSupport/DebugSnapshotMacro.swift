@@ -1095,7 +1095,8 @@ private func accessControl(from modifiers: DeclModifierListSyntax) -> AccessLeve
     .keyword(.fileprivate),
     .keyword(.private),
   ]
-  for modifier in modifiers where accessLevels.contains(modifier.name.tokenKind) {
+  for modifier in modifiers
+  where accessLevels.contains(modifier.name.tokenKind) && modifier.detail == nil {
     switch modifier.name.tokenKind {
     case .keyword(.open), .keyword(.public):
       return .public
