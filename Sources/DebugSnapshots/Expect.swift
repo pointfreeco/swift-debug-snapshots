@@ -251,7 +251,6 @@ private func isReflectivelyEqual(
   if lhsType is AnyClass {
     let lhsObject = lhs as AnyObject
     let rhsObject = rhs as AnyObject
-    if lhsObject === rhsObject { return true }
 
     let pair = _ObjectPair(
       lhs: ObjectIdentifier(lhsObject),
@@ -259,6 +258,8 @@ private func isReflectivelyEqual(
     )
     if visited.contains(pair) { return true }
     visited.insert(pair)
+
+    if lhsObject === rhsObject { return true }
 
     let lhsChildren = Array(Mirror(customDumpReflecting: lhs).children)
     let rhsChildren = Array(Mirror(customDumpReflecting: rhs).children)
@@ -283,7 +284,7 @@ private func isReflectivelyEqual(
         return false
       }
     }
-    return true
+    return lhs is any _DebugSnapshotObject
   }
 
   let lhsMirror = Mirror(reflecting: lhs)

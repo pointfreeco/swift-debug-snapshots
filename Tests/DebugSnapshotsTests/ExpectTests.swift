@@ -134,6 +134,16 @@ import Testing
     }
   }
 
+  @Test func emptyClassesNewObject() {
+    class Bar {}
+    var foo = Foo(bar: Bar())
+    expect(foo) {
+      foo.bar = Bar()
+    } changes: { _ in
+
+    }
+  }
+
   @Test func emptyStructs() {
     struct Bar {}
     let foo = Foo(bar: Bar())
