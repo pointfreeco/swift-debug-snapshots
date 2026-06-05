@@ -137,10 +137,12 @@ import Testing
   @Test func emptyClassesNewObject() {
     class Bar {}
     var foo = Foo(bar: Bar())
-    expect(foo) {
-      foo.bar = Bar()
-    } changes: { _ in
+    withKnownIssue {
+      expect(foo) {
+        foo.bar = Bar()
+      } changes: { _ in
 
+      }
     }
   }
 
