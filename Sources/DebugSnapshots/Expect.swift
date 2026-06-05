@@ -249,68 +249,41 @@ private func isReflectivelyEqual(
   }
 
   if lhsType is AnyClass {
-    if let lhsSnap = lhs as? any _DebugSnapshotObject,
-      let rhsSnap = rhs as? any _DebugSnapshotObject
-    {
-      let lhsObject = lhsSnap as AnyObject
-      let rhsObject = rhsSnap as AnyObject
-      if lhsObject === rhsObject { return true }
+    let lhsObject = lhs as AnyObject
+    let rhsObject = rhs as AnyObject
+    if lhsObject === rhsObject { return true }
 
-      let pair = _ObjectPair(
-        lhs: ObjectIdentifier(lhsObject),
-        rhs: ObjectIdentifier(rhsObject)
-      )
-      if visited.contains(pair) { return true }
-      visited.insert(pair)
+    let pair = _ObjectPair(
+      lhs: ObjectIdentifier(lhsObject),
+      rhs: ObjectIdentifier(rhsObject)
+    )
+    if visited.contains(pair) { return true }
+    visited.insert(pair)
 
-      let lhsChildren = Array(lhsSnap.customDumpMirror.children)
-      let rhsChildren = Array(rhsSnap.customDumpMirror.children)
-      guard lhsChildren.count == rhsChildren.count else { return false }
+    let lhsChildren = Array(Mirror(customDumpReflecting: lhs).children)
+    let rhsChildren = Array(Mirror(customDumpReflecting: rhs).children)
+    guard lhsChildren.count == rhsChildren.count else { return false }
 
-      for (index, (lhsChild, rhsChild)) in zip(lhsChildren, rhsChildren).enumerated() {
-        guard lhsChild.label == rhsChild.label else { return false }
-        var childPath = path
-        childPath.append(lhsChild.label.map { ".\($0)" } ?? "[\(index)]")
-        guard
-          isReflectivelyEqual(
-            lhsChild.value,
-            rhsChild.value,
-            path: childPath,
-            visited: &visited,
-            fileID: fileID,
-            filePath: filePath,
-            line: line,
-            column: column
-          )
-        else {
-          return false
-        }
+    for (index, (lhsChild, rhsChild)) in zip(lhsChildren, rhsChildren).enumerated() {
+      guard lhsChild.label == rhsChild.label else { return false }
+      var childPath = path
+      childPath.append(lhsChild.label.map { ".\($0)" } ?? "[\(index)]")
+      guard
+        isReflectivelyEqual(
+          lhsChild.value,
+          rhsChild.value,
+          path: childPath,
+          visited: &visited,
+          fileID: fileID,
+          filePath: filePath,
+          line: line,
+          column: column
+        )
+      else {
+        return false
       }
-      return true
-    } else {
-      reportIssue(
-        """
-        Non-snapshottable reference '\(lhsType)' found at '\(path.joined())'.
-
-        Add '@DebugSnapshot' to the type to generate a snapshottable value:
-
-          @DebugSnapshot class \(lhsType)
-
-        Or make the property private to suppress this failure:
-
-          private var \(path.last?.dropFirst() ?? "_"): \(lhsType)
-
-        Or use '@DebugSnapshotIgnored':
-
-          @DebugSnapshotIgnored var \(path.last?.dropFirst() ?? "_"): \(lhsType)
-        """,
-        fileID: fileID,
-        filePath: filePath,
-        line: line,
-        column: column
-      )
-      return false
     }
+    return true
   }
 
   let lhsMirror = Mirror(reflecting: lhs)
@@ -320,40 +293,10 @@ private func isReflectivelyEqual(
 
   guard lhsChildren.count == rhsChildren.count else { return false }
 
-  if lhsMirror.displayStyle == .optional || lhsMirror.displayStyle == .enum,
-    lhsMirror.children.isEmpty,
+  if lhsMirror.children.isEmpty,
     rhsMirror.children.isEmpty
   {
     return true
-  }
-
-  if lhsChildren.isEmpty,
-    lhsMirror.displayStyle == .collection || lhsMirror.displayStyle == .set
-  {
-    return true
-  }
-
-  guard !lhsChildren.isEmpty else {
-    guard path.count > 1 else { return true }
-    lazy var name = path.last?.dropFirst() ?? "_"
-    reportIssue(
-      """
-      Non-equatable '\(lhsType)' found at '\(path.joined())'.
-
-      Make the property private to suppress this failure:
-
-        private var \(name): \(lhsType)
-
-      Or use '@DebugSnapshotIgnored':
-
-        @DebugSnapshotIgnored var \(name): \(lhsType)
-      """,
-      fileID: fileID,
-      filePath: filePath,
-      line: line,
-      column: column
-    )
-    return false
   }
 
   for (index, (lhsChild, rhsChild)) in zip(lhsChildren, rhsChildren).enumerated() {
@@ -493,5 +436,12 @@ private func _setDiffTargets(
       using: targets,
       visited: &visited
     )
+  }
+}
+
+// TODO: Publicize in 'swift-custom-dump'
+extension Mirror {
+  fileprivate init(customDumpReflecting subject: Any) {
+    self = (subject as? any CustomDumpReflectable)?.customDumpMirror ?? Mirror(reflecting: subject)
   }
 }
