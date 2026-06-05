@@ -113,6 +113,9 @@ exhaustively how the state in the class changes:
 }
 ```
 
+> Important: If your code is in an Xcode app target with default settings (i.e. main actor isolation
+and Swift 5 mode), then you will have to additionally mark all tests as `@MainActor`.
+
 The first trailing closure of
 [`expect`](<doc:expect(_:_:operation:changes:fileID:filePath:line:column:)>) allows you to perform
 any number of actions on your model, and the second argument asserts on how the state changes after

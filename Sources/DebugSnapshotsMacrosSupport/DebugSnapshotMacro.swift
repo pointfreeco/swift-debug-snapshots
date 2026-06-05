@@ -68,8 +68,12 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
       !funcDecl.modifiers.contains(where: {
         $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
       }),
-      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges")
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChanges"),
+      !funcDecl.hasAttribute(in: \.attributes, equivalentTo: "@LogChangesIgnored")
     {
+      if hasMainActorAnnotation(declaration) && funcDecl.isNonisolated {
+        return ["@LogChangesIgnored"]
+      }
       return ["@LogChanges"]
     }
     let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
@@ -376,7 +380,6 @@ private func classMemberDeclarations(
   let debugSnapshotClass =
     DeclSyntax(
       """
-      @dynamicMemberLookup
       public final class DebugSnapshot: \
       \(raw: moduleName)._DebugSnapshotObject, \(raw: moduleName)._DebugSnapshotCopyable {
       public var _snapshot: DebugSnapshotValue
@@ -384,10 +387,6 @@ private func classMemberDeclarations(
       public var _diffSnapshot: (any \(raw: moduleName)._DebugSnapshotObject)?
       public init(\(raw: initParams)) {
       self._snapshot = DebugSnapshotValue(\(raw: snapshotInitArguments))
-      }
-      public subscript<T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-      get { _snapshot[keyPath: keyPath] }
-      set { _snapshot[keyPath: keyPath] = newValue }
       }
       public static func _copySnapshot(\
       _ value: DebugSnapshot, \
@@ -1171,7 +1170,8 @@ private func accessControl(from modifiers: DeclModifierListSyntax) -> AccessLeve
     .keyword(.fileprivate),
     .keyword(.private),
   ]
-  for modifier in modifiers where accessLevels.contains(modifier.name.tokenKind) {
+  for modifier in modifiers
+  where accessLevels.contains(modifier.name.tokenKind) && modifier.detail == nil {
     switch modifier.name.tokenKind {
     case .keyword(.open), .keyword(.public):
       return .public

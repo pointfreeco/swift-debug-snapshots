@@ -51,21 +51,12 @@
             public var title: String
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(title: String) {
               self._snapshot = DebugSnapshotValue(title: title)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -130,21 +121,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(doubledCount: Int, count: Int) {
               self._snapshot = DebugSnapshotValue(doubledCount: doubledCount, count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -204,21 +186,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -279,21 +252,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -351,21 +315,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -421,21 +376,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -490,21 +436,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -548,21 +485,12 @@
 
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init() {
               self._snapshot = DebugSnapshotValue()
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -618,21 +546,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -691,21 +610,12 @@
               public var count: Int
             }
 
-            @dynamicMemberLookup
             public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
               public var _snapshot: DebugSnapshotValue
               public var _originIdentifier: ObjectIdentifier?
               public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
               public init(count: Int) {
                 self._snapshot = DebugSnapshotValue(count: count)
-              }
-              public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-                get {
-                  _snapshot[keyPath: keyPath]
-                }
-                set {
-                  _snapshot[keyPath: keyPath] = newValue
-                }
               }
               public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
                 if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -754,21 +664,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -829,21 +730,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot, count: Int) {
               self._snapshot = DebugSnapshotValue(child: child, count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -892,21 +784,12 @@
             public var child: Child.DebugSnapshot?
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot? = nil) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -968,21 +851,12 @@
             public var child: Child.DebugSnapshot
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1040,21 +914,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1134,21 +999,12 @@
             public var count: Int
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1265,21 +1121,12 @@
             public var child: Child.DebugSnapshot = DebugSnapshots.snap(Child() as Child)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot = DebugSnapshots.snap(Child() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1336,21 +1183,12 @@
             public var child: Child.DebugSnapshot = DebugSnapshots.snap(FeatureModel.makeChild() as Child)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot = DebugSnapshots.snap(FeatureModel.makeChild() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1399,21 +1237,12 @@
             public var child: Child.DebugSnapshot = DebugSnapshots.snap(.make() as Child)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot = DebugSnapshots.snap(.make() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1462,21 +1291,12 @@
             public var child: Child.DebugSnapshot? = DebugSnapshots.snap(.make() as Child?)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot? = DebugSnapshots.snap(.make() as Child?)) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1525,21 +1345,12 @@
             public var child: Child.DebugSnapshot?? = DebugSnapshots.snap(.make() as Child??)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot?? = DebugSnapshots.snap(.make() as Child??)) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1588,21 +1399,12 @@
             public var child: Child.DebugSnapshot = DebugSnapshots.snap(Factory<FeatureModel>.make() as Child)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child.DebugSnapshot = DebugSnapshots.snap(Factory<FeatureModel>.make() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1651,21 +1453,12 @@
             public var child: ChildContainer.DebugSnapshot = DebugSnapshots.snap(ChildContainer(child: .make()) as ChildContainer)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: ChildContainer.DebugSnapshot = DebugSnapshots.snap(ChildContainer(child: .make()) as ChildContainer)) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1724,7 +1517,6 @@
               }() as Child)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
@@ -1733,14 +1525,6 @@
                   FeatureModel.makeChild()
                 }() as Child)) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1789,21 +1573,12 @@
             public var counters: [Counter.DebugSnapshot] = DebugSnapshots.snap([] as [Counter])
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(counters: [Counter.DebugSnapshot] = DebugSnapshots.snap([] as [Counter])) {
               self._snapshot = DebugSnapshotValue(counters: counters)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -1852,21 +1627,12 @@
             public var counterSet: Set<Counter>.DebugSnapshot = DebugSnapshots.snap([] as Set<Counter>)
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(counterSet: Set<Counter>.DebugSnapshot = DebugSnapshots.snap([] as Set<Counter>)) {
               self._snapshot = DebugSnapshotValue(counterSet: counterSet)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -2452,21 +2218,12 @@
             public var reminders: <#Type#>
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(reminders: <#Type#>) {
               self._snapshot = DebugSnapshotValue(reminders: reminders)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -2602,21 +2359,12 @@
             public var text = ""
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0, opacity: Double = 0.5, text: String = "") {
               self._snapshot = DebugSnapshotValue(count: count, opacity: opacity, text: text)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -2664,21 +2412,12 @@
             public var child: Child?
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: Child? = nil) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -2752,21 +2491,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -2831,21 +2561,12 @@
             public var child: <#Type#> = Child()
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(child: <#Type#> = Child()) {
               self._snapshot = DebugSnapshotValue(child: child)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -2892,21 +2613,12 @@
 
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init() {
               self._snapshot = DebugSnapshotValue()
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -2957,21 +2669,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -3022,21 +2725,12 @@
             public var count = 0
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(uuid: UUIDGenerator, count: Int = 0) {
               self._snapshot = DebugSnapshotValue(uuid: uuid, count: count)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
@@ -3088,21 +2782,12 @@
             public var ratio = -2.5
           }
 
-          @dynamicMemberLookup
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = -1, ratio: Double = -2.5) {
               self._snapshot = DebugSnapshotValue(count: count, ratio: ratio)
-            }
-            public subscript <T>(dynamicMember keyPath: WritableKeyPath<DebugSnapshotValue, T>) -> T {
-              get {
-                _snapshot[keyPath: keyPath]
-              }
-              set {
-                _snapshot[keyPath: keyPath] = newValue
-              }
             }
             public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {

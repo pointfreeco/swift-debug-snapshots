@@ -29,6 +29,12 @@ extension AttributeSyntax {
   }
 }
 
+extension FunctionDeclSyntax {
+  package var isNonisolated: Bool {
+    modifiers.contains { $0.name.text == "nonisolated" }
+  }
+}
+
 extension DeclSyntaxProtocol {
   func addIfNeeded(
     _ attribute: AttributeSyntax?,
