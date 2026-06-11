@@ -123,6 +123,39 @@ import Testing
     #expect(difference?.contains(#"+       name: "Blob!""#) == true)
     #expect(difference?.contains(#"referrer: #1 UserModel.DebugSnapshot(↩︎)"#) == true)
   }
+
+  @Test func emptyClasses() {
+    class Bar {}
+    let foo = Foo(bar: Bar())
+    expect(foo) {
+
+    } changes: { _ in
+
+    }
+  }
+
+  @Test func emptyClassesNewObject() {
+    class Bar {}
+    var foo = Foo(bar: Bar())
+    withKnownIssue {
+      expect(foo) {
+        foo.bar = Bar()
+      } changes: { _ in
+
+      }
+    }
+  }
+
+  @Test func emptyStructs() {
+    struct Bar {}
+    let foo = Foo(bar: Bar())
+    expect(foo) {
+
+    } changes: { _ in
+
+    }
+  }
+  @DebugSnapshot struct Foo<Bar> { var bar: Bar }
 }
 
 @DebugSnapshot
