@@ -2816,5 +2816,166 @@
         """
       }
     }
+
+    @Test func `allow @LogChanges on nonisolated methods of non-@MainActor`() {
+      assertMacro {
+        """
+        @DebugSnapshot(.logChanges)
+        class FeatureModel {
+          nonisolated func noop() {}
+        }
+        """
+      } expansion: {
+        """
+        class FeatureModel {
+          @LogChanges
+          nonisolated func noop() {}
+
+          public struct DebugSnapshotValue {
+
+          }
+
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init() {
+              self._snapshot = DebugSnapshotValue()
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func `do not apply @LogChanges to nonisolated methods of main actors`() {
+      assertMacro {
+        """
+        @MainActor
+        @DebugSnapshot(.logChanges)
+        class FeatureModel {
+          nonisolated func noop() {}
+        }
+        """
+      } expansion: {
+        """
+        @MainActor
+        class FeatureModel {
+          @LogChangesIgnored
+          nonisolated func noop() {}
+
+          public struct DebugSnapshotValue {
+
+          }
+
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init() {
+              self._snapshot = DebugSnapshotValue()
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: @MainActor DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func fileprivateSet() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        class FeatureModel {
+          fileprivate(set) var count = 0
+        }
+        """
+      } expansion: {
+        """
+        class FeatureModel {
+          @DebugSnapshotTracked
+          fileprivate(set) var count = 0
+
+          public struct DebugSnapshotValue {
+            public var count = 0
+          }
+
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(count: Int = 0) {
+              self._snapshot = DebugSnapshotValue(count: count)
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
   }
 #endif
