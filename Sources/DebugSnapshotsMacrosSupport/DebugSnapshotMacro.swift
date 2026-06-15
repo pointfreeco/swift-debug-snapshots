@@ -278,7 +278,9 @@ private func structMemberDeclarations(
   let convertibleSnapshotAssignments =
     properties
     .filter { $0.isDebugSnapshotConvertible }
-    .map { "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" }
+    .map {
+      "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
+    }
   let snapshotBody =
     convertibleSnapshotAssignments.isEmpty
     ? "value"
