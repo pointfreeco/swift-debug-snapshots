@@ -258,6 +258,7 @@ private func structMemberDeclarations(
   if hasIndirectProperties {
     allConformances.append("CustomReflectable")
   }
+  allConformances.append("\(moduleName).DebugSnapshotConvertible")
   let conformancesDescription =
     snapshotConformanceDescription(allConformances)
   let customMirrorDecl: String
@@ -274,12 +275,28 @@ private func structMemberDeclarations(
   } else {
     customMirrorDecl = ""
   }
+  let convertibleSnapshotAssignments =
+    properties
+    .filter { $0.isDebugSnapshotConvertible }
+    .map {
+      "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
+    }
+  let snapshotBody =
+    convertibleSnapshotAssignments.isEmpty
+    ? "value"
+    : "var snapshot = value\n\(convertibleSnapshotAssignments.joined(separator: "\n"))\nreturn snapshot"
   let representation =
     DeclSyntax(
       """
       \(raw: propagatedAttributes.description)\
       public struct DebugSnapshot\(raw: conformancesDescription) {
       \(raw: propertyLines.joined(separator: "\n"))\(raw: customMirrorDecl)
+      public static func _debugSnapshot(\
+      _ value: DebugSnapshot, \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
+      \(raw: snapshotBody)
+      }
       }
       """
     )
@@ -345,25 +362,48 @@ private func classMemberDeclarations(
 
   let initParams = classInitParams(for: properties, modelName: modelDecl.name)
   let snapshotInitArguments = properties.map { "\($0.name): \($0.name)" }.joined(separator: ", ")
-  let debugSnapshotClass =
-    DeclSyntax(
-      """
-      public final class DebugSnapshot: \(raw: moduleName)._DebugSnapshotObject {
-      public var _snapshot: DebugSnapshotValue
-      public var _originIdentifier: ObjectIdentifier?
-      public var _diffSnapshot: (any \(raw: moduleName)._DebugSnapshotObject)?
-      public init(\(raw: initParams)) {
-      self._snapshot = DebugSnapshotValue(\(raw: snapshotInitArguments))
-      }
-      }
-      """
-    )
+
+  let convertibleSnapshotAssignments =
+    properties
+    .filter { $0.isDebugSnapshotConvertible }
+    .map {
+      "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
+    }
+  let convertibleSnapshotAssignmentsCode =
+    convertibleSnapshotAssignments.isEmpty
+    ? ""
+    : "\n" + convertibleSnapshotAssignments.joined(separator: "\n")
 
   let nonConvertibleInitArguments =
     properties
     .filter { !$0.isDebugSnapshotConvertible }
     .map { "\($0.name): value.\($0.name)" }
     .joined(separator: ", ")
+  let debugSnapshotClass =
+    DeclSyntax(
+      """
+      public final class DebugSnapshot: \
+      \(raw: moduleName)._DebugSnapshotObject, \(raw: moduleName).DebugSnapshotConvertible {
+      public var _snapshot: DebugSnapshotValue
+      public var _originIdentifier: ObjectIdentifier?
+      public var _diffSnapshot: (any \(raw: moduleName)._DebugSnapshotObject)?
+      public init(\(raw: initParams)) {
+      self._snapshot = DebugSnapshotValue(\(raw: snapshotInitArguments))
+      }
+      public static func _debugSnapshot(\
+      _ value: DebugSnapshot, \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
+      if let existing: DebugSnapshot = visitor.lookup(value) { return existing }
+      let snapshot = DebugSnapshot(\(raw: nonConvertibleInitArguments))
+      snapshot._originIdentifier = value._originIdentifier
+      visitor.register(value, snapshot: snapshot)\(raw: convertibleSnapshotAssignmentsCode)
+      return snapshot
+      }
+      }
+      """
+    )
+
   let convertibleAssignments =
     properties
     .filter { $0.isDebugSnapshotConvertible }
@@ -555,17 +595,26 @@ private func enumMemberDeclarations(
     debugSnapshotConformances(
       for: declaration,
       properties: []
-    ) + propagatedAttributes.conformances
+    ) + propagatedAttributes.conformances + ["\(moduleName).DebugSnapshotConvertible"]
   )
   let conformanceDescription =
     snapshotConformanceDescription(debugSnapshotConformances)
   let snapshotCaseLines = enumCases.map { debugSnapshotCaseDeclaration($0, modelName: name) }
+  let snapshotSwitchCases = enumCases.map(snapshotSwitchCase)
   let representation =
     DeclSyntax(
       """
       \(raw: propagatedAttributes.description)\
       public \(raw: isIndirect ? "indirect " : "")enum DebugSnapshot\(raw: conformanceDescription) {
       \(raw: snapshotCaseLines.joined(separator: "\n"))
+      public static func _debugSnapshot(\
+      _ value: DebugSnapshot, \
+      visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
+      ) -> DebugSnapshot {
+      switch value {
+      \(raw: snapshotSwitchCases.joined(separator: "\n"))
+      }
+      }
       }
       """
     )
@@ -642,6 +691,34 @@ private func debugSnapshotSwitchCase(_ enumCase: ModelDecl.EnumCase) -> String {
       """
   }
 
+  let valueArguments = zip(parameters, bindings)
+    .map { parameter, binding in
+      let mappedValue =
+        enumCase.isDebugSnapshotConvertible
+        ? "\(moduleName)._debugSnapshot(\(binding), visitor: &visitor)"
+        : binding
+      return "\(caseParameterLabelPrefix(parameter))\(mappedValue)"
+    }
+    .joined(separator: ", ")
+  return """
+    case \(pattern):
+      return .\(name)(\(valueArguments))
+    """
+}
+
+private func snapshotSwitchCase(_ enumCase: ModelDecl.EnumCase) -> String {
+  let name = enumCase.element.name.text
+  let parameters = Array(enumCase.element.parameterClause?.parameters ?? [])
+  let bindings = parameters.indices.map { "v\($0 + 1)" }
+
+  if enumCase.isIgnored || bindings.isEmpty {
+    return """
+      case .\(name):
+        return .\(name)
+      """
+  }
+
+  let pattern = ".\(name)(\(bindings.map { "let \($0)" }.joined(separator: ", ")))"
   let valueArguments = zip(parameters, bindings)
     .map { parameter, binding in
       let mappedValue =
