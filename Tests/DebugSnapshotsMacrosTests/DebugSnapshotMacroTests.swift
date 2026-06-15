@@ -62,10 +62,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(title: value.title)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(title: value.title)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -132,10 +132,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(doubledCount: value.doubledCount, count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(doubledCount: value.doubledCount, count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -197,10 +197,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -263,10 +263,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -326,10 +326,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -387,10 +387,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -447,10 +447,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -496,10 +496,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -557,10 +557,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -621,10 +621,10 @@
                 if let existing: DebugSnapshot = visitor.lookup(value) {
                   return existing
                 }
-                let copy = DebugSnapshot(count: value.count)
-                copy._originIdentifier = value._originIdentifier
-                visitor.register(value, snapshot: copy)
-                return copy
+                let snapshot = DebugSnapshot(count: value.count)
+                snapshot._originIdentifier = value._originIdentifier
+                visitor.register(value, snapshot: snapshot)
+                return snapshot
               }
             }
 
@@ -675,10 +675,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -741,11 +741,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -795,11 +795,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -862,11 +862,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -925,10 +925,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -1010,10 +1010,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -1132,11 +1132,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1194,11 +1194,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1248,11 +1248,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1302,11 +1302,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1356,11 +1356,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1410,11 +1410,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1464,11 +1464,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1530,11 +1530,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1584,11 +1584,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.counters = DebugSnapshots._debugSnapshot(value.counters, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.counters = DebugSnapshots._debugSnapshot(value.counters, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -1638,11 +1638,11 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              copy.counterSet = DebugSnapshots._debugSnapshot(value.counterSet, visitor: &visitor)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.counterSet = DebugSnapshots._debugSnapshot(value.counterSet, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -2229,10 +2229,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(reminders: value.reminders)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(reminders: value.reminders)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -2276,9 +2276,9 @@
               Mirror(self, children: ["nested": nested as Any, "count": count as Any], displayStyle: .struct)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-              var copy = value
-              copy.nested = DebugSnapshots._debugSnapshot(value.nested, visitor: &visitor)
-              return copy
+              var snapshot = value
+              snapshot.nested = DebugSnapshots._debugSnapshot(value.nested, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -2316,9 +2316,9 @@
               Mirror(self, children: ["child": child as Any, "count": count as Any], displayStyle: .struct)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-              var copy = value
-              copy.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
-              return copy
+              var snapshot = value
+              snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              return snapshot
             }
           }
 
@@ -2370,10 +2370,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count, opacity: value.opacity, text: value.text)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count, opacity: value.opacity, text: value.text)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -2423,10 +2423,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(child: value.child)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(child: value.child)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -2502,10 +2502,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -2572,10 +2572,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(child: value.child)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(child: value.child)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -2624,10 +2624,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -2680,10 +2680,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -2736,10 +2736,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(uuid: value.uuid, count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(uuid: value.uuid, count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -2793,10 +2793,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count, ratio: value.ratio)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count, ratio: value.ratio)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 

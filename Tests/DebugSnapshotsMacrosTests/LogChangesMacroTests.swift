@@ -82,10 +82,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -153,10 +153,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -268,10 +268,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -357,10 +357,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot()
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -453,10 +453,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -546,10 +546,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 
@@ -637,10 +637,10 @@
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
-              let copy = DebugSnapshot(count: value.count)
-              copy._originIdentifier = value._originIdentifier
-              visitor.register(value, snapshot: copy)
-              return copy
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
             }
           }
 

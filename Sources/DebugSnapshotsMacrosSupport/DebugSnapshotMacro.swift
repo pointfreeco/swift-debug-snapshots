@@ -275,14 +275,14 @@ private func structMemberDeclarations(
   } else {
     customMirrorDecl = ""
   }
-  let convertibleCopyAssignments =
+  let convertibleSnapshotAssignments =
     properties
     .filter { $0.isDebugSnapshotConvertible }
-    .map { "copy.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" }
-  let copyBody =
-    convertibleCopyAssignments.isEmpty
+    .map { "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" }
+  let snapshotBody =
+    convertibleSnapshotAssignments.isEmpty
     ? "value"
-    : "var copy = value\n\(convertibleCopyAssignments.joined(separator: "\n"))\nreturn copy"
+    : "var snapshot = value\n\(convertibleSnapshotAssignments.joined(separator: "\n"))\nreturn snapshot"
   let representation =
     DeclSyntax(
       """
@@ -293,7 +293,7 @@ private func structMemberDeclarations(
       _ value: DebugSnapshot, \
       visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
       ) -> DebugSnapshot {
-      \(raw: copyBody)
+      \(raw: snapshotBody)
       }
       }
       """
@@ -361,16 +361,16 @@ private func classMemberDeclarations(
   let initParams = classInitParams(for: properties, modelName: modelDecl.name)
   let snapshotInitArguments = properties.map { "\($0.name): \($0.name)" }.joined(separator: ", ")
 
-  let convertibleCopyAssignments =
+  let convertibleSnapshotAssignments =
     properties
     .filter { $0.isDebugSnapshotConvertible }
     .map {
-      "copy.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
+      "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
     }
-  let convertibleCopyAssignmentsCode =
-    convertibleCopyAssignments.isEmpty
+  let convertibleSnapshotAssignmentsCode =
+    convertibleSnapshotAssignments.isEmpty
     ? ""
-    : "\n" + convertibleCopyAssignments.joined(separator: "\n")
+    : "\n" + convertibleSnapshotAssignments.joined(separator: "\n")
 
   let nonConvertibleInitArguments =
     properties
@@ -393,10 +393,10 @@ private func classMemberDeclarations(
       visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
       ) -> DebugSnapshot {
       if let existing: DebugSnapshot = visitor.lookup(value) { return existing }
-      let copy = DebugSnapshot(\(raw: nonConvertibleInitArguments))
-      copy._originIdentifier = value._originIdentifier
-      visitor.register(value, snapshot: copy)\(raw: convertibleCopyAssignmentsCode)
-      return copy
+      let snapshot = DebugSnapshot(\(raw: nonConvertibleInitArguments))
+      snapshot._originIdentifier = value._originIdentifier
+      visitor.register(value, snapshot: snapshot)\(raw: convertibleSnapshotAssignmentsCode)
+      return snapshot
       }
       }
       """
@@ -598,7 +598,7 @@ private func enumMemberDeclarations(
   let conformanceDescription =
     snapshotConformanceDescription(debugSnapshotConformances)
   let snapshotCaseLines = enumCases.map { debugSnapshotCaseDeclaration($0, modelName: name) }
-  let copySwitchCases = enumCases.map(debugSnapshotCopySwitchCase)
+  let snapshotSwitchCases = enumCases.map(snapshotSwitchCase)
   let representation =
     DeclSyntax(
       """
@@ -610,7 +610,7 @@ private func enumMemberDeclarations(
       visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
       ) -> DebugSnapshot {
       switch value {
-      \(raw: copySwitchCases.joined(separator: "\n"))
+      \(raw: snapshotSwitchCases.joined(separator: "\n"))
       }
       }
       }
@@ -704,7 +704,7 @@ private func debugSnapshotSwitchCase(_ enumCase: ModelDecl.EnumCase) -> String {
     """
 }
 
-private func debugSnapshotCopySwitchCase(_ enumCase: ModelDecl.EnumCase) -> String {
+private func snapshotSwitchCase(_ enumCase: ModelDecl.EnumCase) -> String {
   let name = enumCase.element.name.text
   let parameters = Array(enumCase.element.parameterClause?.parameters ?? [])
   let bindings = parameters.indices.map { "v\($0 + 1)" }
