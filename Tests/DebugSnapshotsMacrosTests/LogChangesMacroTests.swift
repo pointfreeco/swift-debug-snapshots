@@ -71,14 +71,14 @@
             public var count = 0
           }
 
-          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
-            public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
@@ -142,14 +142,14 @@
 
           }
 
-          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init() {
               self._snapshot = DebugSnapshotValue()
             }
-            public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
@@ -257,14 +257,14 @@
             public var count = 0
           }
 
-          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
-            public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
@@ -346,14 +346,14 @@
 
           }
 
-          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init() {
               self._snapshot = DebugSnapshotValue()
             }
-            public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
@@ -442,14 +442,14 @@
             public var count = 0
           }
 
-          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
-            public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
@@ -535,14 +535,14 @@
             public var count = 0
           }
 
-          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
-            public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }
@@ -626,14 +626,14 @@
             public var count = 0
           }
 
-          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots._DebugSnapshotCopyable {
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
             public init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
-            public static func _copySnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               if let existing: DebugSnapshot = visitor.lookup(value) {
                 return existing
               }

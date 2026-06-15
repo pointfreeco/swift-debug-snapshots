@@ -258,7 +258,7 @@ private func structMemberDeclarations(
   if hasIndirectProperties {
     allConformances.append("CustomReflectable")
   }
-  allConformances.append("\(moduleName)._DebugSnapshotCopyable")
+  allConformances.append("\(moduleName).DebugSnapshotConvertible")
   let conformancesDescription =
     snapshotConformanceDescription(allConformances)
   let customMirrorDecl: String
@@ -278,7 +278,7 @@ private func structMemberDeclarations(
   let convertibleCopyAssignments =
     properties
     .filter { $0.isDebugSnapshotConvertible }
-    .map { "copy.\($0.name) = \(moduleName)._copySnapshot(value.\($0.name), visitor: &visitor)" }
+    .map { "copy.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" }
   let copyBody =
     convertibleCopyAssignments.isEmpty
     ? "value"
@@ -289,7 +289,7 @@ private func structMemberDeclarations(
       \(raw: propagatedAttributes.description)\
       public struct DebugSnapshot\(raw: conformancesDescription) {
       \(raw: propertyLines.joined(separator: "\n"))\(raw: customMirrorDecl)
-      public static func _copySnapshot(\
+      public static func _debugSnapshot(\
       _ value: DebugSnapshot, \
       visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
       ) -> DebugSnapshot {
@@ -365,7 +365,7 @@ private func classMemberDeclarations(
     properties
     .filter { $0.isDebugSnapshotConvertible }
     .map {
-      "copy.\($0.name) = \(moduleName)._copySnapshot(value.\($0.name), visitor: &visitor)"
+      "copy.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
     }
   let convertibleCopyAssignmentsCode =
     convertibleCopyAssignments.isEmpty
@@ -381,14 +381,14 @@ private func classMemberDeclarations(
     DeclSyntax(
       """
       public final class DebugSnapshot: \
-      \(raw: moduleName)._DebugSnapshotObject, \(raw: moduleName)._DebugSnapshotCopyable {
+      \(raw: moduleName)._DebugSnapshotObject, \(raw: moduleName).DebugSnapshotConvertible {
       public var _snapshot: DebugSnapshotValue
       public var _originIdentifier: ObjectIdentifier?
       public var _diffSnapshot: (any \(raw: moduleName)._DebugSnapshotObject)?
       public init(\(raw: initParams)) {
       self._snapshot = DebugSnapshotValue(\(raw: snapshotInitArguments))
       }
-      public static func _copySnapshot(\
+      public static func _debugSnapshot(\
       _ value: DebugSnapshot, \
       visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
       ) -> DebugSnapshot {
@@ -593,7 +593,7 @@ private func enumMemberDeclarations(
     debugSnapshotConformances(
       for: declaration,
       properties: []
-    ) + propagatedAttributes.conformances + ["\(moduleName)._DebugSnapshotCopyable"]
+    ) + propagatedAttributes.conformances + ["\(moduleName).DebugSnapshotConvertible"]
   )
   let conformanceDescription =
     snapshotConformanceDescription(debugSnapshotConformances)
@@ -605,7 +605,7 @@ private func enumMemberDeclarations(
       \(raw: propagatedAttributes.description)\
       public \(raw: isIndirect ? "indirect " : "")enum DebugSnapshot\(raw: conformanceDescription) {
       \(raw: snapshotCaseLines.joined(separator: "\n"))
-      public static func _copySnapshot(\
+      public static func _debugSnapshot(\
       _ value: DebugSnapshot, \
       visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
       ) -> DebugSnapshot {
@@ -721,7 +721,7 @@ private func debugSnapshotCopySwitchCase(_ enumCase: ModelDecl.EnumCase) -> Stri
     .map { parameter, binding in
       let mappedValue =
         enumCase.isDebugSnapshotConvertible
-        ? "\(moduleName)._copySnapshot(\(binding), visitor: &visitor)"
+        ? "\(moduleName)._debugSnapshot(\(binding), visitor: &visitor)"
         : binding
       return "\(caseParameterLabelPrefix(parameter))\(mappedValue)"
     }
