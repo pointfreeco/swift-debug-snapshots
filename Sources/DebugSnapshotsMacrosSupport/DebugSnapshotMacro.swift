@@ -171,12 +171,30 @@ extension DebugSnapshotMacro: MemberMacro {
       return []
     }
 
-    return memberDeclarations(
+    var declarations = memberDeclarations(
       for: modelDecl,
       declaration: declaration,
       filterPropagatedAttributes: filterPropagatedAttributes,
       attributeConformanceMapping: attributeConformanceMapping
     )
+    if hasLogChangesOption(node) {
+      let keyPaths: [String]
+      switch modelDecl.kind {
+      case .classOrStruct(let properties, _):
+        keyPaths = properties.map { "\\\(modelDecl.name).\($0.name)" }
+      case .enumeration:
+        keyPaths = []
+      }
+      declarations.append(
+        DeclSyntax(
+          """
+          public static var _logChanges: Set<AnyKeyPath> { \
+          [\(raw: keyPaths.joined(separator: ", "))] }
+          """
+        )
+      )
+    }
+    return declarations
   }
 }
 

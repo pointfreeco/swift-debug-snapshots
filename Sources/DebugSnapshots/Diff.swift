@@ -102,7 +102,6 @@ public func _diff<Value>(
   return CustomDump.diff(previous, current, format: format)
 }
 
-@available(macOS 11, iOS 14, watchOS 7, tvOS 14, *)
 public func _logChanges<Value>(
   _ previous: Value,
   _ current: Value,
@@ -122,10 +121,12 @@ public func _logChanges<Value>(
     print(string)
   } else {
     #if canImport(OSLog)
-      logger.log("\(string)")
-    #else
-      print(string)
+      if #available(macOS 11, iOS 14, watchOS 7, tvOS 14, *) {
+        logger.log("\(string)")
+        return
+      }
     #endif
+    print(string)
   }
 }
 

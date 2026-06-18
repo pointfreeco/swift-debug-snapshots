@@ -2478,7 +2478,7 @@
         }
         """
       } expansion: {
-        """
+        #"""
         class FeatureModel {
           @DebugSnapshotTracked
           var count = 0
@@ -2518,11 +2518,15 @@
             visitor.register(value, snapshot: snapshot)
             return snapshot
           }
+
+          public static var _logChanges: Set<AnyKeyPath> {
+            [\FeatureModel.count]
+          }
         }
 
         extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
         }
-        """
+        """#
       }
     }
 
@@ -2862,6 +2866,10 @@
             visitor.register(value, snapshot: snapshot)
             return snapshot
           }
+
+          public static var _logChanges: Set<AnyKeyPath> {
+            []
+          }
         }
 
         extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
@@ -2916,6 +2924,10 @@
             snapshot._originIdentifier = ObjectIdentifier(value)
             visitor.register(value, snapshot: snapshot)
             return snapshot
+          }
+
+          public static var _logChanges: Set<AnyKeyPath> {
+            []
           }
         }
 
