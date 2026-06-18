@@ -16,8 +16,10 @@
     }
   }
 
-  fileprivate extension DebugSnapshotConvertible where Self: AnyObject {
-    subscript<Subject>(logChanges keyPath: ReferenceWritableKeyPath<Self, Subject>) -> Subject {
+  extension DebugSnapshotConvertible where Self: AnyObject {
+    fileprivate subscript<Subject>(logChanges keyPath: ReferenceWritableKeyPath<Self, Subject>)
+      -> Subject
+    {
       get { self[keyPath: keyPath] }
       set {
         guard Self._logChanges.contains(keyPath) else {
