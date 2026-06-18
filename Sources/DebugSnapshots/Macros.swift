@@ -20,7 +20,8 @@
   member,
   names: named(DebugSnapshotValue),
   named(DebugSnapshot),
-  named(_debugSnapshot)
+  named(_debugSnapshot),
+  named(_logChanges)
 )
 @attached(memberAttribute)
 public macro DebugSnapshot(_ options: DebugSnapshotOptions...) =

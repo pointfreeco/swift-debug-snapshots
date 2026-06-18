@@ -5,7 +5,13 @@ public protocol DebugSnapshotConvertible<DebugSnapshot> {
   /// A type representing a "snapshot" of this type.
   associatedtype DebugSnapshot: DebugSnapshotConvertible<DebugSnapshot>
 
+  static var _logChanges: Set<AnyKeyPath> { get }
+
   static func _debugSnapshot(_ value: Self, visitor: inout _DebugSnapshotVisitor) -> DebugSnapshot
+}
+
+extension DebugSnapshotConvertible {
+  public static var _logChanges: Set<AnyKeyPath> { [] }
 }
 
 extension Array: DebugSnapshotConvertible where Element: DebugSnapshotConvertible {

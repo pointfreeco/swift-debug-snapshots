@@ -491,7 +491,7 @@
         }
         """
       } expansion: {
-        """
+        #"""
         class Model {
           @DebugSnapshotTracked
           var count = 0
@@ -562,11 +562,15 @@
             visitor.register(value, snapshot: snapshot)
             return snapshot
           }
+
+          public static var _logChanges: Set<AnyKeyPath> {
+            [\Model.count]
+          }
         }
 
         extension Model: DebugSnapshots.DebugSnapshotConvertible {
         }
-        """
+        """#
       }
     }
 
@@ -583,7 +587,7 @@
         }
         """
       } expansion: {
-        """
+        #"""
         class Model {
           @DebugSnapshotTracked
           var count = 0
@@ -653,11 +657,15 @@
             visitor.register(value, snapshot: snapshot)
             return snapshot
           }
+
+          public static var _logChanges: Set<AnyKeyPath> {
+            [\Model.count]
+          }
         }
 
         extension Model: DebugSnapshots.DebugSnapshotConvertible {
         }
-        """
+        """#
       }
     }
 
@@ -836,7 +844,7 @@
         }
         """
       } expansion: {
-        """
+        #"""
         class Model {
           @DebugSnapshotTracked
           var count = 0
@@ -909,11 +917,15 @@
             visitor.register(value, snapshot: snapshot)
             return snapshot
           }
+
+          public static var _logChanges: Set<AnyKeyPath> {
+            [\Model.count]
+          }
         }
 
         extension Model: DebugSnapshots.DebugSnapshotConvertible {
         }
-        """
+        """#
       }
     }
 
