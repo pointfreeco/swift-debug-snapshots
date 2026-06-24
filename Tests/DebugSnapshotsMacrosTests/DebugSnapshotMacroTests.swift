@@ -34,7 +34,7 @@
         final class FeatureModel {
           @DebugSnapshotIgnored
           private var count: Int
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(String.self)
           var title: String
           @DebugSnapshotIgnored
           var onChange: (Int) -> Void
@@ -109,7 +109,7 @@
           var doubledCount: Int {
             count * 2
           }
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -238,7 +238,7 @@
       } expansion: {
         """
         final class FeatureModel {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
           @DebugSnapshotIgnored
           var _cache: Int
@@ -304,7 +304,7 @@
         """
         @MainActor
         final class FeatureModel {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -365,7 +365,7 @@
       } expansion: {
         """
         final class FeatureModel: DebugSnapshotConvertible {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -425,7 +425,7 @@
         """
         @MainActor
         final class FeatureModel: @MainActor DebugSnapshotConvertible {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -535,7 +535,7 @@
       } expansion: {
         """
         private final class FeatureModel {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -599,7 +599,7 @@
         """
         private struct Parent {
           final class FeatureModel {
-            @DebugSnapshotTracked
+            @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
             var count: Int
 
             init(count: Int) {
@@ -717,7 +717,7 @@
         """
         final class FeatureModel {
           @DebugSnapshotConvertible var child: Child
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
 
           init(child: Child, count: Int) {
@@ -903,7 +903,7 @@
       } expansion: {
         """
         final class FeatureModel: Hashable, Sendable {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -963,15 +963,22 @@
           @DebugSnapshotTracked
           var count: Int
 
-          public struct DebugSnapshot: Sendable, DebugSnapshots.DebugSnapshotConvertible {
-            public var count: Int
+          public struct DebugSnapshot: Sendable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
+            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType(Int.self)
+            public var customMirror: Mirror {
+              Mirror(self, children: ["count": count as Any], displayStyle: .struct)
+            }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-              value
+              var snapshot = value
+              snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
+              return snapshot
             }
           }
 
           public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(count: value.count)
+            var snapshot = DebugSnapshot()
+            snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
+            return snapshot
           }
         }
 
@@ -992,7 +999,7 @@
       } expansion: {
         """
         final class FeatureModel: @unchecked Sendable {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshotValue: @unchecked Sendable {
@@ -1051,16 +1058,25 @@
           @DebugSnapshotTracked
           var count: Int
 
-          public struct DebugSnapshot: Identifiable, DebugSnapshots.DebugSnapshotConvertible {
-            public var id: UUID
-            public var count: Int
+          public struct DebugSnapshot: Identifiable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
+            @DebugSnapshots._Snap public var id = DebugSnapshots._snapshotType(UUID.self)
+            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType(Int.self)
+            public var customMirror: Mirror {
+              Mirror(self, children: ["id": id as Any, "count": count as Any], displayStyle: .struct)
+            }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-              value
+              var snapshot = value
+              snapshot.id = DebugSnapshots._debugSnapshot(value.id, visitor: &visitor)
+              snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
+              return snapshot
             }
           }
 
           public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(id: value.id, count: value.count)
+            var snapshot = DebugSnapshot()
+            snapshot.id = DebugSnapshots._debugSnapshot(value.id, visitor: &visitor)
+            snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
+            return snapshot
           }
         }
 
@@ -1086,15 +1102,22 @@
           @DebugSnapshotTracked
           var count: Int
 
-          public struct DebugSnapshot: DebugSnapshots.DebugSnapshotConvertible {
-            public var count: Int
+          public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
+            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType(Int.self)
+            public var customMirror: Mirror {
+              Mirror(self, children: ["count": count as Any], displayStyle: .struct)
+            }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-              value
+              var snapshot = value
+              snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
+              return snapshot
             }
           }
 
           public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(count: value.count)
+            var snapshot = DebugSnapshot()
+            snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
+            return snapshot
           }
         }
 
@@ -2212,7 +2235,7 @@
         """
         final class FeatureModel {
           @FetchAll(Reminder.all)
-          @DebugSnapshotTracked var reminders: <#Type#>
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(<#Type#>.self) var reminders: <#Type#>
 
           public struct DebugSnapshotValue {
             public var reminders: <#Type#>
@@ -2270,20 +2293,24 @@
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
-            @DebugSnapshots._Indirect public var nested: State.DebugSnapshot?
-            public var count: Int = 0
+            @DebugSnapshots._Snap public var nested = DebugSnapshots._snapshotDefault(nil as State?)
+            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotDefault(0 as Int)
             public var customMirror: Mirror {
               Mirror(self, children: ["nested": nested as Any, "count": count as Any], displayStyle: .struct)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               var snapshot = value
               snapshot.nested = DebugSnapshots._debugSnapshot(value.nested, visitor: &visitor)
+              snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
               return snapshot
             }
           }
 
           public static func _debugSnapshot(_ value: State, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(nested: DebugSnapshots._debugSnapshot(value.nested, visitor: &visitor), count: value.count)
+            var snapshot = DebugSnapshot()
+            snapshot.nested = DebugSnapshots._debugSnapshot(value.nested, visitor: &visitor)
+            snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
+            return snapshot
           }
         }
 
@@ -2310,20 +2337,24 @@
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
-            @DebugSnapshots._Indirect public var child: Child.DebugSnapshot
-            public var count: Int = 0
+            @DebugSnapshots._Snap public var child = DebugSnapshots._snapshotType(Child.self)
+            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotDefault(0 as Int)
             public var customMirror: Mirror {
               Mirror(self, children: ["child": child as Any, "count": count as Any], displayStyle: .struct)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               var snapshot = value
               snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+              snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
               return snapshot
             }
           }
 
           public static func _debugSnapshot(_ value: State, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
-            DebugSnapshot(child: DebugSnapshots._debugSnapshot(value.child, visitor: &visitor), count: value.count)
+            var snapshot = DebugSnapshot()
+            snapshot.child = DebugSnapshots._debugSnapshot(value.child, visitor: &visitor)
+            snapshot.count = DebugSnapshots._debugSnapshot(value.count, visitor: &visitor)
+            return snapshot
           }
         }
 
@@ -2405,7 +2436,7 @@
       } expansion: {
         """
         final class State {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Child?.self)
           var child: Child?
 
           public struct DebugSnapshotValue {
@@ -2558,7 +2589,7 @@
       } expansion: {
         """
         class FeatureModel {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(<#Type#>.self)
           var child: <#Type#> = Child()
 
           public struct DebugSnapshotValue {

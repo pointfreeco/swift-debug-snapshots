@@ -99,6 +99,11 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
         variable.addIfNeeded("@DebugSnapshotConvertible", in: \.attributes, to: &attributes)
       case .tracked:
         variable.addIfNeeded("@DebugSnapshotTracked", in: \.attributes, to: &attributes)
+        if declaration.is(ClassDeclSyntax.self),
+          let type = variable.bindings.first?.typeAnnotation?.type
+        {
+          attributes.append(convertibleCheckAttribute(for: type))
+        }
       case .ignored:
         variable.addIfNeeded("@DebugSnapshotIgnored", in: \.attributes, to: &attributes)
       }
@@ -124,6 +129,13 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
         enumCase.addIfNeeded("@DebugSnapshotConvertible", in: \.attributes, to: &attributes)
       case .tracked:
         enumCase.addIfNeeded("@DebugSnapshotTracked", in: \.attributes, to: &attributes)
+        if let parameters = enumCase.elements.first?.parameterClause?.parameters,
+          enumCase.elements.count == 1,
+          parameters.count == 1,
+          let type = parameters.first?.type
+        {
+          attributes.append(convertibleCheckAttribute(for: type))
+        }
       case .ignored:
         enumCase.addIfNeeded("@DebugSnapshotIgnored", in: \.attributes, to: &attributes)
       }
@@ -270,8 +282,8 @@ private func structMemberDeclarations(
       properties: properties
     ) + propagatedAttributes.conformances
   )
-  let propertyLines = snapshotPropertyLines(for: properties, modelName: modelDecl.name)
-  let hasIndirectProperties = properties.contains(where: \.isDebugSnapshotConvertible)
+  let propertyLines = inferredSnapshotPropertyLines(for: properties, modelName: modelDecl.name)
+  let hasIndirectProperties = !properties.isEmpty
   var allConformances = debugSnapshotConformances
   if hasIndirectProperties {
     allConformances.append("CustomReflectable")
@@ -293,16 +305,16 @@ private func structMemberDeclarations(
   } else {
     customMirrorDecl = ""
   }
-  let convertibleSnapshotAssignments =
-    properties
-    .filter { $0.isDebugSnapshotConvertible }
-    .map {
-      "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
-    }
   let snapshotBody =
-    convertibleSnapshotAssignments.isEmpty
+    properties.isEmpty
     ? "value"
-    : "var snapshot = value\n\(convertibleSnapshotAssignments.joined(separator: "\n"))\nreturn snapshot"
+    : "var snapshot = value\n"
+      + properties
+      .map {
+        "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
+      }
+      .joined(separator: "\n")
+      + "\nreturn snapshot"
   let representation =
     DeclSyntax(
       """
@@ -319,12 +331,16 @@ private func structMemberDeclarations(
       """
     )
 
-  let visitorInitArguments =
-    properties
-    .map {
-      "\($0.name): \($0.isDebugSnapshotConvertible ? "\(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)" : "value.\($0.name)")"
-    }
-    .joined(separator: ", ")
+  let builderBody =
+    properties.isEmpty
+    ? "DebugSnapshot()"
+    : "var snapshot = DebugSnapshot()\n"
+      + properties
+      .map {
+        "snapshot.\($0.name) = \(moduleName)._debugSnapshot(value.\($0.name), visitor: &visitor)"
+      }
+      .joined(separator: "\n")
+      + "\nreturn snapshot"
   let _debugSnapshot =
     DeclSyntax(
       """
@@ -332,7 +348,7 @@ private func structMemberDeclarations(
       _ value: \(raw: modelDecl.name), \
       visitor: inout \(raw: moduleName)._DebugSnapshotVisitor\
       ) -> DebugSnapshot {
-      DebugSnapshot(\(raw: visitorInitArguments))
+      \(raw: builderBody)
       }
       """
     )
@@ -365,8 +381,7 @@ private func classMemberDeclarations(
   let propertyLines = snapshotPropertyLines(
     for: properties,
     modelName: modelDecl.name,
-    snapshotTypeName: "DebugSnapshot",
-    applyIndirection: false
+    snapshotTypeName: "DebugSnapshot"
   )
   let snapshotStruct =
     DeclSyntax(
@@ -451,17 +466,35 @@ private func classMemberDeclarations(
   return [snapshotStruct, debugSnapshotClass, _debugSnapshotMethod]
 }
 
+private func inferredSnapshotPropertyLines(
+  for properties: [ModelDecl.Property],
+  modelName: String
+) -> [String] {
+  properties.map { property in
+    let prefix = "@\(moduleName)._Snap public var \(property.name) = "
+    switch property.kind {
+    case .type(let type):
+      if isOptionalType(type) {
+        return prefix + "\(moduleName)._snapshotDefault(nil as \(type.trimmedDescription))"
+      } else {
+        return prefix + "\(moduleName)._snapshotType(\(type.trimmedDescription).self)"
+      }
+    case .initializer(let defaultValue):
+      let value = rewriteDefaultValue(defaultValue, modelTypeName: modelName).trimmedDescription
+      return prefix + "\(moduleName)._snapshotDefault(\(value))"
+    case .pair(let type, initializer: let defaultValue):
+      let value = rewriteDefaultValue(defaultValue, modelTypeName: modelName).trimmedDescription
+      return prefix + "\(moduleName)._snapshotDefault(\(value) as \(type.trimmedDescription))"
+    }
+  }
+}
+
 private func snapshotPropertyLines(
   for properties: [ModelDecl.Property],
   modelName: String,
-  snapshotTypeName: String = "DebugSnapshot",
-  applyIndirection: Bool = true
+  snapshotTypeName: String = "DebugSnapshot"
 ) -> [String] {
   properties.map { property in
-    let indirectPrefix =
-      applyIndirection && property.isDebugSnapshotConvertible
-      ? "@\(moduleName)._Indirect "
-      : ""
     switch property.kind {
     case .type(let type):
       let typeDescription = type.trimmedDescription
@@ -469,12 +502,12 @@ private func snapshotPropertyLines(
         property.isDebugSnapshotConvertible
         ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
         : typeDescription
-      return "\(indirectPrefix)public var \(property.name): \(snapshotType)"
+      return "public var \(property.name): \(snapshotType)"
     case .initializer(let defaultValue):
       let defaultValue = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
         .trimmedDescription
       if property.isDebugSnapshotConvertible {
-        return "\(indirectPrefix)public var \(property.name) = \(moduleName).snap(\(defaultValue))"
+        return "public var \(property.name) = \(moduleName).snap(\(defaultValue))"
       } else {
         return "public var \(property.name) = \(defaultValue)"
       }
@@ -487,7 +520,7 @@ private func snapshotPropertyLines(
       let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
       if property.isDebugSnapshotConvertible {
         let snapshotDefault = convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault)
-        return "\(indirectPrefix)public var \(property.name): \(snapshotType) = \(snapshotDefault)"
+        return "public var \(property.name): \(snapshotType) = \(snapshotDefault)"
       } else {
         return """
           public var \(property.name): \(typeDescription) = \(rewrittenDefault.trimmedDescription)
@@ -541,6 +574,14 @@ private func classInitParamTypeAndDefault(
       return (snapshotType, rewrittenDefault.trimmedDescription)
     }
   }
+}
+
+private func convertibleCheckAttribute(for type: TypeSyntax) -> AttributeSyntax {
+  let type = type.trimmed
+  let needsParentheses =
+    type.is(SomeOrAnyTypeSyntax.self) || type.is(CompositionTypeSyntax.self)
+  let metatype = needsParentheses ? "(\(type)).self" : "\(type).self"
+  return "@\(raw: moduleName)._ConvertibleCheck(\(raw: metatype))"
 }
 
 private func isOptionalType(_ type: TypeSyntax) -> Bool {

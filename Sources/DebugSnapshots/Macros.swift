@@ -90,6 +90,14 @@ public macro DebugSnapshotIgnored() =
 public macro DebugSnapshotConvertible() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotConvertibleMacro")
 
+@attached(peer)
+public macro _ConvertibleCheck<T>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "ConvertibleCheckPassMacro")
+
+@attached(peer)
+public macro _ConvertibleCheck<T: DebugSnapshotConvertible>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "ConvertibleCheckFailMacro")
+
 /// Add change-logging to a method of a snapshottable type.
 ///
 /// This macro will capture a snapshot of your model at the beginning of your method and again
