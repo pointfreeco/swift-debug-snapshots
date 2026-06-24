@@ -1,32 +1,25 @@
 import DebugSnapshots
-import Testing
 
-@DebugSnapshot
-private struct Child {
+@DebugSnapshot private struct Child {
   var value: Int = 0
 }
 
-@DebugSnapshot
-private struct ParentStructure {
+@DebugSnapshot private struct ParentStructure {
   var count = 0
   var name = ""
   var child = Child()
 }
 
-@DebugSnapshot
-private enum ParentEnumeration {
+@DebugSnapshot private enum ParentEnumeration {
   case count(Int)
   case name(String)
-  @DebugSnapshotConvertible
-  case child(Child)
+  @DebugSnapshotConvertible case child(Child)
 }
 
-@DebugSnapshot
-private final class ParentObject {
+@DebugSnapshot private final class ParentObject {
   var count = 0
   var name = ""
-  @DebugSnapshotConvertible
-  var child: Child = Child()
+  @DebugSnapshotConvertible var child: Child = Child()
 }
 
 private func snapshots() {

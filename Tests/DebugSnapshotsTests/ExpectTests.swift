@@ -225,5 +225,6 @@ final class UserModel {
 
 @DebugSnapshot
 private final class Wrapper {
+  @DebugSnapshotTracked
   var keyPath: AnyKeyPath = \Wrapper.keyPath
 }

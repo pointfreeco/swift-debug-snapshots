@@ -5,8 +5,9 @@ import SwiftSyntaxMacros
 @main
 struct MacrosPlugin: CompilerPlugin {
   let providingMacros: [any Macro.Type] = [
-    ConvertibleCheckPassMacro.self,
-    ConvertibleCheckFailMacro.self,
+    InferenceCheckPassMacro.self,
+    InferenceCheckFailAnyObjectMacro.self,
+    InferenceCheckFailConvertibleMacro.self,
     DebugSnapshotIgnoredMacro.self,
     DebugSnapshotMacro.self,
     DebugSnapshotConvertibleMacro.self,

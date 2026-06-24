@@ -34,7 +34,7 @@
         final class FeatureModel {
           @DebugSnapshotIgnored
           private var count: Int
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(String.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(String.self)
           var title: String
           @DebugSnapshotIgnored
           var onChange: (Int) -> Void
@@ -109,7 +109,7 @@
           var doubledCount: Int {
             count * 2
           }
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -238,7 +238,7 @@
       } expansion: {
         """
         final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
           @DebugSnapshotIgnored
           var _cache: Int
@@ -304,7 +304,7 @@
         """
         @MainActor
         final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -365,7 +365,7 @@
       } expansion: {
         """
         final class FeatureModel: DebugSnapshotConvertible {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -425,7 +425,7 @@
         """
         @MainActor
         final class FeatureModel: @MainActor DebugSnapshotConvertible {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -535,7 +535,7 @@
       } expansion: {
         """
         private final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -599,7 +599,7 @@
         """
         private struct Parent {
           final class FeatureModel {
-            @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+            @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
             var count: Int
 
             init(count: Int) {
@@ -717,7 +717,7 @@
         """
         final class FeatureModel {
           @DebugSnapshotConvertible var child: Child
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           init(child: Child, count: Int) {
@@ -903,7 +903,7 @@
       } expansion: {
         """
         final class FeatureModel: Hashable, Sendable {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -960,7 +960,7 @@
       } expansion: {
         """
         struct FeatureModel: Sendable {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshot: Sendable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -999,7 +999,7 @@
       } expansion: {
         """
         final class FeatureModel: @unchecked Sendable {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshotValue: @unchecked Sendable {
@@ -1053,9 +1053,9 @@
       } expansion: {
         """
         struct FeatureModel: Identifiable {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(UUID.self)
           var id: UUID
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshot: Identifiable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -1099,7 +1099,7 @@
         """
         struct FeatureModel: Identifiable {
           @DebugSnapshotIgnored var id: UUID
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2235,7 +2235,7 @@
         """
         final class FeatureModel {
           @FetchAll(Reminder.all)
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(<#Type#>.self) var reminders: <#Type#>
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(<#Type#>.self) var reminders: <#Type#>
 
           public struct DebugSnapshotValue {
             public var reminders: <#Type#>
@@ -2289,7 +2289,7 @@
         """
         struct State {
           @DebugSnapshotConvertible var nested: State?
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2333,7 +2333,7 @@
         """
         struct State {
           @DebugSnapshotConvertible var child: Child
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2436,7 +2436,7 @@
       } expansion: {
         """
         final class State {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(Child?.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Child?.self)
           var child: Child?
 
           public struct DebugSnapshotValue {
@@ -2589,7 +2589,7 @@
       } expansion: {
         """
         class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots._ConvertibleCheck(<#Type#>.self)
+          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(<#Type#>.self)
           var child: <#Type#> = Child()
 
           public struct DebugSnapshotValue {

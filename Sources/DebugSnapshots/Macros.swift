@@ -91,12 +91,20 @@ public macro DebugSnapshotConvertible() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotConvertibleMacro")
 
 @attached(peer)
-public macro _ConvertibleCheck<T>(_ type: T.Type) =
-  #externalMacro(module: "DebugSnapshotsMacros", type: "ConvertibleCheckPassMacro")
+public macro _InferenceCheck<T>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckPassMacro")
 
 @attached(peer)
-public macro _ConvertibleCheck<T: DebugSnapshotConvertible>(_ type: T.Type) =
-  #externalMacro(module: "DebugSnapshotsMacros", type: "ConvertibleCheckFailMacro")
+public macro _InferenceCheck<T: AnyObject>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailAnyObjectMacro")
+
+@attached(peer)
+public macro _InferenceCheck<T: DebugSnapshotConvertible>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailConvertibleMacro")
+
+@attached(peer)
+public macro _InferenceCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailConvertibleMacro")
 
 /// Add change-logging to a method of a snapshottable type.
 ///
