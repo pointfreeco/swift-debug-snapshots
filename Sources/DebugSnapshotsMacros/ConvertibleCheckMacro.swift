@@ -1,7 +1,7 @@
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
-public import SwiftSyntaxMacros
+import SwiftSyntaxMacros
 
 enum InferenceCheckPassMacro: PeerMacro {
   static func expansion(

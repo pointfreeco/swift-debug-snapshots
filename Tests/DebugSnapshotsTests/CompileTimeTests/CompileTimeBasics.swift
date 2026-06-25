@@ -33,8 +33,9 @@ class RedundantLogChanges {
 }
 
 #if canImport(Observation)
-  @MainActor
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @DebugSnapshot
+  @MainActor
   @Observable
   private class MainActorObservable {
     var count = 0

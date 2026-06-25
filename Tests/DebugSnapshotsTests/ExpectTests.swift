@@ -5,6 +5,7 @@ import Observation
 import Testing
 
 @Suite struct ExpectTests {
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @Test func exhaustive() throws {
     let model = FeatureModel()
     expect(model) {
@@ -23,6 +24,7 @@ import Testing
     }
   }
 
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @Test func nonexhaustive() throws {
     let model = FeatureModel()
     model.perturb()
@@ -51,6 +53,7 @@ import Testing
     }
   }
 
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @Test func async() async throws {
     let model = FeatureModel()
     await expect(model) {
@@ -60,6 +63,7 @@ import Testing
     }
   }
 
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @Test func computed() throws {
     let model = FeatureModel()
     expect(model) {
@@ -69,6 +73,7 @@ import Testing
     }
   }
 
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @Test func references() {
     let blobJr = UserModel(name: "Blob Jr")
     expect(blobJr) {
@@ -78,6 +83,7 @@ import Testing
     }
   }
 
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @Test func recursiveSnapshot() {
     let blobJr = UserModel(name: "Blob Jr")
     blobJr.referrer = blobJr
@@ -88,6 +94,7 @@ import Testing
     #expect(snapshot.referrer! === snapshot)
   }
 
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @Test func customDumpReferences() {
     let blobJr = UserModel(name: "Blob Jr")
     _ = blobJr.refer(name: "Blob")
@@ -110,6 +117,7 @@ import Testing
     )
   }
 
+  @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
   @Test func snapshotDiffReferences() {
     let blobJr = UserModel(name: "Blob Jr")
     let blob = blobJr.refer(name: "Blob")
@@ -158,6 +166,7 @@ import Testing
   @DebugSnapshot struct Foo<Bar> { var bar: Bar }
 }
 
+@available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
 @DebugSnapshot
 @Observable
 private final class FeatureModel {
@@ -202,6 +211,7 @@ private final class FeatureModel {
   }
 }
 
+@available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
 @DebugSnapshot
 @Observable
 final class UserModel {
