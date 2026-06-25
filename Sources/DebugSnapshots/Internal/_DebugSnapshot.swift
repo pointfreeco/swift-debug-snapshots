@@ -7,6 +7,14 @@ public func _debugSnapshot<T: DebugSnapshotConvertible>(
   T._debugSnapshot(value, visitor: &visitor)
 }
 
+@_disfavoredOverload
+public func _debugSnapshot<T>(
+  _ value: T,
+  visitor: inout _DebugSnapshotVisitor
+) -> T {
+  value
+}
+
 @dynamicMemberLookup
 public protocol _DebugSnapshotObject<Snapshot>: AnyObject, CustomDumpReflectable, _CustomDiffObject
 {

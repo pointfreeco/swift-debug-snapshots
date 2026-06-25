@@ -90,6 +90,22 @@ public macro DebugSnapshotIgnored() =
 public macro DebugSnapshotConvertible() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotConvertibleMacro")
 
+@attached(peer)
+public macro _InferenceCheck<T>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckPassMacro")
+
+@attached(peer)
+public macro _InferenceCheck<T: AnyObject>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailAnyObjectMacro")
+
+@attached(peer)
+public macro _InferenceCheck<T: DebugSnapshotConvertible>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailConvertibleMacro")
+
+@attached(peer)
+public macro _InferenceCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailConvertibleMacro")
+
 /// Add change-logging to a method of a snapshottable type.
 ///
 /// This macro will capture a snapshot of your model at the beginning of your method and again
@@ -114,7 +130,6 @@ public macro DebugSnapshotConvertible() =
 /// This will log the changes after the `data` assignment, and then again at the end of the method.
 ///
 /// See <doc:LoggingChanges> for more information.
-@available(iOS 14, macOS 11, tvOS 14, watchOS 7, *)
 @attached(body)
 public macro LogChanges() = #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesMacro")
 
