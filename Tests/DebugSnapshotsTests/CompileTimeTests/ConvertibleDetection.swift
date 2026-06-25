@@ -1,7 +1,7 @@
 import DebugSnapshots
 
 @DebugSnapshot private struct Child {
-  var value: Int = 0
+  var value = 0
 }
 
 @DebugSnapshot private struct ParentStructure {

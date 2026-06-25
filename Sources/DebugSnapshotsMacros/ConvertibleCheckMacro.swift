@@ -63,21 +63,37 @@ enum InferenceCheckFailConvertibleMacro: PeerMacro {
     }
     let message: String
     if declaration.is(EnumCaseDeclSyntax.self) {
-      message = "Associated value must be annotated '@DebugSnapshotConvertible'"
+      message = "Associated value must be annotated '@DebugSnapshotConvertible' to snapshot"
     } else {
-      message = "Property must be annotated '@DebugSnapshotConvertible'"
+      message = "Property must be annotated '@DebugSnapshotConvertible' to snapshot"
     }
     context.diagnose(
       Diagnostic(
         node: Syntax(declaration),
         message: MacroExpansionWarningMessage(message),
-        fixIt: .replace(
-          message: MacroExpansionFixItMessage(
-            "Apply '@DebugSnapshotConvertible' to snapshot"
+        fixIts: [
+          .replace(
+            message: MacroExpansionFixItMessage(
+              "Apply '@DebugSnapshotConvertible' to snapshot"
+            ),
+            oldNode: declaration,
+            newNode: declaration.apply("@DebugSnapshotConvertible")
           ),
-          oldNode: declaration,
-          newNode: declaration.apply("@DebugSnapshotConvertible")
-        )
+          .replace(
+            message: MacroExpansionFixItMessage(
+              "Apply '@DebugSnapshotIgnored' to ignore"
+            ),
+            oldNode: declaration,
+            newNode: declaration.apply("@DebugSnapshotIgnored")
+          ),
+          .replace(
+            message: MacroExpansionFixItMessage(
+              "Apply '@DebugSnapshotTracked' to track reference in snapshot"
+            ),
+            oldNode: declaration,
+            newNode: declaration.apply("@DebugSnapshotTracked")
+          ),
+        ]
       )
     )
     return []
