@@ -33,8 +33,8 @@ let package = Package(
       url: "https://github.com/pointfreeco/swift-identified-collections",
       from: "1.0.0"
     ),
+    .package(url: "https://github.com/pointfreeco/swift-issue-reporting", from: "2.0.0"),
     .package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.1.0"),
-    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.0.0"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
     .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"603.0.0"),
   ],
@@ -44,7 +44,7 @@ let package = Package(
       dependencies: [
         "DebugSnapshotsMacros",
         .product(name: "CustomDump", package: "swift-custom-dump"),
-        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReporting", package: "swift-issue-reporting"),
         .product(
           name: "IdentifiedCollections",
           package: "swift-identified-collections",
@@ -74,7 +74,7 @@ let package = Package(
       dependencies: [
         "DebugSnapshots",
         "DebugSnapshotsMacrosSupport",
-        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReportingTestSupport", package: "swift-issue-reporting"),
       ]
     ),
     .testTarget(
