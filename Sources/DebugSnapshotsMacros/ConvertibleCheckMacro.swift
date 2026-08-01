@@ -23,12 +23,12 @@ enum DebugSnapshotCheckFailAnyObjectMacro: PeerMacro {
     if declaration.is(EnumCaseDeclSyntax.self) {
       message = """
         Associated value is a reference type that is not 'DebugSnapshotConvertible'; apply the \
-        @DebugSnapshot macro to conform
+        @DebugSnapshot macro to conform, or apply a fix-it
         """
     } else {
       message = """
         Property is a reference type that is not 'DebugSnapshotConvertible'; apply the \
-        @DebugSnapshot macro to conform
+        @DebugSnapshot macro to conform, or apply a fix-it
         """
     }
     context.diagnose(
@@ -45,7 +45,7 @@ enum DebugSnapshotCheckFailAnyObjectMacro: PeerMacro {
           ),
           .replace(
             message: MacroExpansionFixItMessage(
-              "Apply '@DebugSnapshotTracked' to track reference in snapshot"
+              "Apply '@DebugSnapshotTracked' to track reference identity in snapshot"
             ),
             oldNode: declaration,
             newNode: declaration.apply("@DebugSnapshotTracked")
@@ -94,7 +94,7 @@ enum DebugSnapshotCheckFailConvertibleMacro: PeerMacro {
           ),
           .replace(
             message: MacroExpansionFixItMessage(
-              "Apply '@DebugSnapshotTracked' to track reference in snapshot"
+              "Apply '@DebugSnapshotTracked' to track reference identity in snapshot"
             ),
             oldNode: declaration,
             newNode: declaration.apply("@DebugSnapshotTracked")
