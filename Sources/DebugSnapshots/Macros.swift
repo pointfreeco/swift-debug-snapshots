@@ -174,29 +174,3 @@ public macro DebugSnapshotCheck<C: Collection & DebugSnapshotConvertible where C
 @attached(peer)
 public macro DebugSnapshotCheck<C: Collection & DebugSnapshotConvertible where C.Element: AnyObject>(_ type: C?.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
-
-
-//@DebugSnapshot
-//class Model {
-//  @LogChanges
-//  static func tick() {}
-//}
-//
-import Dispatch
-@MainActor
-func updateUI() { /* ... */ }
-
-
-func runInBackground(_ work: @escaping @Sendable () -> ()) {
-  DispatchQueue.global().async { work() }
-}
-
-
-func schedule(_ work: @escaping @isolated(any) @Sendable () -> ()) {
-  runInBackground(work) // warning: converting @isolated(any) function of type '@isolated(any) @Sendable () -> ()' to synchronous function type '@Sendable () -> ()' is not allowed
-}
-
-func foo() {
-
-  schedule(updateUI)
-}
