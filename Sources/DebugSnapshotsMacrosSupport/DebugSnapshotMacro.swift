@@ -585,7 +585,7 @@ private func convertibleCheckAttribute(for type: TypeSyntax) -> AttributeSyntax 
   let needsParentheses =
     type.is(SomeOrAnyTypeSyntax.self) || type.is(CompositionTypeSyntax.self)
   let metatype = needsParentheses ? "(\(type)).self" : "\(type).self"
-  return "@\(raw: moduleName)._InferenceCheck(\(raw: metatype))"
+  return "@\(raw: moduleName).DebugSnapshotCheck(\(raw: metatype))"
 }
 
 private func inferenceCheckAttribute(for variable: VariableDeclSyntax) -> AttributeSyntax? {
@@ -594,7 +594,7 @@ private func inferenceCheckAttribute(for variable: VariableDeclSyntax) -> Attrib
     return convertibleCheckAttribute(for: type)
   }
   if let value = binding.initializer?.value {
-    return "@\(raw: moduleName)._InferenceCheck(Swift.type(of: \(value.trimmed)))"
+    return "@\(raw: moduleName).DebugSnapshotCheck(Swift.type(of: \(value.trimmed)))"
   }
   return nil
 }
