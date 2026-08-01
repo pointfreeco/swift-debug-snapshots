@@ -104,7 +104,7 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
         {
           attributes.append(convertibleCheckAttribute(for: type))
         } else if declaration.is(StructDeclSyntax.self),
-          let attribute = inferenceCheckAttribute(for: variable)
+          let attribute = debugSnapshotCheckAttribute(for: variable)
         {
           attributes.append(attribute)
         }
@@ -588,7 +588,7 @@ private func convertibleCheckAttribute(for type: TypeSyntax) -> AttributeSyntax 
   return "@\(raw: moduleName).DebugSnapshotCheck(\(raw: metatype))"
 }
 
-private func inferenceCheckAttribute(for variable: VariableDeclSyntax) -> AttributeSyntax? {
+private func debugSnapshotCheckAttribute(for variable: VariableDeclSyntax) -> AttributeSyntax? {
   guard let binding = variable.bindings.first else { return nil }
   if let type = binding.typeAnnotation?.type {
     return convertibleCheckAttribute(for: type)

@@ -152,8 +152,8 @@ public macro DebugSnapshotCheck<T: DebugSnapshotConvertible & AnyObject>(_ type:
 
 @_documentation(visibility: private)
 @attached(peer)
-public macro InferenceCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T?.Type) =
-  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailConvertibleMacro")
+public macro DebugSnapshotCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T?.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
 
 @_documentation(visibility: private)
 @attached(peer)
