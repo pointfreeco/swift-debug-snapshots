@@ -23,12 +23,12 @@ enum DebugSnapshotCheckFailAnyObjectMacro: PeerMacro {
     if declaration.is(EnumCaseDeclSyntax.self) {
       message = """
         Associated value is a reference type that is not 'DebugSnapshotConvertible'; apply the \
-        @DebugSnapshot macro to conform it
+        @DebugSnapshot macro to conform
         """
     } else {
       message = """
         Property is a reference type that is not 'DebugSnapshotConvertible'; apply the \
-        @DebugSnapshot macro to conform it
+        @DebugSnapshot macro to conform
         """
     }
     context.diagnose(
