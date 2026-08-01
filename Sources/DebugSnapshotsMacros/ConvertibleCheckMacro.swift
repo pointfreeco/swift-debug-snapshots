@@ -3,7 +3,7 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
-enum InferenceCheckPassMacro: PeerMacro {
+enum DebugSnapshotCheckPassMacro: PeerMacro {
   static func expansion(
     of node: AttributeSyntax,
     providingPeersOf declaration: some DeclSyntaxProtocol,
@@ -13,7 +13,7 @@ enum InferenceCheckPassMacro: PeerMacro {
   }
 }
 
-enum InferenceCheckFailAnyObjectMacro: PeerMacro {
+enum DebugSnapshotCheckFailAnyObjectMacro: PeerMacro {
   static func expansion(
     of node: AttributeSyntax,
     providingPeersOf declaration: some DeclSyntaxProtocol,
@@ -51,7 +51,7 @@ enum InferenceCheckFailAnyObjectMacro: PeerMacro {
   }
 }
 
-enum InferenceCheckFailConvertibleMacro: PeerMacro {
+enum DebugSnapshotCheckFailConvertibleMacro: PeerMacro {
   static func expansion(
     of node: AttributeSyntax,
     providingPeersOf declaration: some DeclSyntaxProtocol,
@@ -107,7 +107,7 @@ extension DeclSyntaxProtocol {
       var filtered = Array(attributes).filter { element in
         guard case .attribute(let attribute) = element else { return true }
         let name = attribute.attributeName.trimmedDescription
-        return name != "_InferenceCheck" && name != "DebugSnapshotTracked"
+        return name != "DebugSnapshotCheck" && name != "DebugSnapshotTracked"
       }
       filtered.insert(.attribute(attribute), at: filtered.startIndex)
       return AttributeListSyntax(filtered)
