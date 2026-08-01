@@ -90,26 +90,32 @@ public macro DebugSnapshotIgnored() =
 public macro DebugSnapshotConvertible() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotConvertibleMacro")
 
+@_documentation(visibility: private)
 @attached(peer)
 public macro DebugSnapshotCheck<T>(_ type: T.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckPassMacro")
 
+@_documentation(visibility: private)
 @attached(peer)
 public macro DebugSnapshotCheck<T: AnyObject>(_ type: T.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailAnyObjectMacro")
 
+@_documentation(visibility: private)
 @attached(peer)
 public macro DebugSnapshotCheck<T: AnyObject>(_ type: T?.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailAnyObjectMacro")
 
+@_documentation(visibility: private)
 @attached(peer)
 public macro DebugSnapshotCheck<T: DebugSnapshotConvertible>(_ type: T.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
 
+@_documentation(visibility: private)
 @attached(peer)
 public macro DebugSnapshotCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
 
+@_documentation(visibility: private)
 @attached(peer)
 public macro InferenceCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T?.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailConvertibleMacro")
