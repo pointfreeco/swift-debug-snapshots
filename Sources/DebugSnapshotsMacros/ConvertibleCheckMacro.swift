@@ -1,3 +1,4 @@
+import Foundation
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
@@ -19,6 +20,7 @@ enum DebugSnapshotCheckFailAnyObjectMacro: PeerMacro {
     providingPeersOf declaration: some DeclSyntaxProtocol,
     in context: some MacroExpansionContext
   ) throws -> [DeclSyntax] {
+    if isRedundantEnumCaseExpansion(of: declaration, in: context) { return [] }
     let message: String
     if declaration.is(EnumCaseDeclSyntax.self) {
       message = """
@@ -63,6 +65,7 @@ enum DebugSnapshotCheckFailConvertibleMacro: PeerMacro {
     providingPeersOf declaration: some DeclSyntaxProtocol,
     in context: some MacroExpansionContext
   ) throws -> [DeclSyntax] {
+    if isRedundantEnumCaseExpansion(of: declaration, in: context) { return [] }
     for node in context.lexicalContext {
       if node.is(StructDeclSyntax.self) { return [] }
       if node.is(ClassDeclSyntax.self) || node.is(EnumDeclSyntax.self) { break }
@@ -104,6 +107,14 @@ enum DebugSnapshotCheckFailConvertibleMacro: PeerMacro {
     )
     return []
   }
+}
+
+private func isRedundantEnumCaseExpansion(
+  of declaration: some DeclSyntaxProtocol,
+  in context: some MacroExpansionContext
+) -> Bool {
+  guard declaration.is(EnumCaseDeclSyntax.self) else { return false }
+  return context.makeUniqueName("").text.contains("1_18DebugSnapshotCheckfMp")
 }
 
 extension DeclSyntaxProtocol {

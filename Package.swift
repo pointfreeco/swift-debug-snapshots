@@ -28,6 +28,7 @@ let package = Package(
     )
   ],
   dependencies: [
+    .package(url: "https://github.com/pointfreeco/swift-compilation-testing", branch: "main"),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.6.0"),
     .package(
       url: "https://github.com/pointfreeco/swift-identified-collections",
@@ -74,6 +75,7 @@ let package = Package(
       dependencies: [
         "DebugSnapshots",
         "DebugSnapshotsMacrosSupport",
+        .product(name: "CompilationTesting", package: "swift-compilation-testing"),
         .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
       ]
     ),
