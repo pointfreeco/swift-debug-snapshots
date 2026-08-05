@@ -157,20 +157,24 @@ public macro DebugSnapshotCheck<T: DebugSnapshotConvertible & AnyObject>(_ type:
 
 @_documentation(visibility: private)
 @attached(peer)
-public macro DebugSnapshotCheck<C: Collection where C.Element: AnyObject>(_ type: C.Type) =
+public macro DebugSnapshotCheck<C: Collection>(_ type: C.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailAnyObjectMacro")
+where C.Element: AnyObject
 
 @_documentation(visibility: private)
 @attached(peer)
-public macro DebugSnapshotCheck<C: Collection where C.Element: AnyObject>(_ type: C?.Type) =
+public macro DebugSnapshotCheck<C: Collection>(_ type: C?.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailAnyObjectMacro")
+where C.Element: AnyObject
 
 @_documentation(visibility: private)
 @attached(peer)
-public macro DebugSnapshotCheck<C: Collection & DebugSnapshotConvertible where C.Element: AnyObject>(_ type: C.Type) =
+public macro DebugSnapshotCheck<C: Collection & DebugSnapshotConvertible>(_ type: C.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
+where C.Element: AnyObject
 
 @_documentation(visibility: private)
 @attached(peer)
-public macro DebugSnapshotCheck<C: Collection & DebugSnapshotConvertible where C.Element: AnyObject>(_ type: C?.Type) =
+public macro DebugSnapshotCheck<C: Collection & DebugSnapshotConvertible>(_ type: C?.Type) =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
+where C.Element: AnyObject
