@@ -38,8 +38,14 @@ public struct DebugSnapshotOptions: Sendable {
 /// Tells `@DebugSnapshot` to track a property.
 ///
 /// ``DebugSnapshot(_:)`` automatically applies this macro to most of a type's stored properties, as
-/// long as the property matches the enclosing type's access control, is not underscored, is not a
-/// closure, and is not explicitly ignored using ``DebugSnapshotIgnored()``.
+/// long as the property is at least `internal` (or matches the enclosing type's access control,
+/// when that is narrower), is not underscored, is not a closure, and is not explicitly ignored
+/// using ``DebugSnapshotIgnored()``.
+///
+/// A tracked property is mirrored in the snapshot at its own access level, bounded below by
+/// `internal`, so snapshotting a `public` type does not publish its internal state, and a property
+/// tracked explicitly despite being `private` is mirrored as `internal` — visible to tests that use
+/// `@testable import`, but never outside the module.
 ///
 /// To explicitly snapshot a property that would otherwise be ignored, apply
 /// `@DebugSnapshotTracked`:
@@ -56,8 +62,9 @@ public macro DebugSnapshotTracked() =
 
 /// Tells `@DebugSnapshot` to ignore a property.
 ///
-/// ``DebugSnapshot(_:)`` automatically applies this macro to properties with less access control than
-/// the enclosing type, as well as underscored properties, computed properties, and closures.
+/// ``DebugSnapshot(_:)`` automatically applies this macro to properties with less access control
+/// than `internal` (or than the enclosing type, when that is narrower), as well as underscored
+/// properties, computed properties, and closures.
 ///
 /// To explicitly ignore ``DebugSnapshotTracked()`` properties, apply `@DebugSnapshotIgnored`:
 ///

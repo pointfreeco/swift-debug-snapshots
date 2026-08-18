@@ -14,8 +14,12 @@ attributes to customize the snapshot's definition.
 By default the ``DebugSnapshot(_:)`` macro uses a few rules to determine if a property should be
 tracked or ignored:
 
-  - Private properties, or properties with access control that is less than the access control of
-    their enclosing type, are ignored.
+  - Properties with less access control than `internal`, or than their enclosing type when that is
+    narrower, are ignored.
+  - Tracked properties are mirrored in the snapshot at their own access level, bounded below by
+    `internal`: the internal properties of a `public` type are snapshot without being published as
+    `public`, and a property tracked explicitly despite being `private` is mirrored as `internal`,
+    which keeps it visible to tests that use `@testable import` without ever leaving the module.
   - Underscored properties are ignored.
   - Computed properties are ignored: you must opt into tracking them in the snapshot.
   - Closure properties are ignored: closures are black boxes and cannot be meaningfully tested or

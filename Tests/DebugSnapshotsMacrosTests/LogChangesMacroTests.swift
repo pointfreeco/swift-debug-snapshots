@@ -68,14 +68,14 @@
           }
 
           public struct DebugSnapshotValue {
-            public var count = 0
+            var count = 0
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(count: Int = 0) {
+            init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -254,14 +254,14 @@
           }
 
           public struct DebugSnapshotValue {
-            public var count = 0
+            var count = 0
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(count: Int = 0) {
+            init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -439,14 +439,14 @@
           }
 
           public struct DebugSnapshotValue {
-            public var count = 0
+            var count = 0
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(count: Int = 0) {
+            init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -532,14 +532,14 @@
           }
 
           public struct DebugSnapshotValue {
-            public var count = 0
+            var count = 0
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(count: Int = 0) {
+            init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -627,14 +627,14 @@
           static func tick() {}
 
           public struct DebugSnapshotValue {
-            public var count = 0
+            var count = 0
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(count: Int = 0) {
+            init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -887,14 +887,14 @@
           }
 
           public struct DebugSnapshotValue {
-            public var count = 0
+            var count = 0
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(count: Int = 0) {
+            init(count: Int = 0) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {

@@ -76,7 +76,9 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
       }
       return ["@LogChanges"]
     }
-    let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
+    let requiredAccess = defaultTrackedAccessLevel(
+      forTypeAccess: effectiveAccessLevel(for: declaration, in: context)
+    )
     if let variable = member.as(VariableDeclSyntax.self),
       variable.bindings.count == 1,
       !variable.hasAttribute(in: \.attributes, equivalentTo: "@DebugSnapshotIgnored"),
@@ -398,6 +400,9 @@ private func classMemberDeclarations(
     )
 
   let initParams = classInitParams(for: properties, modelName: modelDecl.name)
+  // The initializer takes every mirrored property as a parameter, so it can be no more visible
+  // than the least visible of them.
+  let initAccess = properties.map(\.accessLevel).min() ?? .public
   let snapshotInitArguments = properties.map { "\($0.name): \($0.name)" }.joined(separator: ", ")
 
   let convertibleSnapshotAssignments =
@@ -424,7 +429,7 @@ private func classMemberDeclarations(
       public var _snapshot: DebugSnapshotValue
       public var _originIdentifier: ObjectIdentifier?
       public var _diffSnapshot: (any \(raw: moduleName)._DebugSnapshotObject)?
-      public init(\(raw: initParams)) {
+      \(raw: initAccess.modifierPrefix)init(\(raw: initParams)) {
       self._snapshot = DebugSnapshotValue(\(raw: snapshotInitArguments))
       }
       public static func _debugSnapshot(\
@@ -475,7 +480,8 @@ private func inferredSnapshotPropertyLines(
   modelName: String
 ) -> [String] {
   properties.map { property in
-    let prefix = "@\(moduleName)._Snap public var \(property.name) = "
+    let prefix =
+      "@\(moduleName)._Snap \(property.accessLevel.modifierPrefix)var \(property.name) = "
     switch property.kind {
     case .type(let type):
       if isOptionalType(type) {
@@ -499,6 +505,7 @@ private func snapshotPropertyLines(
   snapshotTypeName: String = "DebugSnapshot"
 ) -> [String] {
   properties.map { property in
+    let declaration = "\(property.accessLevel.modifierPrefix)var \(property.name)"
     switch property.kind {
     case .type(let type):
       let typeDescription = type.trimmedDescription
@@ -506,14 +513,14 @@ private func snapshotPropertyLines(
         property.isDebugSnapshotConvertible
         ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
         : typeDescription
-      return "public var \(property.name): \(snapshotType)"
+      return "\(declaration): \(snapshotType)"
     case .initializer(let defaultValue):
       let defaultValue = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
         .trimmedDescription
       if property.isDebugSnapshotConvertible {
-        return "public var \(property.name) = \(moduleName).snap(\(defaultValue))"
+        return "\(declaration) = \(moduleName).snap(\(defaultValue))"
       } else {
-        return "public var \(property.name) = \(defaultValue)"
+        return "\(declaration) = \(defaultValue)"
       }
     case .pair(let type, initializer: let defaultValue):
       let typeDescription = type.trimmedDescription
@@ -524,10 +531,10 @@ private func snapshotPropertyLines(
       let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
       if property.isDebugSnapshotConvertible {
         let snapshotDefault = convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault)
-        return "public var \(property.name): \(snapshotType) = \(snapshotDefault)"
+        return "\(declaration): \(snapshotType) = \(snapshotDefault)"
       } else {
         return """
-          public var \(property.name): \(typeDescription) = \(rewrittenDefault.trimmedDescription)
+          \(declaration): \(typeDescription) = \(rewrittenDefault.trimmedDescription)
           """
       }
     }
@@ -863,6 +870,8 @@ private func caseParameterLabelPrefix(_ parameter: EnumCaseParameterSyntax) -> S
 
 private struct ModelDecl {
   struct Property {
+    /// The access level the mirrored property is emitted at, never wider than the source property.
+    var accessLevel: AccessLevel
     var name: String
     var kind: Kind
     var isDebugSnapshotConvertible: Bool
@@ -895,13 +904,13 @@ private struct ModelDecl {
     debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
   ) {
     if let classDecl = declaration.as(ClassDeclSyntax.self) {
-      let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
+      let typeAccess = effectiveAccessLevel(for: declaration, in: context)
       self.name = classDecl.name.text
       self.kind = .classOrStruct(
         Self.storedProperties(
           from: declaration,
           context: context,
-          requiredAccess: requiredAccess,
+          typeAccess: typeAccess,
           isClass: true,
           debugSnapshotAttribute: debugSnapshotAttribute
         ),
@@ -909,13 +918,13 @@ private struct ModelDecl {
       )
       return
     } else if let structDecl = declaration.as(StructDeclSyntax.self) {
-      let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
+      let typeAccess = effectiveAccessLevel(for: declaration, in: context)
       self.name = structDecl.name.text
       self.kind = .classOrStruct(
         Self.storedProperties(
           from: declaration,
           context: context,
-          requiredAccess: requiredAccess,
+          typeAccess: typeAccess,
           isClass: false,
           debugSnapshotAttribute: debugSnapshotAttribute
         ),
@@ -948,11 +957,12 @@ private struct ModelDecl {
   static func storedProperties(
     from declaration: some DeclGroupSyntax,
     context: some MacroExpansionContext,
-    requiredAccess: AccessLevel,
+    typeAccess: AccessLevel,
     isClass: Bool,
     debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
   ) -> [ModelDecl.Property] {
-    declaration.memberBlock.members.compactMap { member -> [ModelDecl.Property]? in
+    let requiredAccess = defaultTrackedAccessLevel(forTypeAccess: typeAccess)
+    return declaration.memberBlock.members.compactMap { member -> [ModelDecl.Property]? in
       guard
         let variable = member.decl.as(VariableDeclSyntax.self),
         modifiers(of: variable).contains(where: {
@@ -982,6 +992,7 @@ private struct ModelDecl {
         return nil
       }
 
+      let accessLevel = mirroredAccessLevel(of: variable, forTypeAccess: typeAccess)
       return variable.bindings.compactMap { binding in
         guard
           let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
@@ -1021,6 +1032,7 @@ private struct ModelDecl {
           }
 
           return ModelDecl.Property(
+            accessLevel: accessLevel,
             name: identifier,
             kind: .initializer(defaultValue),
             isDebugSnapshotConvertible: isDebugSnapshotConvertible
@@ -1030,6 +1042,7 @@ private struct ModelDecl {
           else { return nil }
 
           return ModelDecl.Property(
+            accessLevel: accessLevel,
             name: identifier,
             kind: .type(typeAnnotation),
             isDebugSnapshotConvertible: isDebugSnapshotConvertible
@@ -1041,6 +1054,7 @@ private struct ModelDecl {
           else { return nil }
 
           return ModelDecl.Property(
+            accessLevel: accessLevel,
             name: identifier,
             kind: .pair(
               type: typeAnnotation,
@@ -1215,6 +1229,17 @@ private enum AccessLevel: Int, Comparable {
   case `package`
   case `public`
 
+  /// The modifier to write in front of a generated declaration at this access level.
+  var modifierPrefix: String {
+    switch self {
+    case .fileprivate: return "fileprivate "
+    case .internal: return ""
+    case .package: return "package "
+    case .private: return "private "
+    case .public: return "public "
+    }
+  }
+
   static func < (lhs: Self, rhs: Self) -> Bool {
     lhs.rawValue < rhs.rawValue
   }
@@ -1276,8 +1301,39 @@ private func effectiveAccessLevel(
   )
 }
 
+/// The lowest access level a property can have and still be tracked by default.
+///
+/// The model's own access level is the cap, so a `fileprivate` type tracks its `fileprivate`
+/// properties. Beyond that, tracking stops at `internal`: a public model still snapshots its
+/// internal state, mirrored at `internal` rather than published — see `mirroredAccessLevel`.
+private func defaultTrackedAccessLevel(forTypeAccess typeAccess: AccessLevel) -> AccessLevel {
+  min(typeAccess, .internal)
+}
+
+/// The access level to mirror a property at in the generated snapshot.
+///
+/// A property is mirrored at its own access level, bounded by the model's level above and by
+/// `internal` below. The upper bound is the point of the exercise: publishing the internal state of
+/// a `public` model would widen its API, and would fail to compile were the property's type to
+/// arrive through a non-public import.
+///
+/// The lower bound means `private` and `fileprivate` properties, which reach the snapshot only when
+/// explicitly tracked, are mirrored at `internal` — wider than declared, but never beyond the
+/// module. Anything narrower is unusable: the generated members live in a macro expansion buffer
+/// that counts as a file of its own, so a `fileprivate` mirror would not reach even the model's own
+/// file, and an encapsulated property is snapshot precisely so that tests can read it. Swift caps
+/// what is emitted at the model's access level anyway, so a `private` model mirroring at `internal`
+/// exposes nothing.
+private func mirroredAccessLevel(
+  of variable: VariableDeclSyntax,
+  forTypeAccess typeAccess: AccessLevel
+) -> AccessLevel {
+  let declared = accessControl(for: variable).effectiveAccessLevel
+  return min(max(declared, .internal), max(typeAccess, .internal))
+}
+
 private func enclosingAccessLevel(in context: some MacroExpansionContext) -> AccessLevel {
-  var access: AccessLevel = .internal
+  var access: AccessLevel = .public
   for node in context.lexicalContext {
     if let decl = node.as(ClassDeclSyntax.self) {
       access = min(access, accessControl(for: decl).effectiveAccessLevel)
