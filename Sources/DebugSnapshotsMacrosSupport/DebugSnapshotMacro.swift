@@ -1277,7 +1277,7 @@ private func effectiveAccessLevel(
 }
 
 private func enclosingAccessLevel(in context: some MacroExpansionContext) -> AccessLevel {
-  var access: AccessLevel = .internal
+  var access: AccessLevel = .public
   for node in context.lexicalContext {
     if let decl = node.as(ClassDeclSyntax.self) {
       access = min(access, accessControl(for: decl).effectiveAccessLevel)

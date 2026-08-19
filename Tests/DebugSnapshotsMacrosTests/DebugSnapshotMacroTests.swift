@@ -3020,5 +3020,47 @@
         """
       }
     }
+
+    @Test func publicHidesInternal() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        public struct Foo {
+          public var bar = ""
+          var baz = 0
+        }
+        """
+      } expansion: {
+        """
+        public struct Foo {
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: ""))
+          public var bar = ""
+          @DebugSnapshotIgnored
+          var baz = 0
+
+          public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
+            @DebugSnapshots._Snap public var bar = DebugSnapshots._snapshotDefault("")
+            public var customMirror: Mirror {
+              Mirror(self, children: ["bar": bar as Any], displayStyle: .struct)
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              var snapshot = value
+              snapshot.bar = DebugSnapshots._debugSnapshot(value.bar, visitor: &visitor)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Foo, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            var snapshot = DebugSnapshot()
+            snapshot.bar = DebugSnapshots._debugSnapshot(value.bar, visitor: &visitor)
+            return snapshot
+          }
+        }
+
+        extension Foo: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
   }
 #endif
