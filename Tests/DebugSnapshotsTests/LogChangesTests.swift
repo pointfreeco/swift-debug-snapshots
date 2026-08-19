@@ -16,7 +16,7 @@
       try await expectLog(
         """
         incrementButtonTapped(): After first count
-            #1 FeatureModel.DebugSnapshot(
+            FeatureModel.DebugSnapshot(
           -   count: 0,
           +   count: 1,
               favoriteNumbers: []
@@ -26,7 +26,7 @@
       try await expectLog(
         """
         incrementButtonTapped():
-            #1 FeatureModel.DebugSnapshot(
+            FeatureModel.DebugSnapshot(
           -   count: 1,
           +   count: 2,
               favoriteNumbers: []
@@ -37,7 +37,7 @@
       try await expectLog(
         """
         saveButtonTapped():
-            #1 FeatureModel.DebugSnapshot(
+            FeatureModel.DebugSnapshot(
               count: 2,
               favoriteNumbers: [
           +     [0]: 2
