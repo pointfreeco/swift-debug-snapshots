@@ -99,11 +99,7 @@ extension DebugSnapshotMacro: MemberAttributeMacro {
         variable.addIfNeeded("@DebugSnapshotConvertible", in: \.attributes, to: &attributes)
       case .tracked:
         variable.addIfNeeded("@DebugSnapshotTracked", in: \.attributes, to: &attributes)
-        if declaration.is(ClassDeclSyntax.self),
-          let type = variable.bindings.first?.typeAnnotation?.type
-        {
-          attributes.append(convertibleCheckAttribute(for: type))
-        } else if declaration.is(StructDeclSyntax.self),
+        if declaration.is(ClassDeclSyntax.self) || declaration.is(StructDeclSyntax.self),
           let attribute = debugSnapshotCheckAttribute(for: variable)
         {
           attributes.append(attribute)
@@ -357,6 +353,7 @@ private func structMemberDeclarations(
       """
     )
   return [representation, _debugSnapshot]
+    + memberTypeWitnessDeclarations(for: modelDecl, declaration: declaration)
 }
 
 private func classMemberDeclarations(
@@ -468,6 +465,7 @@ private func classMemberDeclarations(
     )
 
   return [snapshotStruct, debugSnapshotClass, _debugSnapshotMethod]
+    + memberTypeWitnessDeclarations(for: modelDecl, declaration: declaration)
 }
 
 private func inferredSnapshotPropertyLines(
@@ -626,6 +624,99 @@ private func diagnoseMissingTypeAnnotation(
       )
     )
   )
+}
+
+private let memberTypesProtocolName = "_$DebugSnapshotTypes"
+private let memberWitnessName = "_$DebugSnapshotWitness"
+
+private func memberWitnessType(for propertyName: String) -> TypeSyntax {
+  "\(raw: memberWitnessName).\(raw: propertyName)"
+}
+
+private func canUseMemberTypeWitness(
+  for declaration: some DeclGroupSyntax,
+  in context: some MacroExpansionContext
+) -> Bool {
+  guard !isGenericContext(Syntax(declaration)) else { return false }
+  for node in context.lexicalContext where isGenericContext(node) {
+    return false
+  }
+  return true
+}
+
+private func isGenericContext(_ node: Syntax) -> Bool {
+  if let decl = node.as(ClassDeclSyntax.self) {
+    return decl.genericParameterClause != nil
+  }
+  if let decl = node.as(StructDeclSyntax.self) {
+    return decl.genericParameterClause != nil
+  }
+  if let decl = node.as(EnumDeclSyntax.self) {
+    return decl.genericParameterClause != nil
+  }
+  if let decl = node.as(ActorDeclSyntax.self) {
+    return decl.genericParameterClause != nil
+  }
+  if let decl = node.as(FunctionDeclSyntax.self) {
+    return decl.genericParameterClause != nil
+  }
+  if let decl = node.as(ExtensionDeclSyntax.self) {
+    return containsGenericArguments(decl.extendedType)
+  }
+  return false
+}
+
+private func containsGenericArguments(_ type: TypeSyntax) -> Bool {
+  if let type = type.as(IdentifierTypeSyntax.self) {
+    return type.genericArgumentClause != nil
+  }
+  if let type = type.as(MemberTypeSyntax.self) {
+    return type.genericArgumentClause != nil || containsGenericArguments(type.baseType)
+  }
+  return false
+}
+
+private func memberTypeWitnessDeclarations(
+  for modelDecl: ModelDecl,
+  declaration: some DeclGroupSyntax
+) -> [DeclSyntax] {
+  let names = modelDecl.witnessedProperties
+  guard !names.isEmpty else { return [] }
+  let isolation = hasMainActorAnnotation(declaration) ? "@MainActor " : ""
+  let requirements =
+    names
+    .map {
+      """
+      associatedtype \($0)
+      static var \($0)Type: \($0).Type { get }
+      """
+    }
+    .joined(separator: "\n")
+  let witnesses =
+    names
+    .map {
+      """
+      \(isolation)public static let \($0)Type = \
+      \(moduleName)._memberType(\\\(modelDecl.name).\($0))
+      """
+    }
+    .joined(separator: "\n")
+  return [
+    DeclSyntax(
+      """
+      \(raw: isolation)public protocol \(raw: memberTypesProtocolName) {
+      \(raw: requirements)
+      }
+      """
+    ),
+    DeclSyntax(
+      """
+      public enum \(raw: memberWitnessName): \(raw: memberTypesProtocolName) {
+      \(raw: witnesses)
+      }
+      """
+    ),
+  ]
 }
 
 private func inferredLiteralType(of expression: ExprSyntax) -> String? {
@@ -888,6 +979,7 @@ private struct ModelDecl {
 
   var name: String
   var kind: Kind
+  var witnessedProperties: [String] = []
 
   init?(
     declaration: some DeclGroupSyntax,
@@ -897,30 +989,38 @@ private struct ModelDecl {
     if let classDecl = declaration.as(ClassDeclSyntax.self) {
       let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
       self.name = classDecl.name.text
+      var witnessedProperties: [String] = []
       self.kind = .classOrStruct(
         Self.storedProperties(
           from: declaration,
           context: context,
           requiredAccess: requiredAccess,
           isClass: true,
+          canUseWitness: canUseMemberTypeWitness(for: declaration, in: context),
+          witnessedProperties: &witnessedProperties,
           debugSnapshotAttribute: debugSnapshotAttribute
         ),
         isClass: true
       )
+      self.witnessedProperties = witnessedProperties
       return
     } else if let structDecl = declaration.as(StructDeclSyntax.self) {
       let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
       self.name = structDecl.name.text
+      var witnessedProperties: [String] = []
       self.kind = .classOrStruct(
         Self.storedProperties(
           from: declaration,
           context: context,
           requiredAccess: requiredAccess,
           isClass: false,
+          canUseWitness: canUseMemberTypeWitness(for: declaration, in: context),
+          witnessedProperties: &witnessedProperties,
           debugSnapshotAttribute: debugSnapshotAttribute
         ),
         isClass: false
       )
+      self.witnessedProperties = witnessedProperties
       return
     } else if let name = declaration.as(EnumDeclSyntax.self)?.name {
       self.name = name.text
@@ -950,6 +1050,8 @@ private struct ModelDecl {
     context: some MacroExpansionContext,
     requiredAccess: AccessLevel,
     isClass: Bool,
+    canUseWitness: Bool,
+    witnessedProperties: inout [String],
     debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
   ) -> [ModelDecl.Property] {
     declaration.memberBlock.members.compactMap { member -> [ModelDecl.Property]? in
@@ -1006,8 +1108,16 @@ private struct ModelDecl {
 
         switch (typeAnnotation, defaultValue) {
         case (nil, nil):
-          diagnoseMissingTypeAnnotation(on: binding, in: context)
-          return nil
+          guard canUseWitness else {
+            diagnoseMissingTypeAnnotation(on: binding, in: context)
+            return nil
+          }
+          witnessedProperties.append(identifier)
+          return ModelDecl.Property(
+            name: identifier,
+            kind: .type(memberWitnessType(for: identifier)),
+            isDebugSnapshotConvertible: isDebugSnapshotConvertible
+          )
         case (nil, let defaultValue?):
           guard !isClosureInitializer(defaultValue)
           else { return nil }
@@ -1016,8 +1126,16 @@ private struct ModelDecl {
             !isDebugSnapshotConvertible && inferredLiteralType(of: defaultValue) != nil
           }
           if isClass, !canInferInitParameterType {
-            diagnoseMissingTypeAnnotation(on: binding, in: context)
-            return nil
+            guard canUseWitness else {
+              diagnoseMissingTypeAnnotation(on: binding, in: context)
+              return nil
+            }
+            witnessedProperties.append(identifier)
+            return ModelDecl.Property(
+              name: identifier,
+              kind: .pair(type: memberWitnessType(for: identifier), initializer: defaultValue),
+              isDebugSnapshotConvertible: isDebugSnapshotConvertible
+            )
           }
 
           return ModelDecl.Property(

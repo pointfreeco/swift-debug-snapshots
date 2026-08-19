@@ -21,7 +21,9 @@
   names: named(DebugSnapshotValue),
   named(DebugSnapshot),
   named(_debugSnapshot),
-  named(_logChanges)
+  named(_logChanges),
+  named(_$DebugSnapshotTypes),
+  named(_$DebugSnapshotWitness)
 )
 @attached(memberAttribute)
 public macro DebugSnapshot(_ options: DebugSnapshotOptions...) =
