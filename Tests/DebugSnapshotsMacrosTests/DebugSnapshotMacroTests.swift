@@ -2879,6 +2879,84 @@
       }
     }
 
+    @Test func genericContextWithoutTypeAnnotation() {
+      assertMacro {
+        """
+        enum Container<Value> {
+          @DebugSnapshot
+          final class FeatureModel<Value> {
+            var count = Count()
+          }
+        }
+        """
+      } diagnostics: {
+        """
+        enum Container<Value> {
+          @DebugSnapshot
+          final class FeatureModel<Value> {
+            var count = Count()
+                ┬──────────────
+                ╰─ 🛑 Missing required type annotation
+                   ✏️ Insert ': <#Type#>'
+          }
+        }
+        """
+      } fixes: {
+        """
+        enum Container<Value> {
+          @DebugSnapshot
+          final class FeatureModel<Value> {
+            var count: <#Type#> = Count()
+          }
+        }
+        """
+      } expansion: {
+        """
+        enum Container<Value> {
+          final class FeatureModel<Value> {
+            @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(<#Type#>.self)
+            var count: <#Type#> = Count()
+
+            public struct DebugSnapshotValue {
+              public var count: <#Type#> = Count()
+            }
+
+            public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+              public var _snapshot: DebugSnapshotValue
+              public var _originIdentifier: ObjectIdentifier?
+              public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+              public init(count: <#Type#> = Count()) {
+                self._snapshot = DebugSnapshotValue(count: count)
+              }
+              public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+                if let existing: DebugSnapshot = visitor.lookup(value) {
+                  return existing
+                }
+                let snapshot = DebugSnapshot(count: value.count)
+                snapshot._originIdentifier = value._originIdentifier
+                visitor.register(value, snapshot: snapshot)
+                return snapshot
+              }
+            }
+
+            public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = ObjectIdentifier(value)
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
+            }
+          }
+        }
+
+        extension Container.FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
     @Test func ignoredWithoutTypeAnnotation() {
       assertMacro {
         """
