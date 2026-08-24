@@ -8,6 +8,10 @@ public func _snapshotType<Value: DebugSnapshotConvertible>(
   fatalError("'_snapshotType' should not be invoked directly")
 }
 
+public func _memberType<Root, Value>(_ keyPath: KeyPath<Root, Value>) -> Value.Type {
+  Value.self
+}
+
 public func _snapshotDefault<Value>(_ value: Value) -> Value {
   value
 }
