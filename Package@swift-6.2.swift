@@ -1,4 +1,4 @@
-// swift-tools-version: 6.4
+// swift-tools-version: 6.2
 
 import CompilerPluginSupport
 import PackageDescription
@@ -6,10 +6,10 @@ import PackageDescription
 let package = Package(
   name: "swift-debug-snapshots",
   platforms: [
-    .iOS(.v15),
-    .macOS(.v12),
-    .tvOS(.v15),
-    .watchOS(.v9),
+    .iOS(.v13),
+    .macOS(.v10_15),
+    .tvOS(.v13),
+    .watchOS(.v6),
   ],
   products: [
     .library(
@@ -33,10 +33,10 @@ let package = Package(
       url: "https://github.com/pointfreeco/swift-identified-collections",
       from: "1.0.0"
     ),
-    .package(url: "https://github.com/pointfreeco/swift-issue-reporting", from: "2.1.0"),
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.13.0"),
     .package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.1.0"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
-    .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"605.0.0"),
+    .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"603.0.0"),
   ],
   targets: [
     .target(
@@ -44,7 +44,7 @@ let package = Package(
       dependencies: [
         "DebugSnapshotsMacros",
         .product(name: "CustomDump", package: "swift-custom-dump"),
-        .product(name: "IssueReporting", package: "swift-issue-reporting"),
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
         .product(
           name: "IdentifiedCollections",
           package: "swift-identified-collections",
@@ -74,7 +74,7 @@ let package = Package(
       dependencies: [
         "DebugSnapshots",
         "DebugSnapshotsMacrosSupport",
-        .product(name: "IssueReportingTestSupport", package: "swift-issue-reporting"),
+        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
       ]
     ),
     .testTarget(
