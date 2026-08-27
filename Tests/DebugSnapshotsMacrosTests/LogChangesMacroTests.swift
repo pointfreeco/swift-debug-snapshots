@@ -29,7 +29,7 @@
       } expansion: {
         """
         class Model {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG
@@ -215,7 +215,7 @@
       } expansion: {
         """
         class Model {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG
@@ -398,7 +398,7 @@
       } expansion: {
         """
         class Model {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG
@@ -493,7 +493,7 @@
       } expansion: {
         #"""
         class Model {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG
@@ -589,7 +589,7 @@
       } expansion: {
         #"""
         class Model {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG
@@ -846,7 +846,7 @@
       } expansion: {
         #"""
         class Model {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
           func incrementButtonTapped() {
             #if DEBUG

@@ -34,7 +34,7 @@
         final class FeatureModel {
           @DebugSnapshotIgnored
           private var count: Int
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(String.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(String.self)
           var title: String
           @DebugSnapshotIgnored
           var onChange: (Int) -> Void
@@ -109,7 +109,7 @@
           var doubledCount: Int {
             count * 2
           }
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -238,7 +238,7 @@
       } expansion: {
         """
         final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
           @DebugSnapshotIgnored
           var _cache: Int
@@ -304,7 +304,7 @@
         """
         @MainActor
         final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -365,7 +365,7 @@
       } expansion: {
         """
         final class FeatureModel: DebugSnapshotConvertible {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -425,7 +425,7 @@
         """
         @MainActor
         final class FeatureModel: @MainActor DebugSnapshotConvertible {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -535,7 +535,7 @@
       } expansion: {
         """
         private final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -599,7 +599,7 @@
         """
         private struct Parent {
           final class FeatureModel {
-            @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+            @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
             var count: Int
 
             init(count: Int) {
@@ -657,7 +657,7 @@
       } expansion: {
         """
         final class FeatureModel {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
 
           public struct DebugSnapshotValue {
@@ -717,7 +717,7 @@
         """
         final class FeatureModel {
           @DebugSnapshotConvertible var child: Child
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           init(child: Child, count: Int) {
@@ -903,7 +903,7 @@
       } expansion: {
         """
         final class FeatureModel: Hashable, Sendable {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           init(count: Int) {
@@ -960,7 +960,7 @@
       } expansion: {
         """
         struct FeatureModel: Sendable {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshot: Sendable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -999,7 +999,7 @@
       } expansion: {
         """
         final class FeatureModel: @unchecked Sendable {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshotValue: @unchecked Sendable {
@@ -1053,9 +1053,9 @@
       } expansion: {
         """
         struct FeatureModel: Identifiable {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(UUID.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(UUID.self)
           var id: UUID
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshot: Identifiable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -1099,7 +1099,7 @@
         """
         struct FeatureModel: Identifiable {
           @DebugSnapshotIgnored var id: UUID
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2214,38 +2214,21 @@
           @FetchAll(Reminder.all) var reminders
         }
         """
-      } diagnostics: {
-        """
-        @DebugSnapshot
-        final class FeatureModel {
-          @FetchAll(Reminder.all) var reminders
-                                      ┬────────
-                                      ╰─ 🛑 Missing required type annotation
-                                         ✏️ Insert ': <#Type#>'
-        }
-        """
-      } fixes: {
-        """
-        @DebugSnapshot
-        final class FeatureModel {
-          @FetchAll(Reminder.all) var reminders: <#Type#>
-        }
-        """
       } expansion: {
-        """
+        #"""
         final class FeatureModel {
           @FetchAll(Reminder.all)
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(<#Type#>.self) var reminders: <#Type#>
+          @DebugSnapshotTracked var reminders
 
           public struct DebugSnapshotValue {
-            public var reminders: <#Type#>
+            public var reminders: _$DebugSnapshotWitness.reminders
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(reminders: <#Type#>) {
+            public init(reminders: _$DebugSnapshotWitness.reminders) {
               self._snapshot = DebugSnapshotValue(reminders: reminders)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -2268,11 +2251,22 @@
             visitor.register(value, snapshot: snapshot)
             return snapshot
           }
+
+          public protocol _$DebugSnapshotTypes {
+            associatedtype reminders
+            static var remindersType: reminders.Type {
+              get
+            }
+          }
+
+          public enum _$DebugSnapshotWitness: _$DebugSnapshotTypes {
+            public static let remindersType = DebugSnapshots._memberType(\FeatureModel.reminders)
+          }
         }
 
         extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
         }
-        """
+        """#
       }
     }
 
@@ -2289,7 +2283,7 @@
         """
         struct State {
           @DebugSnapshotConvertible var nested: State?
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2333,7 +2327,7 @@
         """
         struct State {
           @DebugSnapshotConvertible var child: Child
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2377,11 +2371,11 @@
       } expansion: {
         """
         final class State {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0.5))
           var opacity = 0.5
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: ""))
           var text = ""
 
           public struct DebugSnapshotValue {
@@ -2436,7 +2430,7 @@
       } expansion: {
         """
         final class State {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(Child?.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Child?.self)
           var child: Child?
 
           public struct DebugSnapshotValue {
@@ -2511,7 +2505,7 @@
       } expansion: {
         #"""
         class FeatureModel {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
           @LogChanges
           func incrementButtonTapped() {
@@ -2569,38 +2563,21 @@
           var child = Child()
         }
         """
-      } diagnostics: {
-        """
-        @DebugSnapshot
-        class FeatureModel {
-          var child = Child()
-              ┬──────────────
-              ╰─ 🛑 Missing required type annotation
-                 ✏️ Insert ': <#Type#>'
-        }
-        """
-      } fixes: {
-        """
-        @DebugSnapshot
-        class FeatureModel {
-          var child: <#Type#> = Child()
-        }
-        """
       } expansion: {
-        """
+        #"""
         class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots._InferenceCheck(<#Type#>.self)
-          var child: <#Type#> = Child()
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: Child()))
+          var child = Child()
 
           public struct DebugSnapshotValue {
-            public var child: <#Type#> = Child()
+            public var child: _$DebugSnapshotWitness.child = Child()
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: <#Type#> = Child()) {
+            public init(child: _$DebugSnapshotWitness.child = Child()) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -2623,9 +2600,358 @@
             visitor.register(value, snapshot: snapshot)
             return snapshot
           }
+
+          public protocol _$DebugSnapshotTypes {
+            associatedtype child
+            static var childType: child.Type {
+              get
+            }
+          }
+
+          public enum _$DebugSnapshotWitness: _$DebugSnapshotTypes {
+            public static let childType = DebugSnapshots._memberType(\FeatureModel.child)
+          }
         }
 
         extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """#
+      }
+    }
+
+    @Test func structWithoutTypeAnnotation() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        struct Feature {
+          @FetchAll(Reminder.all) var reminders
+        }
+        """
+      } expansion: {
+        #"""
+        struct Feature {
+          @FetchAll(Reminder.all)
+          @DebugSnapshotTracked var reminders
+
+          public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
+            @DebugSnapshots._Snap public var reminders = DebugSnapshots._snapshotType(_$DebugSnapshotWitness.reminders.self)
+            public var customMirror: Mirror {
+              Mirror(self, children: ["reminders": reminders as Any], displayStyle: .struct)
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              var snapshot = value
+              snapshot.reminders = DebugSnapshots._debugSnapshot(value.reminders, visitor: &visitor)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Feature, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            var snapshot = DebugSnapshot()
+            snapshot.reminders = DebugSnapshots._debugSnapshot(value.reminders, visitor: &visitor)
+            return snapshot
+          }
+
+          public protocol _$DebugSnapshotTypes {
+            associatedtype reminders
+            static var remindersType: reminders.Type {
+              get
+            }
+          }
+
+          public enum _$DebugSnapshotWitness: _$DebugSnapshotTypes {
+            public static let remindersType = DebugSnapshots._memberType(\Feature.reminders)
+          }
+        }
+
+        extension Feature: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """#
+      }
+    }
+
+    @Test func mainActorWithoutTypeAnnotation() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        @MainActor
+        final class FeatureModel {
+          @FetchAll(Reminder.all) var reminders
+          var count = Count()
+        }
+        """
+      } expansion: {
+        #"""
+        @MainActor
+        final class FeatureModel {
+          @FetchAll(Reminder.all)
+          @DebugSnapshotTracked var reminders
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: Count()))
+          var count = Count()
+
+          public struct DebugSnapshotValue {
+            public var reminders: _$DebugSnapshotWitness.reminders
+            public var count: _$DebugSnapshotWitness.count = Count()
+          }
+
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(reminders: _$DebugSnapshotWitness.reminders, count: _$DebugSnapshotWitness.count = Count()) {
+              self._snapshot = DebugSnapshotValue(reminders: reminders, count: count)
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot(reminders: value.reminders, count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(reminders: value.reminders, count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+
+          @MainActor public protocol _$DebugSnapshotTypes {
+            associatedtype reminders
+            static var remindersType: reminders.Type {
+              get
+            }
+            associatedtype count
+            static var countType: count.Type {
+              get
+            }
+          }
+
+          public enum _$DebugSnapshotWitness: _$DebugSnapshotTypes {
+            @MainActor public static let remindersType = DebugSnapshots._memberType(\FeatureModel.reminders)
+            @MainActor public static let countType = DebugSnapshots._memberType(\FeatureModel.count)
+          }
+        }
+
+        extension FeatureModel: @MainActor DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """#
+      }
+    }
+
+    @Test func convertibleWithoutTypeAnnotation() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        final class FeatureModel {
+          @DebugSnapshotConvertible var children = [ChildModel]()
+        }
+        """
+      } expansion: {
+        #"""
+        final class FeatureModel {
+          @DebugSnapshotConvertible var children = [ChildModel]()
+
+          public struct DebugSnapshotValue {
+            public var children: _$DebugSnapshotWitness.children.DebugSnapshot = DebugSnapshots.snap([ChildModel]() as _$DebugSnapshotWitness.children)
+          }
+
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(children: _$DebugSnapshotWitness.children.DebugSnapshot = DebugSnapshots.snap([ChildModel]() as _$DebugSnapshotWitness.children)) {
+              self._snapshot = DebugSnapshotValue(children: children)
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot()
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              snapshot.children = DebugSnapshots._debugSnapshot(value.children, visitor: &visitor)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot()
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            snapshot.children = DebugSnapshots._debugSnapshot(value.children, visitor: &visitor)
+            return snapshot
+          }
+
+          public protocol _$DebugSnapshotTypes {
+            associatedtype children
+            static var childrenType: children.Type {
+              get
+            }
+          }
+
+          public enum _$DebugSnapshotWitness: _$DebugSnapshotTypes {
+            public static let childrenType = DebugSnapshots._memberType(\FeatureModel.children)
+          }
+        }
+
+        extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """#
+      }
+    }
+
+    @Test func genericWithoutTypeAnnotation() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        final class FeatureModel<Value> {
+          var count = Count()
+        }
+        """
+      } diagnostics: {
+        """
+        @DebugSnapshot
+        final class FeatureModel<Value> {
+          var count = Count()
+              ┬──────────────
+              ╰─ 🛑 Missing required type annotation
+                 ✏️ Insert ': <#Type#>'
+        }
+        """
+      } fixes: {
+        """
+        @DebugSnapshot
+        final class FeatureModel<Value> {
+          var count: <#Type#> = Count()
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel<Value> {
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(<#Type#>.self)
+          var count: <#Type#> = Count()
+
+          public struct DebugSnapshotValue {
+            public var count: <#Type#> = Count()
+          }
+
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            public init(count: <#Type#> = Count()) {
+              self._snapshot = DebugSnapshotValue(count: count)
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(count: value.count)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+        }
+
+        extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func genericContextWithoutTypeAnnotation() {
+      assertMacro {
+        """
+        enum Container<Value> {
+          @DebugSnapshot
+          final class FeatureModel<Value> {
+            var count = Count()
+          }
+        }
+        """
+      } diagnostics: {
+        """
+        enum Container<Value> {
+          @DebugSnapshot
+          final class FeatureModel<Value> {
+            var count = Count()
+                ┬──────────────
+                ╰─ 🛑 Missing required type annotation
+                   ✏️ Insert ': <#Type#>'
+          }
+        }
+        """
+      } fixes: {
+        """
+        enum Container<Value> {
+          @DebugSnapshot
+          final class FeatureModel<Value> {
+            var count: <#Type#> = Count()
+          }
+        }
+        """
+      } expansion: {
+        """
+        enum Container<Value> {
+          final class FeatureModel<Value> {
+            @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(<#Type#>.self)
+            var count: <#Type#> = Count()
+
+            public struct DebugSnapshotValue {
+              public var count: <#Type#> = Count()
+            }
+
+            public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+              public var _snapshot: DebugSnapshotValue
+              public var _originIdentifier: ObjectIdentifier?
+              public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+              public init(count: <#Type#> = Count()) {
+                self._snapshot = DebugSnapshotValue(count: count)
+              }
+              public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+                if let existing: DebugSnapshot = visitor.lookup(value) {
+                  return existing
+                }
+                let snapshot = DebugSnapshot(count: value.count)
+                snapshot._originIdentifier = value._originIdentifier
+                visitor.register(value, snapshot: snapshot)
+                return snapshot
+              }
+            }
+
+            public static func _debugSnapshot(_ value: FeatureModel, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot(count: value.count)
+              snapshot._originIdentifier = ObjectIdentifier(value)
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
+            }
+          }
+        }
+
+        extension Container.FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
         }
         """
       }
@@ -2697,7 +3023,7 @@
         final class FeatureModel {
           @Dependency(\.uuid)
           @DebugSnapshotIgnored var uuid
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
 
           public struct DebugSnapshotValue {
@@ -2752,7 +3078,7 @@
         #"""
         final class FeatureModel {
           @DebugSnapshotTracked @Dependency(\.uuid) var uuid: UUIDGenerator
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           var count = 0
 
           public struct DebugSnapshotValue {
@@ -2807,9 +3133,9 @@
       } expansion: {
         """
         class FeatureModel {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: -1))
           var count = -1
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: -2.5))
           var ratio = -2.5
 
           public struct DebugSnapshotValue {
@@ -2979,7 +3305,7 @@
       } expansion: {
         """
         class FeatureModel {
-          @DebugSnapshotTracked
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: 0))
           fileprivate(set) var count = 0
 
           public struct DebugSnapshotValue {
@@ -3016,6 +3342,48 @@
         }
 
         extension FeatureModel: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """
+      }
+    }
+
+    @Test func publicHidesInternal() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        public struct Foo {
+          public var bar = ""
+          var baz = 0
+        }
+        """
+      } expansion: {
+        """
+        public struct Foo {
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Swift.type(of: ""))
+          public var bar = ""
+          @DebugSnapshotIgnored
+          var baz = 0
+
+          public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
+            @DebugSnapshots._Snap public var bar = DebugSnapshots._snapshotDefault("")
+            public var customMirror: Mirror {
+              Mirror(self, children: ["bar": bar as Any], displayStyle: .struct)
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              var snapshot = value
+              snapshot.bar = DebugSnapshots._debugSnapshot(value.bar, visitor: &visitor)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Foo, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            var snapshot = DebugSnapshot()
+            snapshot.bar = DebugSnapshots._debugSnapshot(value.bar, visitor: &visitor)
+            return snapshot
+          }
+        }
+
+        extension Foo: DebugSnapshots.DebugSnapshotConvertible {
         }
         """
       }

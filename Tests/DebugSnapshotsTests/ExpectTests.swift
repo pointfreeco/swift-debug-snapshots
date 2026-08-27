@@ -41,7 +41,7 @@ import Testing
         """
         Expected changes do not match: ...
 
-            #1 FeatureModel.DebugSnapshot(
+            FeatureModel.DebugSnapshot(
           −   title: "?",
           +   title: "!",
               isLoading: false
@@ -102,13 +102,13 @@ import Testing
     #expect(
       String(customDumping: snap(blobJr))
         == #"""
-        #1 UserModel.DebugSnapshot(
+        UserModel.DebugSnapshot(
           name: "Blob Jr",
           referred: [
-            [0]: #2 UserModel.DebugSnapshot(
+            [0]: #1 UserModel.DebugSnapshot(
               name: "Blob",
               referred: [],
-              referrer: #1 UserModel.DebugSnapshot(↩︎)
+              referrer: UserModel.DebugSnapshot(↩︎)
             )
           ],
           referrer: nil
@@ -129,7 +129,7 @@ import Testing
     let difference = _diff(before, after)
     #expect(difference?.contains(#"-       name: "Blob""#) == true)
     #expect(difference?.contains(#"+       name: "Blob!""#) == true)
-    #expect(difference?.contains(#"referrer: #1 UserModel.DebugSnapshot(↩︎)"#) == true)
+    #expect(difference?.contains(#"referrer: UserModel.DebugSnapshot(↩︎)"#) == true)
   }
 
   @Test func emptyClasses() {

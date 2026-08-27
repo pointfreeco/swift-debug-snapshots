@@ -21,7 +21,9 @@
   names: named(DebugSnapshotValue),
   named(DebugSnapshot),
   named(_debugSnapshot),
-  named(_logChanges)
+  named(_logChanges),
+  named(_$DebugSnapshotTypes),
+  named(_$DebugSnapshotWitness)
 )
 @attached(memberAttribute)
 public macro DebugSnapshot(_ options: DebugSnapshotOptions...) =
@@ -90,22 +92,6 @@ public macro DebugSnapshotIgnored() =
 public macro DebugSnapshotConvertible() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotConvertibleMacro")
 
-@attached(peer)
-public macro _InferenceCheck<T>(_ type: T.Type) =
-  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckPassMacro")
-
-@attached(peer)
-public macro _InferenceCheck<T: AnyObject>(_ type: T.Type) =
-  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailAnyObjectMacro")
-
-@attached(peer)
-public macro _InferenceCheck<T: DebugSnapshotConvertible>(_ type: T.Type) =
-  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailConvertibleMacro")
-
-@attached(peer)
-public macro _InferenceCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T.Type) =
-  #externalMacro(module: "DebugSnapshotsMacros", type: "InferenceCheckFailConvertibleMacro")
-
 /// Add change-logging to a method of a snapshottable type.
 ///
 /// This macro will capture a snapshot of your model at the beginning of your method and again
@@ -140,3 +126,57 @@ public macro LogChanges() = #externalMacro(module: "DebugSnapshotsMacros", type:
 @attached(peer)
 public macro LogChangesIgnored() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "LogChangesIgnoredMacro")
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<T>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckPassMacro")
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<T: AnyObject>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailAnyObjectMacro")
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<T: AnyObject>(_ type: T?.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailAnyObjectMacro")
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<T: DebugSnapshotConvertible>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<T: DebugSnapshotConvertible & AnyObject>(_ type: T?.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<C: Collection>(_ type: C.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailAnyObjectMacro")
+where C.Element: AnyObject
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<C: Collection>(_ type: C?.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailAnyObjectMacro")
+where C.Element: AnyObject
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<C: Collection & DebugSnapshotConvertible>(_ type: C.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
+where C.Element: AnyObject
+
+@_documentation(visibility: private)
+@attached(peer)
+public macro DebugSnapshotCheck<C: Collection & DebugSnapshotConvertible>(_ type: C?.Type) =
+  #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotCheckFailConvertibleMacro")
+where C.Element: AnyObject
