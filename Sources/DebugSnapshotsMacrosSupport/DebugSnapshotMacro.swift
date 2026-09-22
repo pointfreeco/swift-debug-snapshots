@@ -395,6 +395,7 @@ private func classMemberDeclarations(
     )
 
   let initParams = classInitParams(for: properties, modelName: modelDecl.name)
+  let initAccessLevel = properties.map(\.snapshotAccessLevel).min() ?? .public
   let snapshotInitArguments = properties.map { "\($0.name): \($0.name)" }.joined(separator: ", ")
 
   let convertibleSnapshotAssignments =
@@ -421,7 +422,7 @@ private func classMemberDeclarations(
       public var _snapshot: DebugSnapshotValue
       public var _originIdentifier: ObjectIdentifier?
       public var _diffSnapshot: (any \(raw: moduleName)._DebugSnapshotObject)?
-      public init(\(raw: initParams)) {
+      \(raw: initAccessLevel.modifier) init(\(raw: initParams)) {
       self._snapshot = DebugSnapshotValue(\(raw: snapshotInitArguments))
       }
       public static func _debugSnapshot(\
@@ -473,7 +474,8 @@ private func inferredSnapshotPropertyLines(
   modelName: String
 ) -> [String] {
   properties.map { property in
-    let prefix = "@\(moduleName)._Snap public var \(property.name) = "
+    let prefix =
+      "@\(moduleName)._Snap \(property.snapshotAccessLevel.modifier) var \(property.name) = "
     switch property.kind {
     case .type(let type):
       if isOptionalType(type) {
@@ -497,6 +499,7 @@ private func snapshotPropertyLines(
   snapshotTypeName: String = "DebugSnapshot"
 ) -> [String] {
   properties.map { property in
+    let prefix = "\(property.snapshotAccessLevel.modifier) var \(property.name)"
     switch property.kind {
     case .type(let type):
       let typeDescription = type.trimmedDescription
@@ -504,14 +507,14 @@ private func snapshotPropertyLines(
         property.isDebugSnapshotConvertible
         ? snapshotTypeDescription(for: typeDescription, snapshotTypeName: snapshotTypeName)
         : typeDescription
-      return "public var \(property.name): \(snapshotType)"
+      return "\(prefix): \(snapshotType)"
     case .initializer(let defaultValue):
       let defaultValue = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
         .trimmedDescription
       if property.isDebugSnapshotConvertible {
-        return "public var \(property.name) = \(moduleName).snap(\(defaultValue))"
+        return "\(prefix) = \(moduleName).snap(\(defaultValue))"
       } else {
-        return "public var \(property.name) = \(defaultValue)"
+        return "\(prefix) = \(defaultValue)"
       }
     case .pair(let type, initializer: let defaultValue):
       let typeDescription = type.trimmedDescription
@@ -522,10 +525,10 @@ private func snapshotPropertyLines(
       let rewrittenDefault = rewriteDefaultValue(defaultValue, modelTypeName: modelName)
       if property.isDebugSnapshotConvertible {
         let snapshotDefault = convertibleSnapshotDefault(for: type, defaultValue: rewrittenDefault)
-        return "public var \(property.name): \(snapshotType) = \(snapshotDefault)"
+        return "\(prefix): \(snapshotType) = \(snapshotDefault)"
       } else {
         return """
-          public var \(property.name): \(typeDescription) = \(rewrittenDefault.trimmedDescription)
+          \(prefix): \(typeDescription) = \(rewrittenDefault.trimmedDescription)
           """
       }
     }
@@ -629,8 +632,15 @@ private func diagnoseMissingTypeAnnotation(
 private let memberTypesProtocolName = "_$DebugSnapshotTypes"
 private let memberWitnessName = "_$DebugSnapshotWitness"
 
-private func memberWitnessType(for propertyName: String) -> TypeSyntax {
-  "\(raw: memberWitnessName).\(raw: propertyName)"
+private func memberWitnessType(
+  for propertyName: String,
+  accessLevel: AccessLevel
+) -> TypeSyntax {
+  let container =
+    accessLevel == .public
+    ? memberWitnessName
+    : "\(memberWitnessName).\(accessLevel.witnessContainerName)"
+  return "\(raw: container).\(raw: propertyName)"
 }
 
 private func canUseMemberTypeWitness(
@@ -680,43 +690,78 @@ private func memberTypeWitnessDeclarations(
   for modelDecl: ModelDecl,
   declaration: some DeclGroupSyntax
 ) -> [DeclSyntax] {
-  let names = modelDecl.witnessedProperties
-  guard !names.isEmpty else { return [] }
+  guard !modelDecl.witnessedProperties.isEmpty else { return [] }
   let isolation = hasMainActorAnnotation(declaration) ? "@MainActor " : ""
-  let requirements =
-    names
-    .map {
-      """
-      associatedtype \($0)
-      static var \($0)Type: \($0).Type { get }
-      """
+  let propertiesByAccess = Dictionary(
+    grouping: modelDecl.witnessedProperties,
+    by: \.accessLevel
+  )
+  func requirements(for properties: [ModelDecl.WitnessedProperty]) -> String {
+    properties
+      .map {
+        """
+        associatedtype \($0.name)
+        static var \($0.name)Type: \($0.name).Type { get }
+        """
+      }
+      .joined(separator: "\n")
+  }
+  func witnesses(
+    for properties: [ModelDecl.WitnessedProperty],
+    accessLevel: AccessLevel
+  ) -> String {
+    properties
+      .map {
+        """
+        \(isolation)\(accessLevel.modifier) static let \($0.name)Type = \
+        \(moduleName)._memberType(\\\(modelDecl.name).\($0.name))
+        """
+      }
+      .joined(separator: "\n")
+  }
+
+  var declarations: [DeclSyntax] = []
+  let publicProperties = propertiesByAccess[.public]
+  if let publicProperties {
+    declarations.append(
+      DeclSyntax(
+        """
+        \(raw: isolation)public protocol \(raw: memberTypesProtocolName) {
+        \(raw: requirements(for: publicProperties))
+        }
+        """
+      )
+    )
+  }
+  let nestedWitnesses = AccessLevel.allCases.compactMap { accessLevel -> String? in
+    guard accessLevel != .public, let properties = propertiesByAccess[accessLevel] else {
+      return nil
     }
-    .joined(separator: "\n")
-  let witnesses =
-    names
-    .map {
-      """
-      \(isolation)public static let \($0)Type = \
-      \(moduleName)._memberType(\\\(modelDecl.name).\($0))
-      """
-    }
-    .joined(separator: "\n")
-  return [
-    DeclSyntax(
-      """
-      \(raw: isolation)public protocol \(raw: memberTypesProtocolName) {
-      \(raw: requirements)
+    return """
+      \(isolation)\(accessLevel.modifier) protocol \(accessLevel.witnessContainerName)Types {
+      \(requirements(for: properties))
+      }
+      \(accessLevel.modifier) enum \(accessLevel.witnessContainerName): \
+      \(accessLevel.witnessContainerName)Types {
+      \(witnesses(for: properties, accessLevel: accessLevel))
       }
       """
-    ),
+  }
+  let conformance = publicProperties == nil ? "" : ": \(memberTypesProtocolName)"
+  let publicWitnesses =
+    publicProperties.map {
+      witnesses(for: $0, accessLevel: .public) + (nestedWitnesses.isEmpty ? "" : "\n")
+    } ?? ""
+  declarations.append(
     DeclSyntax(
       """
-      public enum \(raw: memberWitnessName): \(raw: memberTypesProtocolName) {
-      \(raw: witnesses)
+      public enum \(raw: memberWitnessName)\(raw: conformance) {
+      \(raw: publicWitnesses)\(raw: nestedWitnesses.joined(separator: "\n"))
       }
       """
-    ),
-  ]
+    )
+  )
+  return declarations
 }
 
 private func inferredLiteralType(of expression: ExprSyntax) -> String? {
@@ -953,10 +998,16 @@ private func caseParameterLabelPrefix(_ parameter: EnumCaseParameterSyntax) -> S
 }
 
 private struct ModelDecl {
+  struct WitnessedProperty {
+    var name: String
+    var accessLevel: AccessLevel
+  }
+
   struct Property {
     var name: String
     var kind: Kind
     var isDebugSnapshotConvertible: Bool
+    var snapshotAccessLevel: AccessLevel
 
     enum Kind {
       case type(TypeSyntax)
@@ -979,7 +1030,7 @@ private struct ModelDecl {
 
   var name: String
   var kind: Kind
-  var witnessedProperties: [String] = []
+  var witnessedProperties: [WitnessedProperty] = []
 
   init?(
     declaration: some DeclGroupSyntax,
@@ -989,7 +1040,7 @@ private struct ModelDecl {
     if let classDecl = declaration.as(ClassDeclSyntax.self) {
       let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
       self.name = classDecl.name.text
-      var witnessedProperties: [String] = []
+      var witnessedProperties: [WitnessedProperty] = []
       self.kind = .classOrStruct(
         Self.storedProperties(
           from: declaration,
@@ -1007,7 +1058,7 @@ private struct ModelDecl {
     } else if let structDecl = declaration.as(StructDeclSyntax.self) {
       let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
       self.name = structDecl.name.text
-      var witnessedProperties: [String] = []
+      var witnessedProperties: [WitnessedProperty] = []
       self.kind = .classOrStruct(
         Self.storedProperties(
           from: declaration,
@@ -1051,7 +1102,7 @@ private struct ModelDecl {
     requiredAccess: AccessLevel,
     isClass: Bool,
     canUseWitness: Bool,
-    witnessedProperties: inout [String],
+    witnessedProperties: inout [WitnessedProperty],
     debugSnapshotAttribute: (DeclSyntax) -> DebugSnapshotAttribute?
   ) -> [ModelDecl.Property] {
     declaration.memberBlock.members.compactMap { member -> [ModelDecl.Property]? in
@@ -1076,6 +1127,12 @@ private struct ModelDecl {
           || isDebugSnapshotTracked
           || hasDebugSnapshotConvertibleAttribute
       else { return nil }
+
+      let propertyAccessLevel = accessControl(for: variable).effectiveAccessLevel
+      let snapshotAccessLevel =
+        propertyAccessLevel >= requiredAccess
+        ? AccessLevel.public
+        : max(propertyAccessLevel, .fileprivate)
 
       if variable.attributes.hasIgnoredPropertyWrapper,
         !isDebugSnapshotTracked,
@@ -1112,11 +1169,16 @@ private struct ModelDecl {
             diagnoseMissingTypeAnnotation(on: binding, in: context)
             return nil
           }
-          witnessedProperties.append(identifier)
+          witnessedProperties.append(
+            WitnessedProperty(name: identifier, accessLevel: snapshotAccessLevel)
+          )
           return ModelDecl.Property(
             name: identifier,
-            kind: .type(memberWitnessType(for: identifier)),
-            isDebugSnapshotConvertible: isDebugSnapshotConvertible
+            kind: .type(
+              memberWitnessType(for: identifier, accessLevel: snapshotAccessLevel)
+            ),
+            isDebugSnapshotConvertible: isDebugSnapshotConvertible,
+            snapshotAccessLevel: snapshotAccessLevel
           )
         case (nil, let defaultValue?):
           guard !isClosureInitializer(defaultValue)
@@ -1130,18 +1192,28 @@ private struct ModelDecl {
               diagnoseMissingTypeAnnotation(on: binding, in: context)
               return nil
             }
-            witnessedProperties.append(identifier)
+            witnessedProperties.append(
+              WitnessedProperty(name: identifier, accessLevel: snapshotAccessLevel)
+            )
             return ModelDecl.Property(
               name: identifier,
-              kind: .pair(type: memberWitnessType(for: identifier), initializer: defaultValue),
-              isDebugSnapshotConvertible: isDebugSnapshotConvertible
+              kind: .pair(
+                type: memberWitnessType(
+                  for: identifier,
+                  accessLevel: snapshotAccessLevel
+                ),
+                initializer: defaultValue
+              ),
+              isDebugSnapshotConvertible: isDebugSnapshotConvertible,
+              snapshotAccessLevel: snapshotAccessLevel
             )
           }
 
           return ModelDecl.Property(
             name: identifier,
             kind: .initializer(defaultValue),
-            isDebugSnapshotConvertible: isDebugSnapshotConvertible
+            isDebugSnapshotConvertible: isDebugSnapshotConvertible,
+            snapshotAccessLevel: snapshotAccessLevel
           )
         case (let typeAnnotation?, nil):
           guard !isClosureType(typeAnnotation)
@@ -1150,7 +1222,8 @@ private struct ModelDecl {
           return ModelDecl.Property(
             name: identifier,
             kind: .type(typeAnnotation),
-            isDebugSnapshotConvertible: isDebugSnapshotConvertible
+            isDebugSnapshotConvertible: isDebugSnapshotConvertible,
+            snapshotAccessLevel: snapshotAccessLevel
           )
         case (let typeAnnotation?, let defaultValue?):
           guard
@@ -1164,7 +1237,8 @@ private struct ModelDecl {
               type: typeAnnotation,
               initializer: defaultValue
             ),
-            isDebugSnapshotConvertible: isDebugSnapshotConvertible
+            isDebugSnapshotConvertible: isDebugSnapshotConvertible,
+            snapshotAccessLevel: snapshotAccessLevel
           )
         }
       }
@@ -1326,7 +1400,7 @@ private func isClosureInitializer(_ initializer: ExprSyntax) -> Bool {
   initializer.as(ClosureExprSyntax.self) != nil
 }
 
-private enum AccessLevel: Int, Comparable {
+private enum AccessLevel: Int, CaseIterable, Comparable {
   case `private`
   case `fileprivate`
   case `internal`
@@ -1335,6 +1409,26 @@ private enum AccessLevel: Int, Comparable {
 
   static func < (lhs: Self, rhs: Self) -> Bool {
     lhs.rawValue < rhs.rawValue
+  }
+
+  var modifier: String {
+    switch self {
+    case .private: "private"
+    case .fileprivate: "fileprivate"
+    case .internal: "internal"
+    case .package: "package"
+    case .public: "public"
+    }
+  }
+
+  var witnessContainerName: String {
+    switch self {
+    case .private: "Private"
+    case .fileprivate: "Fileprivate"
+    case .internal: "Internal"
+    case .package: "Package"
+    case .public: "Public"
+    }
   }
 }
 

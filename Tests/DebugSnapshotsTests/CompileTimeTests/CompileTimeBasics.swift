@@ -1,4 +1,4 @@
-import DebugSnapshots
+public import DebugSnapshots
 
 #if canImport(Observation)
   import Observation
@@ -7,6 +7,25 @@ import DebugSnapshots
 private class Model {
   var count = 0
   var isLoading = false
+}
+
+struct InternalValue {}
+
+@DebugSnapshot public struct PublicTrackedStruct {
+  @DebugSnapshotTracked var value = InternalValue()
+  @DebugSnapshotTracked private var count = 0
+}
+
+@DebugSnapshot public final class PublicTrackedClass {
+  @DebugSnapshotTracked var value = InternalValue()
+  @DebugSnapshotTracked private var count = 0
+}
+
+private func trackedSnapshotsCompile() {
+  let structure = snap(PublicTrackedStruct())
+  _ = structure.value
+  let object = snap(PublicTrackedClass())
+  _ = object.value
 }
 
 @DebugSnapshot private class Parent {
