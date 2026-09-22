@@ -54,8 +54,8 @@ public struct DebugSnapshotOptions: Sendable {
 /// ```
 ///
 /// > Note: The corresponding debug snapshot property preserves the tracked property's access level,
-/// > so an internal property remains available to `@testable` imports without becoming public API,
-/// > and a private property will participate in change logging.
+/// > so an internal property remains available to `@testable` imports, and a private property
+/// > participates in change logging.
 @attached(peer)
 public macro DebugSnapshotTracked() =
   #externalMacro(module: "DebugSnapshotsMacros", type: "DebugSnapshotTrackedMacro")
