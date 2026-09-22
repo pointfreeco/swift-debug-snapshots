@@ -183,14 +183,14 @@
           }
 
           public struct DebugSnapshotValue {
-            public var count: Int
+            fileprivate var count: Int
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(count: Int) {
+            fileprivate init(count: Int) {
               self._snapshot = DebugSnapshotValue(count: count)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -848,14 +848,14 @@
           }
 
           public struct DebugSnapshotValue {
-            public var child: Child.DebugSnapshot
+            fileprivate var child: Child.DebugSnapshot
           }
 
           public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
             public var _snapshot: DebugSnapshotValue
             public var _originIdentifier: ObjectIdentifier?
             public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
-            public init(child: Child.DebugSnapshot) {
+            fileprivate init(child: Child.DebugSnapshot) {
               self._snapshot = DebugSnapshotValue(child: child)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
@@ -3354,6 +3354,8 @@
         public struct Foo {
           public var bar = ""
           var baz = 0
+          @DebugSnapshotTracked
+          var qux = 1
         }
         """
       } expansion: {
@@ -3363,15 +3365,19 @@
           public var bar = ""
           @DebugSnapshotIgnored
           var baz = 0
+          @DebugSnapshotTracked
+          var qux = 1
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
             @DebugSnapshots._Snap public var bar = DebugSnapshots._snapshotDefault("")
+            @DebugSnapshots._Snap internal var qux = DebugSnapshots._snapshotDefault(1)
             public var customMirror: Mirror {
-              Mirror(self, children: ["bar": bar as Any], displayStyle: .struct)
+              Mirror(self, children: ["bar": bar as Any, "qux": qux as Any], displayStyle: .struct)
             }
             public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
               var snapshot = value
               snapshot.bar = DebugSnapshots._debugSnapshot(value.bar, visitor: &visitor)
+              snapshot.qux = DebugSnapshots._debugSnapshot(value.qux, visitor: &visitor)
               return snapshot
             }
           }
@@ -3379,6 +3385,7 @@
           public static func _debugSnapshot(_ value: Foo, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
             var snapshot = DebugSnapshot()
             snapshot.bar = DebugSnapshots._debugSnapshot(value.bar, visitor: &visitor)
+            snapshot.qux = DebugSnapshots._debugSnapshot(value.qux, visitor: &visitor)
             return snapshot
           }
         }
@@ -3386,6 +3393,72 @@
         extension Foo: DebugSnapshots.DebugSnapshotConvertible {
         }
         """
+      }
+    }
+
+    @Test func internalTrackedPropertyUsesInternalTypeWitness() {
+      assertMacro {
+        """
+        @DebugSnapshot
+        public final class Foo {
+          @DebugSnapshotTracked
+          var bar = Bar()
+        }
+        """
+      } expansion: {
+        #"""
+        public final class Foo {
+          @DebugSnapshotTracked
+          var bar = Bar()
+
+          public struct DebugSnapshotValue {
+            internal var bar: _$DebugSnapshotWitness.Internal.bar = Bar()
+          }
+
+          public final class DebugSnapshot: DebugSnapshots._DebugSnapshotObject, DebugSnapshots.DebugSnapshotConvertible {
+            public var _snapshot: DebugSnapshotValue
+            public var _originIdentifier: ObjectIdentifier?
+            public var _diffSnapshot: (any DebugSnapshots._DebugSnapshotObject)?
+            internal init(bar: _$DebugSnapshotWitness.Internal.bar = Bar()) {
+              self._snapshot = DebugSnapshotValue(bar: bar)
+            }
+            public static func _debugSnapshot(_ value: DebugSnapshot, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+              if let existing: DebugSnapshot = visitor.lookup(value) {
+                return existing
+              }
+              let snapshot = DebugSnapshot(bar: value.bar)
+              snapshot._originIdentifier = value._originIdentifier
+              visitor.register(value, snapshot: snapshot)
+              return snapshot
+            }
+          }
+
+          public static func _debugSnapshot(_ value: Foo, visitor: inout DebugSnapshots._DebugSnapshotVisitor) -> DebugSnapshot {
+            if let existing: DebugSnapshot = visitor.lookup(value) {
+              return existing
+            }
+            let snapshot = DebugSnapshot(bar: value.bar)
+            snapshot._originIdentifier = ObjectIdentifier(value)
+            visitor.register(value, snapshot: snapshot)
+            return snapshot
+          }
+
+          public enum _$DebugSnapshotWitness {
+            internal protocol InternalTypes {
+              associatedtype bar
+              static var barType: bar.Type {
+                get
+              }
+            }
+            internal enum Internal: InternalTypes {
+              internal static let barType = DebugSnapshots._memberType(\Foo.bar)
+            }
+          }
+        }
+
+        extension Foo: DebugSnapshots.DebugSnapshotConvertible {
+        }
+        """#
       }
     }
   }
