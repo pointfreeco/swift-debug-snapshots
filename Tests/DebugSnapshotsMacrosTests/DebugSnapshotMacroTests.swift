@@ -964,7 +964,7 @@
           var count: Int
 
           public struct DebugSnapshot: Sendable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
-            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType(Int.self)
+            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType((Int).self)
             public var customMirror: Mirror {
               Mirror(self, children: ["count": count as Any], displayStyle: .struct)
             }
@@ -1059,8 +1059,8 @@
           var count: Int
 
           public struct DebugSnapshot: Identifiable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
-            @DebugSnapshots._Snap public var id = DebugSnapshots._snapshotType(UUID.self)
-            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType(Int.self)
+            @DebugSnapshots._Snap public var id = DebugSnapshots._snapshotType((UUID).self)
+            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType((Int).self)
             public var customMirror: Mirror {
               Mirror(self, children: ["id": id as Any, "count": count as Any], displayStyle: .struct)
             }
@@ -1103,7 +1103,7 @@
           var count: Int
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
-            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType(Int.self)
+            @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotType((Int).self)
             public var customMirror: Mirror {
               Mirror(self, children: ["count": count as Any], displayStyle: .struct)
             }
@@ -2331,7 +2331,7 @@
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
-            @DebugSnapshots._Snap public var child = DebugSnapshots._snapshotType(Child.self)
+            @DebugSnapshots._Snap public var child = DebugSnapshots._snapshotType((Child).self)
             @DebugSnapshots._Snap public var count = DebugSnapshots._snapshotDefault(0 as Int)
             public var customMirror: Mirror {
               Mirror(self, children: ["child": child as Any, "count": count as Any], displayStyle: .struct)
@@ -2634,7 +2634,7 @@
           @DebugSnapshotTracked var reminders
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
-            @DebugSnapshots._Snap public var reminders = DebugSnapshots._snapshotType(_$DebugSnapshotWitness.reminders.self)
+            @DebugSnapshots._Snap public var reminders = DebugSnapshots._snapshotType((_$DebugSnapshotWitness.reminders).self)
             public var customMirror: Mirror {
               Mirror(self, children: ["reminders": reminders as Any], displayStyle: .struct)
             }

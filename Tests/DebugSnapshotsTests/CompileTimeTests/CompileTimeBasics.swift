@@ -76,3 +76,9 @@ final class CustomGlobalActor {
   var count = 0
   func increment() { count += 1 }
 }
+
+@DebugSnapshot
+struct `Class with existentials` {
+  var error: any Error
+  var optionalError: any Error?
+}
