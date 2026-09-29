@@ -80,5 +80,7 @@ final class CustomGlobalActor {
 @DebugSnapshot
 struct `Class with existentials` {
   var error: any Error
-  var optionalError: any Error?
+  #if compiler(>=6.4)
+    var optionalError: any Error?
+  #endif
 }
