@@ -1,6 +1,15 @@
 {
-  "originHash" : "0f63a8a1e1fdd894795a21f5cced1ce487424aaae33c3bd588c286092117bba5",
+  "originHash" : "bc2ba38265984d5ed18512ef79bbb931999be91d525627a2952d835aeba1df12",
   "pins" : [
+    {
+      "identity" : "swift-compilation-testing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-compilation-testing",
+      "state" : {
+        "branch" : "simplification",
+        "revision" : "14aa44cdb7e25b5d88f879052ddd32bf09ee9d5b"
+      }
+    },
     {
       "identity" : "swift-custom-dump",
       "kind" : "remoteSourceControl",
@@ -56,12 +65,30 @@
       }
     },
     {
+      "identity" : "swift-subprocess",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-subprocess",
+      "state" : {
+        "revision" : "b3937ab85dd32f6e9435914599c1519074769c1a",
+        "version" : "1.0.0"
+      }
+    },
+    {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-syntax",
       "state" : {
         "revision" : "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
         "version" : "603.0.2"
+      }
+    },
+    {
+      "identity" : "swift-system",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-system",
+      "state" : {
+        "revision" : "869129b7bf4ecc57b97d0193ad29690ca2134750",
+        "version" : "1.8.1"
       }
     }
   ],

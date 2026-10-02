@@ -35,6 +35,7 @@ let package = Package(
     ),
     .package(url: "https://github.com/pointfreeco/swift-issue-reporting", from: "2.1.0"),
     .package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.1.0"),
+    .package(url: "https://github.com/pointfreeco/swift-compilation-testing", branch: "simplification"),
     .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
     .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0"..<"605.0.0"),
   ],
@@ -75,6 +76,14 @@ let package = Package(
         "DebugSnapshots",
         "DebugSnapshotsMacrosSupport",
         .product(name: "IssueReportingTestSupport", package: "swift-issue-reporting"),
+      ]
+    ),
+    .testTarget(
+      name: "DebugSnapshotsCompilationTests",
+      dependencies: [
+        "DebugSnapshots",
+        "DebugSnapshotsMacros",
+        .product(name: "CompilationTesting", package: "swift-compilation-testing")
       ]
     ),
     .testTarget(
