@@ -1,5 +1,5 @@
 {
-  "originHash" : "bc2ba38265984d5ed18512ef79bbb931999be91d525627a2952d835aeba1df12",
+  "originHash" : "7ed30f08f02f79761b5ebb6f68772dcda623e2a8b042cf69152730175cb3f487",
   "pins" : [
     {
       "identity" : "swift-compilation-testing",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/pointfreeco/swift-compilation-testing",
       "state" : {
         "branch" : "simplification",
-        "revision" : "14aa44cdb7e25b5d88f879052ddd32bf09ee9d5b"
+        "revision" : "243aa9924775ce3f432ff362a1f756d510ffa25d"
       }
     },
     {
