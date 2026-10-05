@@ -481,7 +481,7 @@ private func inferredSnapshotPropertyLines(
       if isOptionalType(type) {
         return prefix + "\(moduleName)._snapshotDefault(nil as \(type.trimmedDescription))"
       } else {
-        return prefix + "\(moduleName)._snapshotType(\(type.trimmedDescription).self)"
+        return prefix + "\(moduleName)._snapshotType((\(type.trimmedDescription)).self)"
       }
     case .initializer(let defaultValue):
       let value = rewriteDefaultValue(defaultValue, modelTypeName: modelName).trimmedDescription
