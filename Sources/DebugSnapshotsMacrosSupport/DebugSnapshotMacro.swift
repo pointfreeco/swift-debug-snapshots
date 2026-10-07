@@ -583,9 +583,7 @@ private func classInitParamTypeAndDefault(
 
 private func convertibleCheckAttribute(for type: TypeSyntax) -> AttributeSyntax {
   let type = type.trimmed
-  let needsParentheses =
-    type.is(SomeOrAnyTypeSyntax.self) || type.is(CompositionTypeSyntax.self)
-  let metatype = needsParentheses ? "(\(type)).self" : "\(type).self"
+  let metatype = "(\(type)).self"
   return "@\(raw: moduleName).DebugSnapshotCheck(\(raw: metatype))"
 }
 
