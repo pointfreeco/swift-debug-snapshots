@@ -34,7 +34,7 @@
         final class FeatureModel {
           @DebugSnapshotIgnored
           private var count: Int
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(String.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((String).self)
           var title: String
           @DebugSnapshotIgnored
           var onChange: (Int) -> Void
@@ -109,7 +109,7 @@
           var doubledCount: Int {
             count * 2
           }
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           init(count: Int) {
@@ -238,7 +238,7 @@
       } expansion: {
         """
         final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
           @DebugSnapshotIgnored
           var _cache: Int
@@ -304,7 +304,7 @@
         """
         @MainActor
         final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           init(count: Int) {
@@ -365,7 +365,7 @@
       } expansion: {
         """
         final class FeatureModel: DebugSnapshotConvertible {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           init(count: Int) {
@@ -425,7 +425,7 @@
         """
         @MainActor
         final class FeatureModel: @MainActor DebugSnapshotConvertible {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           init(count: Int) {
@@ -535,7 +535,7 @@
       } expansion: {
         """
         private final class FeatureModel {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           init(count: Int) {
@@ -599,7 +599,7 @@
         """
         private struct Parent {
           final class FeatureModel {
-            @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+            @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
             var count: Int
 
             init(count: Int) {
@@ -717,7 +717,7 @@
         """
         final class FeatureModel {
           @DebugSnapshotConvertible var child: Child
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           init(child: Child, count: Int) {
@@ -903,7 +903,7 @@
       } expansion: {
         """
         final class FeatureModel: Hashable, Sendable {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           init(count: Int) {
@@ -960,7 +960,7 @@
       } expansion: {
         """
         struct FeatureModel: Sendable {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           public struct DebugSnapshot: Sendable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -999,7 +999,7 @@
       } expansion: {
         """
         final class FeatureModel: @unchecked Sendable {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           public struct DebugSnapshotValue: @unchecked Sendable {
@@ -1053,9 +1053,9 @@
       } expansion: {
         """
         struct FeatureModel: Identifiable {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(UUID.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((UUID).self)
           var id: UUID
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           public struct DebugSnapshot: Identifiable, CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -1099,7 +1099,7 @@
         """
         struct FeatureModel: Identifiable {
           @DebugSnapshotIgnored var id: UUID
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2283,7 +2283,7 @@
         """
         struct State {
           @DebugSnapshotConvertible var nested: State?
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2327,7 +2327,7 @@
         """
         struct State {
           @DebugSnapshotConvertible var child: Child
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Int.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Int).self)
           var count: Int = 0
 
           public struct DebugSnapshot: CustomReflectable, DebugSnapshots.DebugSnapshotConvertible {
@@ -2430,7 +2430,7 @@
       } expansion: {
         """
         final class State {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(Child?.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((Child?).self)
           var child: Child?
 
           public struct DebugSnapshotValue {
@@ -2837,7 +2837,7 @@
       } expansion: {
         """
         final class FeatureModel<Value> {
-          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(<#Type#>.self)
+          @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((<#Type#>).self)
           var count: <#Type#> = Count()
 
           public struct DebugSnapshotValue {
@@ -2914,7 +2914,7 @@
         """
         enum Container<Value> {
           final class FeatureModel<Value> {
-            @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck(<#Type#>.self)
+            @DebugSnapshotTracked @DebugSnapshots.DebugSnapshotCheck((<#Type#>).self)
             var count: <#Type#> = Count()
 
             public struct DebugSnapshotValue {
